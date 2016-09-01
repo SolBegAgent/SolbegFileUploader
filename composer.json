@@ -21,7 +21,7 @@
         "illuminate/support": "5.2.*|5.3.*",
         "illuminate/validation": "5.2.*|5.3.*",
         "paragonie/random_compat": ">=1.0",
-        "symfony/http-foundation": "2.8.*|3.0.*",
+        "symfony/http-foundation": "2.8.*|3.0.*|3.1.*",
         "intervention/image": "2.3.*"
     },
     "autoload": {
