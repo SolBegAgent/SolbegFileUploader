@@ -127,7 +127,7 @@ class FilesCleaner
      */
     protected function remove($path)
     {
-        if (!$this->disk()->delete($path)) {
+        if (!$this->disk->delete($path)) {
             throw new FileSystemException("Cannot delete file by path: '$path'.");
         }
         $this->processedDirs[FileHelper::dirname($path)] = true;

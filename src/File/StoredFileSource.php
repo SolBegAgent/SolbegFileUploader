@@ -128,12 +128,4 @@ class StoredFileSource implements Contracts\StoredFileSource
     {
         return $this->storage->fileFormats($this->relativePath());
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function isStored()
-    {
-        return $this->storage === $this->storage->context()->storage(false);
-    }
 }

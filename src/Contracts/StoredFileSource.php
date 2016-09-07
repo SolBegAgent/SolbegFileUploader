@@ -5,7 +5,7 @@ namespace Bicycle\FilesManager\Contracts;
 interface StoredFileSource extends FileSource
 {
     /**
-     * @return boolean
+     * @return Storage
      */
-    public function isStored();
+    public function getStorage();
 }

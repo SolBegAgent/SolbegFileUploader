@@ -4,7 +4,7 @@ namespace Bicycle\FilesManager\File;
 
 use Bicycle\FilesManager\Contracts\Context as ContextInterface;
 use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
-use Bicycle\FilesManager\Contracts\StoredFileSource as StoredFileSourceInterface;
+use Bicycle\FilesManager\Contracts\StoredFileSource as StoredFileInterface;
 
 /**
  * File objects that will be instantiated for each file attribute.
@@ -148,7 +148,7 @@ class File implements FileSourceInterface
     {
         $source = $this->source;
         $storage = $this->context->storage(false);
-        if ($source instanceof StoredFileSourceInterface && $source->isStored()) {
+        if ($source instanceof StoredFileInterface && $source->getStorage() === $storage) {
             return;
         }
 
@@ -156,7 +156,7 @@ class File implements FileSourceInterface
 
         if ($deleteOld) {
             foreach ($this->oldSources as $oldSource) {
-                if ($oldSource instanceof StoredFileSourceInterface && $source->isStored()) {
+                if ($oldSource instanceof StoredFileInterface && $oldSource->getStorage() === $storage) {
                     $oldSource->delete();
                 }
             }
