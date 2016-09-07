@@ -7,20 +7,12 @@ interface FormatterFactory
     /**
      * Creates formatter.
      * 
-     * @param ContextInterface $context
+     * @param Context $context
      * @param string $name
      * @param mixed $config
      * @return Formatter
      */
-    public function build(ContextInterface $context, $name, $config);
-
-    /**
-     * Parses the name of format and creates formatter.
-     * 
-     * @param string $name the name of format
-     * @return Formatter|null created formatter or null if name cannot be parsed.
-     */
-    public function parseFromName($name);
+    public function build(Context $context, $name, $config);
 
     /**
      * Adds new alias for any formatter class.
@@ -29,4 +21,11 @@ interface FormatterFactory
      * @param string $class
      */
     public function alias($alias, $class);
+
+    /**
+     * @param Context $context
+     * @param string $name
+     * @return Formatter|null
+     */
+    public function parse(Context $context, $name);
 }

@@ -80,9 +80,10 @@ trait ModelFilesTrait
         if (!isset($this->filesInstances[$attribute])) {
             $context = $this->getFileAttributeContext($attribute);
             $data = $this->getAttributeValue($attribute);
+            $storage = $context->storage(false);
             $source = $data
-                ? $context->getSourceFactory()->storedFile($data, false)
-                : $context->getSourceFactory()->emptyFile();
+                ? $context->getSourceFactory()->storedFile($data, $storage)
+                : $context->getSourceFactory()->emptyFile($storage);
             $this->filesInstances[$attribute] = $this->createFileAttributeInstance($context, $source);
         }
         return $this->filesInstances[$attribute];
@@ -201,8 +202,9 @@ trait ModelFilesTrait
 
     /**
      * Deletes all files for all defined file attributes.
+     * @param array $options
      */
-    public function deleteFileAttributes()
+    public function deleteFileAttributes(array $options = [])
     {
         if (!$this->deleteOldFiles) {
             return;
@@ -210,7 +212,7 @@ trait ModelFilesTrait
 
         $this->initFilesAttributesConfig();
         foreach (array_keys($this->filesAttributesConfig) as $attribute) {
-            $this->getFileAttributeValue($attribute)->delete();
+            $this->getFileAttributeValue($attribute)->delete($options);
         }
     }
 }

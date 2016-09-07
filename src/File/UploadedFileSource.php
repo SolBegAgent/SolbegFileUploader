@@ -5,8 +5,6 @@ namespace Bicycle\FilesManager\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 use Bicycle\FilesManager\Contracts\FileSource;
-use Bicycle\FilesManager\Exceptions\NotSupportedException;
-use Bicycle\FilesManager\Helpers\File as FileHelper;
 
 /**
  * UploadedFileSource
@@ -28,38 +26,24 @@ class UploadedFileSource extends SplFileSource implements FileSource
     /**
      * @inheritdoc
      */
-    public function exists($format = null)
+    protected function originExists()
     {
-        return $format === null ? $this->getFile()->getError() == UPLOAD_ERR_OK : false;
+        return $this->getFile()->isValid();
     }
 
     /**
      * @inheritdoc
-     * @throws NotSupportedException if `$format` is not null.
      */
-    public function name($format = null)
+    protected function originName()
     {
-        $this->assertFormatIsNull($format);
         return $this->getFile()->getClientOriginalName();
     }
 
     /**
      * @inheritdoc
-     * @throws NotSupportedException if `$format` is not null.
      */
-    public function extension($format = null)
+    protected function originExtension()
     {
-        $this->assertFormatIsNull($format);
         return $this->getFile()->guessExtension();
-    }
-
-    /**
-     * @inheritdoc
-     * @throws NotSupportedException if `$format` is not null.
-     */
-    public function basename($format = null)
-    {
-        $this->assertFormatIsNull($format);
-        return FileHelper::basename($this->name());
     }
 }

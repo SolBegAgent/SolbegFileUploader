@@ -14,13 +14,13 @@ interface FileSource
     public function exists($format = null);
 
     /**
-     * Returns path that may be used to read file content, e.g. by `file_get_contents()` function.
+     * Returns file contents.
      * 
      * @param string|null $format the name of formatted version of the file.
      * Null means original version.
      * @return string
      */
-    public function readPath($format = null);
+    public function contents($format = null);
 
     /**
      * Returns relative path to the original file. This path will be stored in database.
@@ -85,6 +85,16 @@ interface FileSource
 
     /**
      * Deletes this file.
+     * 
+     * @param string|null $format the name of formatted version of the file.
+     * Null means original version.
      */
-    public function delete();
+    public function delete($format = null);
+
+    /**
+     * Returns format names of all existing formated versions of files.
+     * 
+     * @return string[] format names.
+     */
+    public function formats();
 }

@@ -5,7 +5,7 @@ namespace Bicycle\FilesManager\File;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
 use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
-use Bicycle\FilesManager\Helpers\File as FileHelper;
+use Bicycle\FilesManager\Exceptions\FileSystemException;
 
 /**
  * SplFileSource
@@ -14,6 +14,8 @@ use Bicycle\FilesManager\Helpers\File as FileHelper;
  */
 class SplFileSource implements FileSourceInterface
 {
+    use Traits\NotSupported, Traits\WithoutFormatting, Traits\WithoutRelativePath;
+
     /**
      * @var \SplFileInfo
      */
@@ -38,122 +40,68 @@ class SplFileSource implements FileSourceInterface
     /**
      * @inheritdoc
      */
-    public function exists($format = null)
+    protected function originExists()
     {
-        return $format === null ? $this->getFile()->isFile() : false;
+        return (bool) $this->getFile()->isFile();
     }
 
     /**
      * @inheritdoc
-     * @throws NotSupportedException if `$format` is not null.
+     * @throws FileSystemException
      */
-    public function readPath($format = null)
+    protected function originContents()
     {
-        $this->assertFormatIsNull($format);
-        return $this->getFile()->getPathname();
+        $path = $this->getFile()->getPathname();
+        $result = @file_get_contents($path);
+        if ($result === false || $result === null) {
+            throw new FileSystemException("Cannot read file '$path'.");
+        }
+        return $result;
     }
 
     /**
      * @inheritdoc
-     * @throws NotSupportedException always
+     * @throws \Bicycle\FilesManager\Exceptions\NotSupportedException always
      */
-    public function relativePath()
+    protected function originUrl()
     {
-        throw $this->createNotSupportedException('{class} does not support direct storing in database. You need save it before that.');
-    }
-
-    /**
-     * @inheritdoc
-     * @throws NotSupportedException always
-     */
-    public function url($format = null)
-    {
-        $this->assertFormatIsNull($format);
         throw $this->createNotSupportedException('{class} does not support access by HTTP.');
     }
 
     /**
      * @inheritdoc
-     * @throws NotSupportedException if `$format` is not null.
      */
-    public function name($format = null)
+    protected function originName()
     {
-        $this->assertFormatIsNull($format);
         return $this->getFile()->getFilename();
     }
 
     /**
      * @inheritdoc
-     * @throws NotSupportedException if `$format` is not null.
      */
-    public function extension($format = null)
+    protected function originMimeType()
     {
-        $this->assertFormatIsNull($format);
-        return $this->getFile()->getExtension();
-    }
-
-    /**
-     * @inheritdoc
-     * @throws NotSupportedException if `$format` is not null.
-     */
-    public function basename($format = null)
-    {
-        $this->assertFormatIsNull($format);
-        return $this->getFile()->getBasename();
-    }
-
-    /**
-     * @inheritdoc
-     * @throws NotSupportedException if `$format` is not null.
-     */
-    public function mimeType($format = null)
-    {
-        $this->assertFormatIsNull($format);
         $file = $this->getFile();
-
         if (!$file instanceof SymfonyFile) {
             $file = new SymfonyFile($file->getPathname());
         }
-        return $file->getMimeType() ?: 'application/octet-stream';
+        return $file->getMimeType() ?: null;
     }
 
     /**
      * @inheritdoc
-     * @throws NotSupportedException if `$format` is not null.
      */
-    public function size($format = null)
+    protected function originSize()
     {
-        $this->assertFormatIsNull($format);
         return (int) $this->getFile()->getSize();
     }
 
     /**
-     * @param string|null $format
-     * @throws NotSupportedException
-     */
-    protected function assertFormatIsNull($format)
-    {
-        if ($format !== null) {
-            throw $this->createNotSupportedException('{class} does not support file formatting.');
-        }
-    }
-
-    /**
-     * @param string $message
-     * @return NotSupportedException
-     */
-    protected function createNotSupportedException($message)
-    {
-        return new NotSupportedException(strtr($message, [
-            '{class}' => FileHelper::basename(static::class),
-        ]));
-    }
-
-    /**
      * @inheritdoc
      */
-    public function delete()
+    protected function deleteOrigin()
     {
-        @unlink($this->getFile()->getPathname());
+        $path = $this->getFile()->getPathname();
+        @unlink($path);
     }
 }

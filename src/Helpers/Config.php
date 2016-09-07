@@ -2,6 +2,8 @@
 
 namespace Bicycle\FilesManager\Helpers;
 
+use Illuminate\Contracts\Support\Arrayable;
+
 /**
  * Array helper provides some helpful methods for internal usage in this package.
  *
@@ -28,6 +30,8 @@ class Config
                     }
                 } elseif (is_array($value) && isset($config[$key]) && is_array($config[$key])) {
                     $config[$key] = static::merge($config[$key], $value);
+                } elseif ($value instanceof Arrayable) {
+                    $config[$key] = $value->toArray();
                 } else {
                     $config[$key] = $value;
                 }

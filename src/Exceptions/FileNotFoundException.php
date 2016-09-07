@@ -2,14 +2,15 @@
 
 namespace Bicycle\FilesManager\Exceptions;
 
-use Bicycle\FilesManager\Contracts\Context;
+use Bicycle\FilesManager\Contracts\Storage;
+use Bicycle\FilesManager\Contracts\FileNotFoundException as ExceptionInterface;
 
-class FileNotFoundException extends FileSystemException
+class FileNotFoundException extends FileSystemException implements ExceptionInterface
 {
     /**
-     * @var Context
+     * @var Storage
      */
-    private $context;
+    private $storage;
 
     /**
      * @var string
@@ -17,23 +18,21 @@ class FileNotFoundException extends FileSystemException
     private $relativePath;
 
     /**
-     * @var boolean
+     * @var boolean|null
      */
-    private $isTemporary = false;
+    private $isOriginFileExists = null;
 
     /**
-     * @param Context $context
+     * @param Storage $storage
      * @param string $relativePath
-     * @param boolean $temp
      * @param string|null $message
      * @param integer $code
      * @param \Exception $previous
      */
-    public function __construct(Context $context, $relativePath, $temp = false, $message = null, $code = 0, \Exception $previous = null)
+    public function __construct(Storage $storage, $relativePath, $message = null, $code = 0, \Exception $previous = null)
     {
-        $this->context = $context;
+        $this->storage = $storage;
         $this->relativePath = $relativePath;
-        $this->isTemporary = (bool) $temp;
 
         if ($message === null || $message === '') {
             $message = $this->generateMessage();
@@ -47,20 +46,23 @@ class FileNotFoundException extends FileSystemException
      */
     protected function generateMessage()
     {
-        $label = $this->isTemporary ? 'Temporary file' : 'File';
-        return "$label with relative path '$this->relativePath' does not exist in '{$this->context->getName()}' context.";
+        return implode(' ', [
+            "File with relative path '$this->relativePath' does not exist",
+            "on the '{$this->storage->name()}' storage",
+            "of the '{$this->storage->context()->getName()}' context.",
+        ]);
     }
 
     /**
-     * @return Context
+     * @inheritdoc
      */
-    public function getContext()
+    public function getStorage()
     {
-        return $this->context;
+        return $this->storage;
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     public function getRelativePath()
     {
@@ -68,10 +70,30 @@ class FileNotFoundException extends FileSystemException
     }
 
     /**
-     * @return boolean
+     * @inheritdoc
+     * @return null
      */
-    public function isTemporaryFile()
+    public function getFormat()
     {
-        return $this->isTemporary;
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isOriginFileExists($recheck = false)
+    {
+        if ($recheck || $this->isOriginFileExists === null) {
+            $this->isOriginFileExists = (bool) $this->getStorage()->fileExists($this->getRelativePath(), null);
+        }
+        return $this->isOriginFileExists;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isRequestedFileExists($recheck = false)
+    {
+        return $this->isOriginFileExists($recheck);
     }
 }

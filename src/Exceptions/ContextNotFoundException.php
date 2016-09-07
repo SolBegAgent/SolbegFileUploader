@@ -2,14 +2,12 @@
 
 namespace Bicycle\FilesManager\Exceptions;
 
-use Bicycle\FilesManager\Manager;
-
 class ContextNotFoundException extends \Exception
 {
     /**
      * @var string
      */
-    protected $contextName;
+    private $contextName;
 
     /**
      * @param string $contextName
@@ -42,7 +40,7 @@ class ContextNotFoundException extends \Exception
         $contextName = $this->getContextName();
         return implode(' ', [
             "File context '$contextName' was not found.",
-            "You should add `$contextName.php` file in your `app/config/filecontexts/` directory."
+            "You should add `$contextName.php` file in your `app/config/filecontexts/` directory.",
         ]);
     }
 }

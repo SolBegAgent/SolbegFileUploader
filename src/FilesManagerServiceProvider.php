@@ -57,7 +57,14 @@ class FilesManagerServiceProvider extends ServiceProvider
         $this->app->alias('filesmanager', Manager::class);
     }
 
-    
+    /**
+     * Registers middleware that stores uploaded files in session.
+     */
+    protected function registerMiddleware()
+    {
+        $this->app->singleton(StoreUploadedFilesMiddleware::class);
+        $this->app->alias(StoreUploadedFilesMiddleware::class, 'filesmanager.middleware');
+    }
 
     /**
      * Registers handlers for file not found events.
@@ -78,22 +85,5 @@ class FilesManagerServiceProvider extends ServiceProvider
                 $validator->setAutoAssoc($this->autoSaveUploadsToSession);
             });
         }
-    }
-
-    /**
-     * @return string
-     */
-    protected function validatorClassName()
-    {
-        return ;
-    }
-
-    /**
-     * Registers middleware that stores uploaded files in session.
-     */
-    protected function registerMiddleware()
-    {
-        $this->app->singleton(StoreUploadedFilesMiddleware::class);
-        $this->app->alias('filesmanager.middleware', StoreUploadedFilesMiddleware::class);
     }
 }

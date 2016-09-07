@@ -4,6 +4,7 @@ namespace Bicycle\FilesManager\File;
 
 use Bicycle\FilesManager\Contracts\Context as ContextInterface;
 use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
+use Bicycle\FilesManager\Contracts\StoredFileSource as StoredFileSourceInterface;
 
 /**
  * File objects that will be instantiated for each file attribute.
@@ -43,7 +44,9 @@ class File implements FileSourceInterface
      */
     public function setData($data)
     {
-        $this->oldSources[] = $this->source;
+        if ($this->source !== null) {
+            $this->oldSources[] = $this->source;
+        }
         if ($data instanceof FileSourceInterface) {
             $this->source = $data;
         } else {
@@ -53,21 +56,15 @@ class File implements FileSourceInterface
     }
 
     /**
-     * Returns path that may be used to read file content, e.g. by `file_get_contents()` function.
-     * 
-     * @param string|null $format the name of formatted version of the file.
-     * Null means original version.
-     * @return string
+     * @inheritdoc
      */
-    public function readPath($format = null)
+    public function contents($format = null)
     {
-        return $this->source->readPath($format);
+        return $this->source->contents($format);
     }
 
     /**
-     * Returns relative path to the original file. This path will be stored in database.
-     * 
-     * @return string|null relative path or null if file does not exist.
+     * @inheritdoc
      */
     public function relativePath()
     {
@@ -75,11 +72,7 @@ class File implements FileSourceInterface
     }
 
     /**
-     * Returns url to the file.
-     * 
-     * @param string|null $format the name of formatted version of the file.
-     * Null means original version.
-     * @return string
+     * @inheritdoc
      */
     public function url($format = null)
     {
@@ -87,11 +80,7 @@ class File implements FileSourceInterface
     }
 
     /**
-     * Returns name of the file.
-     * 
-     * @param string|null $format the name of formatted version of the file.
-     * Null means original version.
-     * @return string
+     * @inheritdoc
      */
     public function name($format = null)
     {
@@ -99,11 +88,7 @@ class File implements FileSourceInterface
     }
 
     /**
-     * Returns basename of the file (file name without extension)
-     * 
-     * @param string|null $format the name of formatted version of the file.
-     * Null means original version.
-     * @return string
+     * @inheritdoc
      */
     public function basename($format = null)
     {
@@ -111,11 +96,7 @@ class File implements FileSourceInterface
     }
 
     /**
-     * Returns MIME type of the file.
-     * 
-     * @param string|null $format the name of formatted version of the file.
-     * Null means original version.
-     * @return string
+     * @inheritdoc
      */
     public function mimeType($format = null)
     {
@@ -123,11 +104,7 @@ class File implements FileSourceInterface
     }
 
     /**
-     * Returns size of the file in bytes.
-     * 
-     * @param string|null $format the name of formatted version of the file.
-     * Null means original version.
-     * @return integer
+     * @inheritdoc
      */
     public function size($format = null)
     {
@@ -135,11 +112,7 @@ class File implements FileSourceInterface
     }
 
     /**
-     * Returns extension of the file.
-     * 
-     * @param string|null $format the name of formatted version of the file.
-     * Null means original version.
-     * @return string|null file extension or null if file has not it.
+     * @inheritdoc
      */
     public function extension($format = null)
     {
@@ -147,11 +120,7 @@ class File implements FileSourceInterface
     }
 
     /**
-     * Checks whether the original or formatted version of file exists in file system.
-     * 
-     * @param string|null $format the name of formatted version of the file.
-     * Null means original version.
-     * @return boolean whether file exists or not.
+     * @inheritdoc
      */
     public function exists($format = null)
     {
@@ -178,30 +147,41 @@ class File implements FileSourceInterface
     public function save($deleteOld = false)
     {
         $source = $this->source;
-        if ($source instanceof StoredFileSource && !$source->isTemporary()) {
+        $storage = $this->context->storage(false);
+        if ($source instanceof StoredFileSourceInterface && $source->isStored()) {
             return;
         }
 
-        $newSource = $this->context->saveNewFile($source, false);
-        $this->setData($newSource);
+        $this->setData($storage->saveNewFile($source));
 
         if ($deleteOld) {
             foreach ($this->oldSources as $oldSource) {
-                if ($oldSource instanceof StoredFileSource && !$oldSource->isTemporary()) {
+                if ($oldSource instanceof StoredFileSourceInterface && $source->isStored()) {
                     $oldSource->delete();
                 }
             }
+            $this->oldSources = [];
         }
-        $this->oldSources = [];
+    }
+
+    /**
+     * @inheritdoc
+     * @param array $options
+     */
+    public function delete($format = null, array $options = [])
+    {
+        $this->source->delete($format, $options);
+        if ($format === null) {
+            $this->setData(null);
+            $this->oldSources = [];
+        }
     }
 
     /**
      * @inheritdoc
      */
-    public function delete()
+    public function formats()
     {
-        $this->source->delete();
-        $this->setData(null);
-        $this->oldSources = [];
+        return $this->source->formats();
     }
 }

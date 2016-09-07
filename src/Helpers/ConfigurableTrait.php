@@ -21,13 +21,13 @@ trait ConfigurableTrait
     {
         $reflection = new \ReflectionClass($this);
         foreach ($config as $key => $value) {
-            $normalized = str_replace(['_', '-'], ['', ''], $key);
-            $setter = "set$normalized";
+            $normalized = lcfirst(str_replace(' ' , '', ucwords(str_replace(['_', '-'], [' ', ' '], $key))));
+            $setter = 'set' . ucfirst($normalized);
 
             if ($reflection->hasMethod($setter) && !$reflection->getMethod($setter)->isPrivate()) {
                 $this->{$setter}($value);
-            } elseif ($reflection->hasProperty($key) && !$reflection->getProperty($key)->isPrivate()) {
-                $this->{$key} = $value;
+            } elseif ($reflection->hasProperty($normalized) && !$reflection->getProperty($normalized)->isPrivate()) {
+                $this->{$normalized} = $value;
             } else {
                 $class = get_class($this);
                 throw new InvalidConfigException("Unknown config key '$key' for '$class' class.");

@@ -2,7 +2,7 @@
 
 namespace Bicycle\FilesManager\Exceptions;
 
-use Bicycle\FilesManager\Contracts\Context;
+use Bicycle\FilesManager\Contracts\Storage;
 
 class FormattedFileNotFoundException extends FileNotFoundException
 {
@@ -12,18 +12,22 @@ class FormattedFileNotFoundException extends FileNotFoundException
     private $format;
 
     /**
-     * @param Context $context
+     * @var boolean|null
+     */
+    private $isRequestedFileExists = null;
+
+    /**
+     * @param Storage $storage
      * @param string $format
      * @param string $relativePath
-     * @param boolean $temp
      * @param string|null $message
      * @param integer $code
      * @param \Exception $previous
      */
-    public function __construct(Context $context, $format, $relativePath, $temp = false, $message = null, $code = 0, \Exception $previous = null)
+    public function __construct(Storage $storage, $format, $relativePath, $message = null, $code = 0, \Exception $previous = null)
     {
         $this->format = $format;
-        parent::__construct($context, $relativePath, $temp, $message, $code, $previous);
+        parent::__construct($storage, $relativePath, $message, $code, $previous);
     }
 
     /**
@@ -31,15 +35,31 @@ class FormattedFileNotFoundException extends FileNotFoundException
      */
     protected function generateMessage()
     {
-        $label = $this->isTemporaryFile() ? 'temporary file' : 'file';
-        return "Formatted as '$this->format' version of $label '{$this->getRelativePath()}' does not exist in '{$this->getContext()->getName()}' context.";
+        return implode(' ', [
+            "Formatted as '$this->format' version of",
+            "file with relative path '{$this->getRelativePath()}' does not exist",
+            "on the '{$this->getStorage()->name()}' storage",
+            "of the '{$this->getStorage()->context()->getName()}' context.",
+        ]);
     }
 
     /**
+     * @inheritdoc
      * @return string
      */
     public function getFormat()
     {
         return $this->format;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isRequestedFileExists($recheck = false)
+    {
+        if ($recheck || $this->isRequestedFileExists === null) {
+            $this->isRequestedFileExists = $this->getStorage()->fileExists($this->getRelativePath(), $this->getFormat());
+        }
+        return $this->isRequestedFileExists;
     }
 }

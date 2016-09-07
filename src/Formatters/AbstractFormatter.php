@@ -5,7 +5,6 @@ namespace Bicycle\FilesManager\Formatters;
 use Bicycle\FilesManager\Contracts\Context as ContextInterface;
 use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
 use Bicycle\FilesManager\Contracts\Formatter as FormatterInterface;
-use Bicycle\FilesManager\Exceptions\InvalidConfigException;
 use Bicycle\FilesManager\Helpers\ConfigurableTrait;
 
 /**

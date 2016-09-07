@@ -88,7 +88,7 @@ class ContextFactory implements Contracts\ContextFactory
         }
 
         $config = $this->getContextConfig($name);
-        return $this->buildContext($name, $config);
+        return $this->make($name, $config);
     }
 
     /**

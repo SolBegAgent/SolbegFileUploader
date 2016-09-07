@@ -3,7 +3,6 @@
 namespace Bicycle\FilesManager\Context;
 
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Support\Facades\Storage;
 
 use Bicycle\FilesManager\Contracts;
 use Bicycle\FilesManager\Exceptions;
@@ -37,46 +36,36 @@ class Context implements Contracts\Context
     protected $name;
 
     /**
-     * The name of disk of laravel's filesystems.
-     * 
-     * @var string
+     * @var array
      */
-    protected $disk = 'public';
-
-    /**
-     * The name of disk of laravel's filesystems for storing temporary files.
-     * 
-     * @var string
-     */
-    protected $tempDisk = 'temporary';
-
-    /**
-     * @var array|string|null array (or comma separated string) of allowed mime types.
-     * 
-     */
-    protected $mimeTypes;
-
-    /**
-     * @var array|string|null array (or comma separated string) of allowed extensions.
-     */
-    protected $extensions;
-
-    /**
-     * @var integer|array|null exact size in bytes or assoc array with params for size validator.
-     */
-    protected $size;
-
-    /**
-     * @var Contracts\FileNameGenerator|array config for name generator.
-     */
-    protected $nameGenerator = [
-        'global_prefix' => 'uploads',
+    protected $fileNotFoundHandlers = [
+        FileNotFound\GenerateOnFlyHandler::class,
     ];
 
     /**
-     * @var Contracts\FileNameGenerator|array config for name generator for temporary files.
+     * @var array config for the main storage.
      */
-    protected $tempNameGenerator;
+    protected $mainStorage = [
+        'disk' => 'public',
+        'name' => 'main',
+        'generate_formats_on_save' => true,
+        'name_generator' => [
+            'class' => File\NameGenerators\RandomNameGenerator::class,
+            'global_prefix' => 'uploads',
+        ],
+    ];
+
+    /**
+     * @var array config for temporary storage.
+     */
+    protected $tempStorage = [
+        'disk' => 'temporary',
+        'name' => 'temp',
+        'generate_formats_on_save' => false,
+        'name_generator' => [
+            'class' => File\NameGenerators\OriginNameGenerator::class,
+        ],
+    ];
 
     /**
      * Config for formats available to this context.
@@ -91,24 +80,12 @@ class Context implements Contracts\Context
      * Without writing full class names you may use abbreviations like 'image/thumb'. See FormatterFactory for more info.
      * 
      */
-    protected $formats;
+    protected $formats = [];
 
     /**
-     * If this param is true the context will auto generate all formatted versions of file on fly.
-     * 
-     * @var mixed may be one of the followings:
-     * - true (default), means all formatted versions of file will be generated,
-     * - false, means formatted versions of file will not be generated,
-     * - array of formats names, only these formats will be generated.
-     */
-    protected $generateFormatsOnSave = true;
-
-    /**
-     * Whether the context should try to parse format name when formatter was not found.
-     *
      * @var boolean
      */
-    protected $parseFormatName = true;
+    protected $parseFormatNames = true;
 
     /**
      * @var File\FileSourceFactory|null
@@ -116,14 +93,9 @@ class Context implements Contracts\Context
     private $sourceFactory;
 
     /**
-     * @var string|null
+     * @var array
      */
-    private $rootDir;
-
-    /**
-     * @var string|null
-     */
-    private $tempRootDir;
+    private $parsedFormatters = [];
 
     /**
      * Constructor for a new context instance.
@@ -139,7 +111,13 @@ class Context implements Contracts\Context
         $this->container = $container;
         $this->manager = $manager;
         $this->name = $name;
-        $this->configure($config);
+
+        $defaultConfig = [
+            'main_storage' => $this->mainStorage,
+            'temp_storage' => $this->tempStorage,
+        ];
+
+        $this->configure(Helpers\Config::merge($defaultConfig, $config));
     }
 
     /**
@@ -174,321 +152,122 @@ class Context implements Contracts\Context
     }
 
     /**
-     * @param boolean $temp
-     * @return \Illuminate\Filesystem\FilesystemAdapter
+     * @inheritdoc
      */
     public function storage($temp = false)
     {
-        return $temp ? $this->tempStorage() : Storage::disk($this->disk);
+        $result = $temp ? $this->tempStorage : $this->mainStorage;
+        if ($result instanceof Contracts\Storage) {
+            return $result;
+        }
+
+        $property = $temp ? 'tempStorage' : 'mainStorage';
+        $class = isset($result['class']) ? $result['class'] : Storage::class;
+        unset($result['class']);
+        $result = $this->container->make($class, [
+            'context' => $this,
+            'config' => $result,
+        ]);
+
+        if (!$result instanceof Contracts\Storage) {
+            throw new Exceptions\InvalidConfigException("Invalid config of '$property' in the '{$this->getName()}' file context.");
+        }
+        return $this->{$property} = $result;
     }
 
     /**
-     * @return \Illuminate\Filesystem\FilesystemAdapter
+     * @return Contracts\Storage
      */
     public function tempStorage()
     {
-        return Storage::disk($this->tempDisk);
+        return $this->storage(true);
     }
 
     /**
-     * @param boolean $temp whether it is meaning working with temporary files or not.
-     * @return string path to root directory where all files of the context will be stored.
+     * @inheritdoc
      */
-    public function getRootDir($temp = false)
+    public function handleFileNotFound(Contracts\FileNotFoundException $exception)
     {
-        if ($temp) {
-            return $this->getTempRootDir();
-        } elseif ($this->rootDir === null) {
-            $this->rootDir = rtrim($this->getNamesGenerator()->generateRootDirectory(), '\/');
+        foreach ($this->fileNotFoundHandlers as $key => $value) {
+            if (!$value instanceof Contracts\FileNotFoundHandler) {
+                list($class, $config) = is_int($key) ? [$value, []] : [$key, (array) $value];
+                $this->fileNotFoundHandlers[$key] = $value = $this->createFileNotFoundHandler($class, $config);
+            }
+
+            $result = $value->handle($exception);
+            if ($result === null) {
+                continue;
+            } elseif ($result === false) {
+                return null;
+            } elseif ($result === true) {
+                $sourceFactory = $this->getSourceFactory();
+                $storedFile = $sourceFactory->storedFile($exception->getRelativePath(), $exception->getStorage());
+                return $sourceFactory->formattedFile($storedFile, $exception->getFormat());
+            } elseif ($result instanceof Contracts\FileSource) {
+                return $result;
+            } else {
+                throw new \RuntimeException('Invalid result returned by "' . get_class($value) . '" handler: ' . gettype($result) . '.');
+            }
         }
-        return $this->rootDir;
+        return null;
     }
 
     /**
-     * @return string path to root directory where temporary files of the context will be stored.
+     * @param string $class
+     * @param array $config
+     * @return Contracts\FileNotFoundException
+     * @throws Exceptions\InvalidConfigException
      */
-    public function getTempRootDir()
+    protected function createFileNotFoundHandler($class, array $config = [])
     {
-        if ($this->tempRootDir === null) {
-            $this->tempRootDir = rtrim($this->getTempNamesGenerator()->generateRootDirectory(), '\/');
-        }
-        return $this->tempRootDir;
-    }
-
-    /**
-     * @param mixed $config
-     * @param \Illuminate\Contracts\Filesystem\Filesystem $storage
-     * @param string $defaultClass
-     * @return Contracts\FileNameGenerator
-     */
-    protected function createNamesGenerator($config, $storage, $defaultClass)
-    {
-        if (is_array($config)) {
-            $class = isset($config['class']) ? $config['class'] : $defaultClass;
-            unset($config['class']);
-        } elseif ($config && is_string($config)) {
-            list($class, $config) = [$config, []];
-        } else {
-            list($class, $config) = [$defaultClass, []];
-        }
-
         $result = $this->container->make($class, [
             'context' => $this,
-            'storage' => $storage,
             'config' => $config,
         ]);
-        if (!$result instanceof Contracts\FileNameGenerator) {
-            throw new Exceptions\InvalidConfigException("Invalid configuration for names generator. It must be an instance of '" . Contracts\FileNameGenerator::class . '\'.');
+        if (!$result instanceof Contracts\FileNotFoundHandler) {
+            throw new Exceptions\InvalidConfigException("Invalid config of file not found handler '$class', it must implement '" . Contracts\FileNotFoundHandler::class . '\' interface.');
         }
         return $result;
     }
 
     /**
-     * @param boolean $temp whether it is meaning working with temporary files or not.
-     * @return Contracts\FileNameGenerator
+     * @inheritdoc
      */
-    public function getNamesGenerator($temp = false)
+    public function hasPredefinedFormat($format)
     {
-        if ($temp) {
-            return $this->getTempNamesGenerator();
-        } elseif (!$this->nameGenerator instanceof Contracts\FileNameGenerator) {
-            $this->nameGenerator = $this->createNamesGenerator(
-                $this->nameGenerator,
-                $this->storage(false),
-                File\NameGenerators\RandomNameGenerator::class
-            );
-        }
-        return $this->nameGenerator;
-    }
-
-    /**
-     * @return Contracts\FileNameGenerator
-     */
-    public function getTempNamesGenerator()
-    {
-        if (!$this->tempNameGenerator instanceof Contracts\FileNameGenerator) {
-            $this->tempNameGenerator = $this->createNamesGenerator(
-                $this->tempNameGenerator,
-                $this->storage(true),
-                File\NameGenerators\OriginNameGenerator::class
-            );
-        }
-        return $this->tempNameGenerator;
+        return isset($this->formats[$format]);
     }
 
     /**
      * @inheritdoc
      */
-    public function saveNewFile(Contracts\FileSource $source, $temp = false)
+    public function getPredefinedFormatNames()
     {
-        $readPath = $source->readPath();
-        if (!is_string($content = @file_get_contents($readPath))) {
-            throw new Exceptions\FileSystemException("Cannot read file: '$readPath'.");
+        return array_keys($this->formats);
+    }
+
+    /**
+     * @inheritdoc
+     * @throws Exceptions\FormatterNotFoundException
+     */
+    public function getFormatter($format)
+    {
+        if (isset($this->formats[$format])) {
+            if (!$this->formats[$format] instanceof Contracts\Formatter) {
+                $this->formats[$format] = $this->getManager()->formats()->build($this, $format, $this->formats[$format]);
+            }
+            return $this->formats[$format];
         }
 
-        $relativePath = $this->getNamesGenerator($temp)->generatePathForNewFile($source);
-        $fullpath = $this->generateFullPathToFile($relativePath, null, $temp);
-
-        if (!$this->storage($temp)->put($fullpath, $content)) {
-            throw new Exceptions\FileSystemException("Cannot write file to path: '$fullpath'.");
-        }
-
-        $resultSource = $this->getSourceFactory()->storedFile($relativePath, $temp);
-        if (!$temp && $this->generateFormatsOnSave) {
-            $formats = is_array($this->generateFormatsOnSave) ? $this->generateFormatsOnSave : array_keys($this->formats);
-            foreach ($formats as $format) {
-                $this->generateFormattedFile($resultSource, $format, $temp);
+        if ($this->parseFormatNames) {
+            if (!isset($this->parsedFormatters[$format])) {
+                $this->parsedFormatters[$format] = $this->getManager()->formats()->parse($this, $format) ?: false;
+            }
+            if ($this->parsedFormatters[$format]) {
+                return $this->parsedFormatters[$format];
             }
         }
-        return $resultSource;
-    }
 
-    /**
-     * @param \Bicycle\FilesManager\Contracts\FileSource $source
-     * @return Contracts\FileSource
-     */
-    public function saveNewTempFile(Contracts\FileSource $source)
-    {
-        return $this->saveNewFile($source, true);
-    }
-
-    /**
-     * @inheritdoc
-     */
-//    public function generateFormattedFile(Contracts\FileSource $source, $format)
-//    {
-//        $formatter = $this->getManager()->formats()->build($this, $format, $config)
-//    }
-
-    /**
-     * Generates full path to original or formatted version of file.
-     * 
-     * @param string $relativePath
-     * @param string|null $format the name of format or null for original file.
-     * @param boolean $temp whether it is meaning working with temporary files or not.
-     * @return string|null full path to file
-     * Null value may be returned if $format was passed and formatted version of file has not been generated yet.
-     */
-    protected function generateFullPathToFile($relativePath, $format = null, $temp = false)
-    {
-        if ($format === null) {
-            return "{$this->getRootDir($temp)}/$relativePath";
-        } else {
-            return $this->getNamesGenerator($temp)->getPathOfFormattedFile($format, $relativePath);
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function fileExists($relativePath, $format = null, $temp = false)
-    {
-        if (!$this->getNamesGenerator($temp)->validatePathOfOriginFile($relativePath)) {
-            return false;
-        }
-
-        $originPath = $this->generateFullPathToFile($relativePath, null, $temp);
-        if (!$this->storage($temp)->exists($originPath)) {
-            return false;
-        } elseif ($format === null) {
-            return true;
-        }
-
-        $formattedPath = $this->generateFullPathToFile($relativePath, $format, $temp);
-        return $formattedPath !== null && $this->storage($temp)->exists($formattedPath);
-    }
-
-    /**
-     * @param callable $callback
-     * @param string $relativePath
-     * @param string $format
-     * @param boolean $temp
-     * @return mixed
-     * @throws Exceptions\FileNotFoundException
-     */
-    protected function operateWithFile(callable $callback, $relativePath, $format = null, $temp = false)
-    {
-        $path = $this->generateFullPathToFile($relativePath, $format, $temp);
-        $process = function () use ($relativePath, $format, $temp) {
-            if (!$this->fileExists($relativePath, null, $temp)) {
-                throw $this->createNotFoundException($relativePath, null, $temp);
-            }
-
-// @todo autogenerate (may be fire event)
-            return true;
-        };
-
-        if (!$path && $format !== null && $process()) {
-            $path = $this->generateFullPathToFile($relativePath, $format, $temp);
-        }
-        if (!$path) {
-            throw $this->createNotFoundException($relativePath, $format, $temp);
-        }
-
-        try {
-            return call_user_func($callback, $path, false);
-        } catch (\Exception $ex) {
-            if ($format === null || $this->fileExists($relativePath, $format, $temp)) {
-                throw $ex;
-            } elseif (!$process()) {
-                throw $this->createNotFoundException($relativePath, $format, $temp, $ex);
-            }
-            return call_user_func($callback, $path, true);
-        }
-    }
-
-    /**
-     * @param string $relativePath
-     * @param string|null $format
-     * @param boolean $temp
-     * @param \Exception|null $previous
-     * @return Exceptions\FileNotFoundException
-     * @return Exceptions\FormattedFileNotFoundException
-     */
-    private function createNotFoundException($relativePath, $format, $temp, \Exception $previous = null)
-    {
-        $code = $previous === null ? 0 : $previous->getCode();
-        return $format === null
-            ? new Exceptions\FileNotFoundException($this, $relativePath, $temp, null, $code, $previous)
-            : new Exceptions\FormattedFileNotFoundException($this, $format, $relativePath, $temp, null, $code, $previous);
-    }
-
-    /**
-     * @param string $operationMsg
-     * @param string $relativePath
-     * @param string|null $format
-     * @param boolean $temp
-     */
-    private function createOperationException($operationMsg, $relativePath, $format, $temp)
-    {
-        $fileLabel = $temp ? 'temporary file' : 'file';
-        if ($format !== null) {
-            $fileLabel = "formatted as '$format' version of $fileLabel";
-        }
-        $message = rtrim($operationMsg, '.') . " for $fileLabel '$relativePath' of {$this->getName()} context.";
-        throw new Exceptions\FileSystemException($message);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function fileReadPath($relativePath, $format = null, $temp = false)
-    {
-        return $this->operateWithFile(function ($path) {
-            return $path;
-        }, $relativePath, $format, $temp);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function fileName($relativePath, $format = null, $temp = false)
-    {
-        return $this->operateWithFile(function ($path) {
-            return Helpers\File::filename($path);
-        }, $relativePath, $format, $temp);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function fileUrl($relativePath, $format = null, $temp = false)
-    {
-        try {
-            return $this->operateWithFile(function ($path) use ($temp) {
-                return $this->storage($temp)->url($path);
-            }, $relativePath, $format, $temp);
-        } catch (Exceptions\FileNotFoundException $ex) {
-$defaultUrl = null;
-// @todo get default url (may be fire event)
-            if ($defaultUrl !== null) {
-                return $defaultUrl;
-            }
-            throw $ex;
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function fileMimeType($relativePath, $format = null, $temp = false)
-    {
-        return $this->operateWithFile(function ($path) use ($relativePath, $format, $temp) {
-            $result = $this->storage($temp)->mimeType($path);
-            if (!$result) {
-                throw $this->createOperationException('Cannot detect MIME type', $relativePath, $format, $temp);
-            }
-            return $result;
-        }, $relativePath, $format, $temp);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function fileSize($relativePath, $format = null, $temp = false)
-    {
-        return $this->operateWithFile(function ($path) use ($temp) {
-            return (int) $this->storage($temp)->size($path);
-        }, $relativePath, $format, $temp);
+        throw new Exceptions\FormatterNotFoundException($this, $format);
     }
 }

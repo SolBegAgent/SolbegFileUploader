@@ -17,7 +17,7 @@ class File
     {
         $filename = static::filename($path);
         $pos = mb_strrpos($filename, '.', 0, 'UTF-8');
-        return $pos === false ? $filename : mb_substr($filename, $pos + 1, null, 'UTF-8');
+        return $pos === false ? $filename : mb_substr($filename, 0, $pos, 'UTF-8');
     }
 
     /**

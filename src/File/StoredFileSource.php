@@ -10,7 +10,7 @@ use Bicycle\FilesManager\Helpers\File as FileHelper;
  *
  * @author Alexey Sejnov <alexey.sejnov@solbeg.com>
  */
-class StoredFileSource implements Contracts\FileSource
+class StoredFileSource implements Contracts\StoredFileSource
 {
     /**
      * @var string relative path to origin file in context
@@ -18,25 +18,19 @@ class StoredFileSource implements Contracts\FileSource
     protected $relativePath;
 
     /**
-     * @var Contracts\Context
+     * @var Contracts\Storage
      */
-    protected $context;
+    protected $storage;
 
     /**
-     * @var boolean whether this file saved in temporary storage or not.
-     */
-    protected $isTemporary = false;
-
-    /**
-     * @param Contracts\Context $context
+     * @param Contracts\Storage $storage
      * @param string $relativePath
      * @param boolean $temp whether this file saved in temporary storage or not.
      */
-    public function __construct(Contracts\Context $context, $relativePath, $temp = false)
+    public function __construct(Contracts\Storage $storage, $relativePath)
     {
-        $this->context = $context;
+        $this->storage = $storage;
         $this->relativePath = $relativePath;
-        $this->isTemporary = (bool) $temp;
     }
 
     /**
@@ -44,15 +38,15 @@ class StoredFileSource implements Contracts\FileSource
      */
     public function exists($format = null)
     {
-        return $this->context->fileExists($this->relativePath(), $format, $this->isTemporary());
+        return $this->storage->fileExists($this->relativePath(), $format);
     }
 
     /**
      * @inheritdoc
      */
-    public function readPath($format = null)
+    public function contents($format = null)
     {
-        return $this->context->fileReadPath($this->relativePath(), $format, $this->isTemporary());
+        return $this->storage->fileContents($this->relativePath(), $format);
     }
 
     /**
@@ -68,7 +62,7 @@ class StoredFileSource implements Contracts\FileSource
      */
     public function url($format = null)
     {
-        return $this->context->fileUrl($this->relativePath(), $format, $this->isTemporary());
+        return $this->storage->fileUrl($this->relativePath(), $format);
     }
 
     /**
@@ -76,7 +70,7 @@ class StoredFileSource implements Contracts\FileSource
      */
     public function name($format = null)
     {
-        return $this->context->fileName($this->relativePath(), $format, $this->isTemporary());
+        return $this->storage->fileName($this->relativePath(), $format);
     }
 
     /**
@@ -92,7 +86,7 @@ class StoredFileSource implements Contracts\FileSource
      */
     public function mimeType($format = null)
     {
-        return $this->context->fileMimeType($this->relativePath(), $format, $this->isTemporary());
+        return $this->storage->fileMimeType($this->relativePath(), $format);
     }
 
     /**
@@ -100,7 +94,7 @@ class StoredFileSource implements Contracts\FileSource
      */
     public function size($format = null)
     {
-        return $this->context->fileSize($this->relativePath(), $format, $this->isTemporary());
+        return $this->storage->fileSize($this->relativePath(), $format);
     }
 
     /**
@@ -112,18 +106,34 @@ class StoredFileSource implements Contracts\FileSource
     }
 
     /**
-     * @return boolean
+     * @return Contracts\Storage
      */
-    public function isTemporary()
+    public function getStorage()
     {
-        return $this->isTemporary;
+        return $this->storage;
     }
 
     /**
-     * Deletes file from context's storage.
+     * @inheritdoc
      */
-    public function delete()
+    public function delete($format = null, array $options = [])
     {
-        $this->context->deleteFile($this, $this->isTemporary());
+        $this->storage->deleteFile($this->relativePath(), $format, $options);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function formats()
+    {
+        return $this->storage->fileFormats($this->relativePath());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isStored()
+    {
+        return $this->storage === $this->storage->context()->storage(false);
     }
 }

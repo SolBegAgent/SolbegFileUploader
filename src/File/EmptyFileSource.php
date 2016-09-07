@@ -13,6 +13,19 @@ use Bicycle\FilesManager\Exceptions\NotSupportedException;
 class EmptyFileSource implements FileSource
 {
     /**
+     * @var callable|null
+     */
+    private $defaultCallback;
+
+    /**
+     * @param callable|null $defaultCallback
+     */
+    public function __construct(callable $defaultCallback = null)
+    {
+        $this->defaultCallback = $defaultCallback;
+    }
+
+    /**
      * @param string $format
      * @return boolean
      */
@@ -23,11 +36,11 @@ class EmptyFileSource implements FileSource
 
     /**
      * @inheritdoc
-     * @throws NotSupportedException always
+     * @throws NotSupportedException
      */
-    public function readPath($format = null)
+    public function contents($format = null)
     {
-        throw $this->createNotSupportedException(__FUNCTION__);
+        return $this->process(__FUNCTION__, $format);
     }
 
     /**
@@ -45,7 +58,7 @@ class EmptyFileSource implements FileSource
      */
     public function url($format = null)
     {
-        throw $this->createNotSupportedException(__FUNCTION__);
+        return $this->process(__FUNCTION__, $format);
     }
 
     /**
@@ -54,7 +67,7 @@ class EmptyFileSource implements FileSource
      */
     public function name($format = null)
     {
-        throw $this->createNotSupportedException(__FUNCTION__);
+        return $this->process(__FUNCTION__, $format);
     }
 
     /**
@@ -63,7 +76,7 @@ class EmptyFileSource implements FileSource
      */
     public function basename($format = null)
     {
-        throw $this->createNotSupportedException(__FUNCTION__);
+        return $this->process(__FUNCTION__, $format);
     }
 
     /**
@@ -72,7 +85,7 @@ class EmptyFileSource implements FileSource
      */
     public function extension($format = null)
     {
-        throw $this->createNotSupportedException(__FUNCTION__);
+        return $this->process(__FUNCTION__, $format);
     }
 
     /**
@@ -81,7 +94,7 @@ class EmptyFileSource implements FileSource
      */
     public function mimeType($format = null)
     {
-        throw $this->createNotSupportedException(__FUNCTION__);
+        return $this->process(__FUNCTION__, $format);
     }
 
     /**
@@ -90,7 +103,38 @@ class EmptyFileSource implements FileSource
      */
     public function size($format = null)
     {
-        throw $this->createNotSupportedException(__FUNCTION__);
+        return $this->process(__FUNCTION__, $format);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function delete($format = null)
+    {
+        // nothing to do
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function formats()
+    {
+        return [];
+    }
+
+    /**
+     * @param string|null $format
+     * @return FileSource|null
+     * @throws NotSupportedException
+     */
+    protected function process($method, $format = null)
+    {
+        if (!$this->defaultCallback) {
+            throw $this->createNotSupportedException($method);
+        } elseif (false === $result = call_user_func($this->defaultCallback, $method, $format, $this)) {
+            throw $this->createNotSupportedException($method);
+        }
+        return $result;
     }
 
     /**
@@ -100,13 +144,5 @@ class EmptyFileSource implements FileSource
     protected function createNotSupportedException($method)
     {
         return new NotSupportedException("File is empty and does not support the `$method()` method.");
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function delete()
-    {
-        // nothing to do
     }
 }

@@ -14,7 +14,7 @@ interface FileNameGenerator
     /**
      * Generates relative path that may be used for saving new file.
      * 
-     * @param \Bicycle\FilesManager\Contracts\FileSource $source
+     * @param FileSource $source
      * @return string generated path
      */
     public function generatePathForNewFile(FileSource $source);
@@ -22,21 +22,29 @@ interface FileNameGenerator
     /**
      * Generates relative path that may be used for saving formatted version of file.
      * 
+     * @param string $relativePathToOrigin
      * @param string $format the name of format
-     * @param string|null $extension the extension for formatted file version
-     * @param \Bicycle\FilesManager\Contracts\FileSource $source
-     * @return string generated path
+     * @param FileSource $source source of formatted file.
+     * @return string generated relative path
      */
-    public function generatePathForNewFormattedFile($format, $extension, FileSource $source);
+    public function generatePathForNewFormattedFile($relativePathToOrigin, $format, FileSource $source);
 
     /**
-     * Gets full path of formatted version of file.
+     * Gets full path of original or formatted version of file.
      * 
-     * @param string $format the name of format
      * @param string $relativePathToOrigin
-     * @return string|null path to formatted version of file or null if file was not found.
+     * @param string|null $format the name of format
+     * @return string|null path to original or formatted version of file or null if file was not found.
      */
-    public function getPathOfFormattedFile($format, $relativePathToOrigin);
+    public function getFileFullPath($relativePathToOrigin, $format = null);
+
+    /**
+     * Gets list of all generated formatted versions of file.
+     * 
+     * @param string $relativePathToOrigin
+     * @return array Values of this array are the names of formats, keys are full path to formatted files.
+     */
+    public function getListOfFormattedFiles($relativePathToOrigin);
 
     /**
      * Validates whether the `$path` has correct format.

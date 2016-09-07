@@ -132,6 +132,14 @@ class FormatterFactory implements FormatterFactoryInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function parse(ContextInterface $context, $name)
+    {
+        return null;
+    }
+
+    /**
      * @return Container
      */
     public function getContainer()

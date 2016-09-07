@@ -52,7 +52,7 @@ class StoreUploadedFilesMiddleware
         $response = $next($request);
 
         if ($response instanceof RedirectResponse) {
-            $this->saveFiles($names ? $this->parseNames($names) : $this->fileContexts);
+            $this->saveFiles($request, $names ? $this->parseNames($names) : $this->fileContexts);
         }
 
         return $response;
@@ -85,7 +85,8 @@ class StoreUploadedFilesMiddleware
             }
 
             $context = $this->getManager()->context($contextName);
-            $result[$name] = $context->saveNewFile($request->file($name), true);
+            $source = $context->getSourceFactory()->make($request->file($name));
+            $result[$name] = $context->saveNewFile($source, true);
         }
         return $result;
     }

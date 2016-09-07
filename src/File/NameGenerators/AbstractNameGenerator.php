@@ -2,7 +2,7 @@
 
 namespace Bicycle\FilesManager\File\NameGenerators;
 
-use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemAdapter;
 
 use Bicycle\FilesManager\Contracts\Context as ContextInterface;
 use Bicycle\FilesManager\Contracts\FileNameGenerator as GeneratorInterface;
@@ -84,6 +84,11 @@ abstract class AbstractNameGenerator implements GeneratorInterface
     private $context;
 
     /**
+     * @var FilesystemAdapter
+     */
+    private $disk;
+
+    /**
      * Generates filename for new file.
      * 
      * @param FileSourceInterface $source
@@ -93,11 +98,13 @@ abstract class AbstractNameGenerator implements GeneratorInterface
 
     /**
      * @param ContextInterface $context
+     * @param FilesystemAdapter $disk
      * @param array $config
      */
-    public function __construct(ContextInterface $context, array $config = [])
+    public function __construct(ContextInterface $context, FilesystemAdapter $disk, array $config = [])
     {
         $this->context = $context;
+        $this->disk = $disk;
         $this->configure($config);
     }
 
@@ -107,6 +114,14 @@ abstract class AbstractNameGenerator implements GeneratorInterface
     public function getContext()
     {
         return $this->context;
+    }
+
+    /**
+     * @return FilesystemAdapter
+     */
+    public function getDisk()
+    {
+        return $this->disk;
     }
 
     /**
@@ -125,40 +140,59 @@ abstract class AbstractNameGenerator implements GeneratorInterface
     /**
      * @inheritdoc
      */
-    public function generatePathForNewFile(Filesystem $storage, FileSourceInterface $source)
+    public function generatePathForNewFile(FileSourceInterface $source)
     {
         $filename = $this->generateNewFilename($source);
         if ($this->lowerize) {
             $filename = mb_strtolower($filename, 'UTF-8');
         }
 
-        $subdir = $this->getSubdirForNewFile($storage, $filename, $source);
+        $subdir = $this->getSubdirForNewFile($filename, $source);
         return "$subdir/$filename";
     }
 
     /**
      * @inheritdoc
      */
-    public function generatePathForNewFormattedFile(Filesystem $storage, $format, $extension, FileSourceInterface $source)
+    public function generatePathForNewFormattedFile($relativePathToOrigin, $format, FileSourceInterface $source)
     {
+        $extension = $source->extension();
         $filename = $extension === null ? $format : "$format.$extension";
-        $originPath = $source->relativePath();
-        return "{$this->generateFormatsRelativeDir($originPath)}/$filename";
+        return "{$this->generateFormatsRelativeDir($relativePathToOrigin)}/$filename";
     }
 
     /**
      * @inheritdoc
      */
-    public function getPathOfFormattedFile(Filesystem $storage, $format, $relativePathToOrigin)
+    public function getFileFullPath($relativePathToOrigin, $format = null)
     {
         $rootDir = rtrim($this->generateRootDirectory(), '\/');
+        if ($format === null) {
+            return "$rootDir/$relativePathToOrigin";
+        }
+
         $formatsSubdir = $this->generateFormatsRelativeDir($relativePathToOrigin);
-        foreach ($storage->files("$rootDir/$formatsSubdir") as $file) {
+        foreach ($this->getDisk()->files("$rootDir/$formatsSubdir") as $file) {
             if ($format === FileHelper::basename($file)) {
                 return $file;
             }
         }
         return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getListOfFormattedFiles($relativePathToOrigin)
+    {
+        $rootDir = rtrim($this->generateRootDirectory(), '\/');
+        $formatsSubdir = $this->generateFormatsRelativeDir($relativePathToOrigin);
+
+        $result = [];
+        foreach ($this->getDisk()->files("$rootDir/$formatsSubdir") as $file) {
+            $result[$file] = FileHelper::basename($file);
+        }
+        return $result;
     }
 
     /**
@@ -194,25 +228,24 @@ abstract class AbstractNameGenerator implements GeneratorInterface
     /**
      * Generates subdirectory for file with passed `$filename`.
      * 
-     * @param Filesystem $storage
      * @param string $filename
      * @param FileSourceInterface $source
      * @return string subdirectory name
      */
-    protected function getSubdirForNewFile(Filesystem $storage, $filename, FileSourceInterface $source)
+    protected function getSubdirForNewFile($filename, FileSourceInterface $source)
     {
         $rootDir = $this->generateRootDirectory();
         $resultDir = null;
 
-        $subdirs = $storage->directories($rootDir);
+        $subdirs = $this->getDisk()->directories($rootDir);
         if (count($subdirs) > 1) {
             shuffle($subdirs);
         }
 
         foreach ($subdirs as $subdir) {
-            if ($storage->exists("$subdir/$filename")) {
+            if ($this->getDisk()->exists("$subdir/$filename")) {
                 continue;
-            } elseif (count($storage->files($subdir)) >= $this->maxSubdirFilesCount) {
+            } elseif (count($this->getDisk()->files($subdir)) >= $this->maxSubdirFilesCount) {
                 continue;
             }
             $resultDir = FileHelper::filename($subdir);
@@ -224,7 +257,7 @@ abstract class AbstractNameGenerator implements GeneratorInterface
             if ($this->lowerize) {
                 $resultDir = strtolower($resultDir);
             }
-            if ($storage->exists("$rootDir/$resultDir")) {
+            if ($this->getDisk()->exists("$rootDir/$resultDir")) {
                 $resultDir = null;
             }
         }
