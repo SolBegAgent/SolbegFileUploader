@@ -38,4 +38,12 @@ interface Manager
      * @return FormatterFactory
      */
     public function formats();
+
+    /**
+     * Generates and returns filename for new temporary file.
+     * 
+     * @param string|null $extension
+     * @return string
+     */
+    public function generateNewTempFilename($extension = null);
 }

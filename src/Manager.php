@@ -30,6 +30,12 @@ class Manager implements Contracts\Manager
     private $formattersFactory;
 
     /**
+     * @var string path to temporary directory.
+     * System temp dir will be used by default.
+     */
+    private $tempDir;
+
+    /**
      * Constructor for new files manager instance.
      * 
      * @param Application $app
@@ -103,5 +109,50 @@ class Manager implements Contracts\Manager
             ]);
         }
         return $this->formattersFactory;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTempDirectory()
+    {
+        if ($this->tempDir !== null) {
+            return $this-> tempDir;
+        }
+
+        $configDir = $this->app['config']['filemanager.temp_directory'];
+        if ($configDir) {
+            if (!is_dir($configDir) || !is_writable($configDir)) {
+                throw new Exceptions\InvalidConfigException("Invalid temporary directory: '$configDir'.");
+            }
+            $this->tempDir = rtrim($configDir, '\/');
+        } else {
+            $this->tempDir = rtrim(sys_get_temp_dir(), '\/');
+        }
+
+        return $this->tempDir;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getTempFilePrefix()
+    {
+        return '__php_' . strtolower(str_replace('\\', '_', static::class));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function generateNewTempFilename($extension = null)
+    {
+        $prefix = $this->getTempFilePrefix();
+        $dir = $this->getTempDirectory();
+        do {
+            $basename = $prefix . Helpers\File::generateRandomBasename();
+            $filename = $extension === null ? $basename : "$basename.$extension";
+            $fullPath = $dir . DIRECTORY_SEPARATOR . $filename;
+        } while (file_exists($fullPath));
+        return $fullPath;
     }
 }

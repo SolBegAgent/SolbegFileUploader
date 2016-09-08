@@ -22,6 +22,7 @@ class FormatterFactory implements FormatterFactoryInterface
     protected $aliases = [
         'from' => FromFormatter::class,
         'inline' => InlineFormatter::class,
+        'image/fit' => Image\FitFormatter::class,
     ];
 
     /**

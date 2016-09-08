@@ -17,6 +17,16 @@ abstract class AbstractFormatter implements FormatterInterface
     use ConfigurableTrait;
 
     /**
+     * @var string|null
+     */
+    protected $defaultExtension = null;
+
+    /**
+     * @var string|null|boolean
+     */
+    protected $forceExtension = false;
+
+    /**
      * @var ContextInterface
      */
     private $context;
@@ -41,6 +51,16 @@ abstract class AbstractFormatter implements FormatterInterface
         $this->name = $name;
         $this->context = $context;
         $this->configure($config);
+        $this->init();
+    }
+
+    /**
+     * Initializes config.
+     * 
+     * @throws \Bicycle\FilesManager\Exceptions\InvalidConfigException
+     */
+    protected function init()
+    {
     }
 
     /**
@@ -57,5 +77,32 @@ abstract class AbstractFormatter implements FormatterInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Generates and returns filename for new temporary file.
+     * 
+     * @param string|null $extension
+     * @return string
+     */
+    protected function generateNewTempFilename($extension = null)
+    {
+        return $this->getContext()->getManager()->generateNewTempFilename($extension);
+    }
+
+    /**
+     * @param FileSourceInterface $source
+     */
+    protected function generateExtension(FileSourceInterface $source)
+    {
+        if ($this->forceExtension !== false) {
+            return $this->forceExtension;
+        }
+
+        $extension = $source->extension();
+        if ($extension === null) {
+            $extension = $this->defaultExtension;
+        }
+        return $extension;
     }
 }
