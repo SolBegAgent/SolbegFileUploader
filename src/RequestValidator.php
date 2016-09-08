@@ -5,6 +5,8 @@ namespace Bicycle\FilesManager;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Validation\Validator;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 /**
  * RequestValidator
  *
@@ -23,6 +25,11 @@ class RequestValidator
     private $app;
 
     /**
+     * @var TranslatorInterface
+     */
+    private $trans;
+
+    /**
      * @var boolean
      */
     private $autoAssoc = true;
@@ -30,15 +37,12 @@ class RequestValidator
     /**
      * @param Application $app
      * @param Contracts\Manager $manager
-     * @param string $attribute
-     * @param mixed $value
-     * @param array $parameters
-     * @param Validator $validator
      */
-    public function __construct(Application $app, Contracts\Manager $manager)
+    public function __construct(Application $app, Contracts\Manager $manager, TranslatorInterface $trans)
     {
         $this->app = $app;
         $this->manager = $manager;
+        $this->trans = $trans;
     }
 
     /**
@@ -59,9 +63,10 @@ class RequestValidator
      * @param string $attribute
      * @param mixed $value
      * @param array $parameters
+     * @param Validator $validator
      * @return boolean
      */
-    public function validate($attribute, $value, $parameters)
+    public function validate($attribute, $value, $parameters, Validator $validator)
     {
         $contextName = $this->extractContextName($parameters);
         if ($this->getAutoAssoc()) {
@@ -74,7 +79,16 @@ class RequestValidator
 
         $context = $this->getContext($contextName);
         $source = $context->getSourceFactory()->make($value);
-        return $source->exists();
+        if (!$source->exists()) {
+            $validator->getMessageBag()->add($attribute, $this->trans->trans('filesmanager::validation.not-found', [
+                'attribute' => $attribute,
+                'value' => (string) $value,
+                'context' => $contextName,
+            ]));
+            return false;
+        }
+
+        return true;
     }
 
     /**

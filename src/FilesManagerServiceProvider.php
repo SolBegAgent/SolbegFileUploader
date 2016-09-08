@@ -2,7 +2,6 @@
 
 namespace Bicycle\FilesManager;
 
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -41,7 +40,7 @@ class FilesManagerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerFileNotFoundHandlers();
+        $this->registerTranslations();
         $this->registerValidators();
     }
 
@@ -67,23 +66,24 @@ class FilesManagerServiceProvider extends ServiceProvider
     }
 
     /**
-     * Registers handlers for file not found events.
-     */
-    protected function registerFileNotFoundHandlers()
-    {
-// @todo add default event handlers
-    }
-
-    /**
      * Registers file validators.
      */
     protected function registerValidators()
     {
         if ($this->requestValidatorClass) {
-            Validator::extend('filecontext', "$this->requestValidatorClass@validate");
+            $message = $this->app['translator']->trans('filesmanager::validation.failed');
+            $this->app['validator']->extend('filecontext', "$this->requestValidatorClass@validate", $message);
             $this->app->resolving(function (RequestValidator $validator) {
                 $validator->setAutoAssoc($this->autoSaveUploadsToSession);
             });
         }
+    }
+
+    /**
+     * Registers translations.
+     */
+    protected function registerTranslations()
+    {
+        $this->loadTranslationsFrom(__DIR__ . '/resources/lang', 'filesmanager');
     }
 }

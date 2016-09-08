@@ -15,6 +15,11 @@ use Illuminate\Session\Store as SessionStore;
 class StoreUploadedFilesMiddleware
 {
     /**
+     * @var string
+     */
+    public static $oldInputKey = '_old_input';
+
+    /**
      * @var string[]
      */
     protected $fileContexts = [];
@@ -51,7 +56,7 @@ class StoreUploadedFilesMiddleware
     {
         $response = $next($request);
 
-        if ($response instanceof RedirectResponse) {
+        if ($response instanceof RedirectResponse && $this->isSessionHasOldInput()) {
             $this->saveFiles($request, $names ? $this->parseNames($names) : $this->fileContexts);
         }
 
@@ -67,28 +72,46 @@ class StoreUploadedFilesMiddleware
         $sources = $this->saveFileInputs($request, $fileContextsNames);
 
         foreach ($sources as $name => $source) {
-            $this->getSession()->flashInput([$name => $source->relativePath()]);
+            $this->getSession()->flashInput([$name => $source]);
         }
     }
 
     /**
      * @param \Illuminate\Http\Request $request
      * @param array $fileContextsNames
-     * @return Contracts\FileSource[]
+     * @return Contracts\StoredFileSource[]
      */
     protected function saveFileInputs($request, array $fileContextsNames)
     {
         $result = [];
         foreach ($fileContextsNames as $name => $contextName) {
-            if (!$request->hasFile($name)) {
+            $data = $request->hasFile($name) ? $request->file($name) : $request->get($name);
+            if (!$data) {
                 continue;
             }
 
-            $context = $this->getManager()->context($contextName);
-            $source = $context->getSourceFactory()->make($request->file($name));
-            $result[$name] = $context->saveNewFile($source, true);
+            $source = $this->saveFileInput($contextName, $data);
+            if ($source) {
+                $result[$name] = $source;
+            }
         }
         return $result;
+    }
+
+    /**
+     * @param string $contextName
+     * @param string|\Illuminate\Http\UploadedFile $data
+     * @return Contracts\StoredFileSource|null
+     */
+    protected function saveFileInput($contextName, $data)
+    {
+        $context = $this->getManager()->context($contextName);
+        $storage = $context->storage(true);
+        $source = $context->getSourceFactory()->make($data);
+        if ($source instanceof Contracts\StoredFileSource && $storage === $source->getStorage()) {
+            return $source;
+        }
+        return $source->exists() ? $storage->saveNewFile($source) : null;
     }
 
     /**
@@ -143,5 +166,14 @@ class StoreUploadedFilesMiddleware
     protected function getSession()
     {
         return $this->session;
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function isSessionHasOldInput()
+    {
+        $session = $this->getSession();
+        return $session->hasOldInput() || $session->get(static::$oldInputKey, null) !== null;
     }
 }

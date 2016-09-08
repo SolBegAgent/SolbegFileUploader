@@ -2,6 +2,8 @@
 
 namespace Bicycle\FilesManager\File;
 
+use Illuminate\Container\Container;
+
 use Bicycle\FilesManager\Contracts;
 use Bicycle\FilesManager\Helpers\File as FileHelper;
 
@@ -127,5 +129,45 @@ class StoredFileSource implements Contracts\StoredFileSource
     public function formats()
     {
         return $this->storage->fileFormats($this->relativePath());
+    }
+
+    /**
+     * @return string
+     */
+    public function serialize()
+    {
+        return serialize([
+            'path' => $this->relativePath,
+            'storage' => $this->storage->name(),
+            'context' => $this->storage->context()->getName(),
+        ]);
+    }
+
+    /**
+     * @param string $serialized
+     */
+    public function unserialize($serialized)
+    {
+        $data = @unserialize($serialized);
+        if (!is_array($data) || !isset($data['path'], $data['storage'], $data['context'])) {
+            throw new \InvalidArgumentException("Cannot unserialize stored source from string: '$serialized'.");
+        }
+
+        $manager = Container::getInstance()->make('filesmanager');
+        /* @var $manager \Bicycle\FilesManager\Manager */
+        $context = $manager->context($data['context']);
+
+        foreach ([true, false] as $temp) {
+            if ($context->storage($temp)->name() === $data['storage']) {
+                $storage = $context->storage($temp);
+                break;
+            }
+        }
+        if (!isset($storage)) {
+            throw new \LogicException("Storage '$data[storage]' was not found in '$data[context]' context.");
+        }
+
+        $this->storage = $storage;
+        $this->relativePath = $data['path'];
     }
 }

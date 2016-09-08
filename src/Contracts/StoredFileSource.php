@@ -2,7 +2,7 @@
 
 namespace Bicycle\FilesManager\Contracts;
 
-interface StoredFileSource extends FileSource
+interface StoredFileSource extends FileSource, \Serializable
 {
     /**
      * @return Storage

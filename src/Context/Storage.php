@@ -104,7 +104,7 @@ class Storage implements Contracts\Storage
     public function disk()
     {
         if (!$this->disk instanceof FilesystemAdapter) {
-            $this->disk = \Illuminate\Support\Facades\Storage::disk($this->disk);
+            $this->disk = $this->container['filesystem']->disk($this->disk);
             if (!$this->disk instanceof FilesystemAdapter) {
                 throw new Exceptions\InvalidConfigException("Invalid filesystem disk: '$this->disk'. \"" . static::class . '" allows only "' . FilesystemAdapter::class . '" disks.');
             }

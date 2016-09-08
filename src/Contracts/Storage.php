@@ -21,7 +21,7 @@ interface Storage
      * Saves new file to the context's storage.
      * 
      * @param FileSource $source
-     * @return FileSource
+     * @return StoredFileSource
      */
     public function saveNewFile(FileSource $source);
 

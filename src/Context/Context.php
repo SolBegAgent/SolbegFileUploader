@@ -59,11 +59,12 @@ class Context implements Contracts\Context
      * @var array config for temporary storage.
      */
     protected $tempStorage = [
-        'disk' => 'temporary',
+        'disk' => 'public',
         'name' => 'temp',
         'generate_formats_on_save' => false,
         'name_generator' => [
             'class' => File\NameGenerators\OriginNameGenerator::class,
+            'global_prefix' => 'temp',
         ],
     ];
 
