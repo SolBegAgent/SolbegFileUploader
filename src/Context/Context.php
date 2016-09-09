@@ -89,6 +89,22 @@ class Context implements Contracts\Context
     protected $parseFormatNames = true;
 
     /**
+     * Validators for this context.
+     * 
+     * @var array
+     * 
+     * Examples:
+     * ```php
+     *  'validate' => [
+     *      'extensions' => 'jpg, png', // or ['jpg', 'png']
+     *      'types' => 'image/*', // or ['image/jpeg', 'image/png'] or 'image/jpeg, image/png'
+     *      'size' => 5 * 1024 * 1024, // or 'max = 5M, min = 1k' or ['max' => 5 * 1024 * 1024, 'min' => 1024]
+     *  ],
+     * ```
+     */
+    protected $validate = [];
+
+    /**
      * @var File\FileSourceFactory|null
      */
     private $sourceFactory;
@@ -270,5 +286,37 @@ class Context implements Contracts\Context
         }
 
         throw new Exceptions\FormatterNotFoundException($this, $format);
+    }
+
+    /**
+     * @return Contracts\Validator[]
+     */
+    public function getValidators()
+    {
+        foreach ($this->validate as $rule => $validator) {
+            if (!$validator instanceof Contracts\Validator) {
+                $this->validate[$rule] = $this->getManager()->validators()->build($this, $rule, $validator);
+            }
+        }
+        return $this->validate;
+    }
+
+    /**
+     * @param Contracts\FileSource $source
+     * @throws Exceptions\ValidationException
+     */
+    public function validate(Contracts\FileSource $source)
+    {
+        $failed = $messages = [];
+        foreach ($this->getValidators() as $rule => $validator) {
+            $error = $validator->validate($source);
+            if ($error !== null) {
+                $messages[$rule] = $error;
+                $failed[$rule] = $validator;
+            }
+        }
+        if ($failed && $messages) {
+            throw new Exceptions\ValidationException($this, $source, $messages, $failed);
+        }
     }
 }

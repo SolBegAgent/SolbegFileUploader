@@ -110,8 +110,15 @@ class StoreUploadedFilesMiddleware
         $source = $context->getSourceFactory()->make($data);
         if ($source instanceof Contracts\StoredFileSource && $storage === $source->getStorage()) {
             return $source;
+        } elseif (!$source->exists()) {
+            return null;
         }
-        return $source->exists() ? $storage->saveNewFile($source) : null;
+
+        try {
+            return $storage->saveNewFile($source);
+        } catch (Contracts\ValidationException $ex) {
+            return null;
+        }
     }
 
     /**

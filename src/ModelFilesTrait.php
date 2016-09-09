@@ -195,7 +195,9 @@ trait ModelFilesTrait
     public function saveFileAttributes()
     {
         foreach ($this->filesInstances as $attribute => $file) {
-            $file->save($this->deleteOldFiles);
+            $file->save([
+                'deleteOld' => (bool) $this->deleteOldFiles,
+            ]);
             $this->attributes[$attribute] = $file->relativePath();
         }
     }

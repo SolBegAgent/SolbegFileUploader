@@ -174,14 +174,14 @@ class ContextFactory implements Contracts\ContextFactory
         return [
             static::TYPE_DEFAULT => [],
             'image' => [
-                'mime_types' => 'image/*',
-                'extensions' => implode(', ', [ // imploding for useful merging if user wants to override this config
-                    'jpeg',
-                    'png',
-                    'gif',
-                    'bmp',
-                    'svg',
-                ]),
+                'validate' => [
+                    'types' => 'image/*',
+                    'extensions' => implode(', ', [ // imploding for useful merging if user wants to override this config
+                        'jpg',
+                        'jpeg',
+                        'png',
+                    ]),
+                ],
             ],
         ];
     }

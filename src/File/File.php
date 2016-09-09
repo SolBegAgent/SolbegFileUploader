@@ -142,9 +142,11 @@ class File implements FileSourceInterface
 
     /**
      * Saves this file if not saved.
-     * @param boolean $deleteOld if true then all old stored non-temporary sources will be deleted.
+     * @param array $options You may use the followings options:
+     *  - 'deleteOld': boolean (default = true), whether old stored files should be also removed
+     *  - 'validate': boolean (default = true), whether the file should be validated before saving
      */
-    public function save($deleteOld = false)
+    public function save(array $options = [])
     {
         $source = $this->source;
         $storage = $this->context->storage(false);
@@ -152,9 +154,9 @@ class File implements FileSourceInterface
             return;
         }
 
-        $this->setData($storage->saveNewFile($source));
+        $this->setData($storage->saveNewFile($source, $options));
 
-        if ($deleteOld) {
+        if (!isset($options['deleteOld']) || $options['deleteOld']) {
             foreach ($this->oldSources as $oldSource) {
                 if ($oldSource instanceof StoredFileInterface && $oldSource->getStorage() === $storage) {
                     $oldSource->delete();
@@ -166,7 +168,9 @@ class File implements FileSourceInterface
 
     /**
      * @inheritdoc
-     * @param array $options
+     * @param array $options You may use the followings options:
+     *  - 'clearFormattedFiles': boolean (default = true), whether formatted files should be also removed.
+     *  - 'clearEmptyDirs': boolean (default = true), whether empty directories should be also removed.
      */
     public function delete($format = null, array $options = [])
     {

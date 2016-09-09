@@ -25,9 +25,14 @@ class Manager implements Contracts\Manager
     private $contextFactory;
 
     /**
-     * @var Contracts\FormatterFactory
+     * @var Contracts\FormatterFactory|null
      */
     private $formattersFactory;
+
+    /**
+     * @var Contracts\ValidatorFactory|null
+     */
+    private $validatorsFactory;
 
     /**
      * @var string path to temporary directory.
@@ -109,6 +114,19 @@ class Manager implements Contracts\Manager
             ]);
         }
         return $this->formattersFactory;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function validators()
+    {
+        if ($this->validatorsFactory === null) {
+            $this->validatorsFactory = $this->app->make(Validation\ValidatorFactory::class, [
+                'manager' => $this,
+            ]);
+        }
+        return $this->validatorsFactory;
     }
 
     /**

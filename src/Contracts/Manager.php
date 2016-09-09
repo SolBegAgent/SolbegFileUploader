@@ -40,6 +40,13 @@ interface Manager
     public function formats();
 
     /**
+     * Returns validators factory.
+     * 
+     * @return ValidatorFactory
+     */
+    public function validators();
+
+    /**
      * Generates and returns filename for new temporary file.
      * 
      * @param string|null $extension

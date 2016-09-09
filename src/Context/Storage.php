@@ -173,9 +173,16 @@ class Storage implements Contracts\Storage
 
     /**
      * @inheritdoc
+     * @param array $options
+     * @throws Exceptions\ValidationException
+     * @throws Exceptions\FileSystemException
      */
-    public function saveNewFile(Contracts\FileSource $source)
+    public function saveNewFile(Contracts\FileSource $source, array $options = [])
     {
+        if (!isset($options['validate']) || $options['validate']) {
+            $this->context()->validate($source);
+        }
+
         $relativePath = $this->getNameGenerator()->generatePathForNewFile($source);
         $fullpath = $this->getNameGenerator()->getFileFullPath($relativePath, null);
 

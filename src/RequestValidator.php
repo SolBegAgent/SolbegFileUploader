@@ -88,6 +88,15 @@ class RequestValidator
             return false;
         }
 
+        try {
+            $context->validate($source);
+        } catch (Contracts\ValidationException $ex) {
+            foreach ($ex->getMessages() as $message) {
+                $validator->getMessageBag()->add($attribute, $message);
+            }
+            return false;
+        }
+
         return true;
     }
 

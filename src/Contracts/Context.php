@@ -49,4 +49,10 @@ interface Context
      * @return FileSource|null source that may be used to return data or null if this case cannot be handled.
      */
     public function handleFileNotFound(FileNotFoundException $exception);
+
+    /**
+     * @param FileSource $source
+     * @throws ValidationException
+     */
+    public function validate(FileSource $source);
 }

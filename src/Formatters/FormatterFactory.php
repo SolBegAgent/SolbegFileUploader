@@ -8,6 +8,7 @@ use Bicycle\FilesManager\Contracts\Context as ContextInterface;
 use Bicycle\FilesManager\Contracts\Formatter as FormatterInterface;
 use Bicycle\FilesManager\Contracts\FormatterFactory as FormatterFactoryInterface;
 use Bicycle\FilesManager\Exceptions\InvalidConfigException;
+use Bicycle\FilesManager\Helpers;
 
 /**
  * FormatterFactory builds formatters instances.
@@ -119,42 +120,7 @@ class FormatterFactory implements FormatterFactoryInterface
         } else {
             list($class, $paramsString) = [trim($string), ''];
         }
-
-        $parts = preg_split('/(\,\s*)/u', $paramsString, null, PREG_SPLIT_NO_EMPTY);
-        $result = [];
-        foreach ($parts as $part) {
-            $keyValuePair = preg_split('/(\s*\=\s*)/u', $part);
-            if (isset($keyValuePair[0], $keyValuePair[1])) {
-                $result[$keyValuePair[0]] = $this->typecastParsedValue($keyValuePair[1]);
-            } else {
-                $result[$part] = true;
-            }
-        }
-
-        return array_merge([$class], $result);
-    }
-
-    /**
-     * @param string $value
-     * @return mixed
-     */
-    protected function typecastParsedValue($value)
-    {
-        if (!is_string($value)) {
-            return $value;
-        } elseif ($value === '' || strcasecmp($value, 'null') === 0) {
-            return null;
-        } elseif (preg_match('/^\-?(?:0|[1-9]\d*)$/', $value)) {
-            return (int) $value;
-        } elseif (is_numeric($value)) {
-            return (float) $value;
-        } elseif (strcasecmp($value, 'true') === 0) {
-            return true;
-        } elseif (strcasecmp($value, 'false') === 0) {
-            return false;
-        } else {
-            return $value;
-        }
+        return array_merge([$class], Helpers\Config::parse($paramsString));
     }
 
     /**
