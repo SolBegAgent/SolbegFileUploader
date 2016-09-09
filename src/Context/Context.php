@@ -75,7 +75,7 @@ class Context implements Contracts\Context
      * Values are formats config. Each of value may have one of the followings:
      *  - string in format 'Formatter\Class\Name:param1=value1,param2=value2'
      *  - array in format ['Formatter\Class\Name', 'param1' => 'value1', 'param2' => 'value2]
-     *  - Closure in format `function (Contracts\FileSource $source, Formatters\InlineFormatter $formatter).
+     *  - Closure in format `function (Contracts\FileSource $source, Contracts\Storage $storage, Formatters\InlineFormatter $formatter).
      * This Closure must return string path to temporary formatted file or null if file cannot be converted.
      * 
      * Without writing full class names you may use abbreviations like 'image/thumb'. See FormatterFactory for more info.

@@ -34,7 +34,7 @@ abstract class BaseImageFormatter extends Formatters\AbstractFormatter
      * @param Image $image
      * @return Image|string|null
      */
-    abstract protected function processImage(Image $image, Contracts\FileSource $source);
+    abstract protected function processImage(Image $image, Contracts\FileSource $source, Contracts\Storage $storage);
 
     /**
      * @param ImageManager $imageManager
@@ -51,10 +51,10 @@ abstract class BaseImageFormatter extends Formatters\AbstractFormatter
     /**
      * @inheritdoc
      */
-    public function format(Contracts\FileSource $source)
+    public function format(Contracts\FileSource $source, Contracts\Storage $storage)
     {
         $img = $this->getImageManager()->make($source->contents());
-        $result = $this->processImage($img, $source);
+        $result = $this->processImage($img, $source, $storage);
 
         if ($result instanceof Image) {
             $extension = $this->generateExtension($source);
@@ -69,7 +69,7 @@ abstract class BaseImageFormatter extends Formatters\AbstractFormatter
     /**
      * @return ImageManager
      */
-    protected function getImageManager()
+    public function getImageManager()
     {
         return $this->imageManager;
     }

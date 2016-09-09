@@ -4,6 +4,7 @@ namespace Bicycle\FilesManager\Formatters;
 
 use Bicycle\FilesManager\Contracts\Context as ContextInterface;
 use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
+use Bicycle\FilesManager\Contracts\Storage as StorageInterface;
 use Bicycle\FilesManager\Exceptions\FileSystemException;
 use Bicycle\FilesManager\Exceptions\InvalidConfigException;
 
@@ -61,6 +62,20 @@ class FromFormatter extends AbstractFormatter
     }
 
     /**
+     * @inheritdoc
+     */
+    protected function init()
+    {
+        if (in_array($this->source, [null, ''], true)) {
+            throw new InvalidConfigException('Property "source" is required for `' . $this->getName() . '` formatter.');
+        } elseif (in_array($this->formatter, [null, ''], true)) {
+            throw new InvalidConfigException('Property "formatter" is required for `' . $this->getName() . '` formatter.');
+        }
+
+        return parent::init();
+    }
+
+    /**
      * @return string[]
      */
     protected function selfProperties()
@@ -81,10 +96,9 @@ class FromFormatter extends AbstractFormatter
     }
 
     /**
-     * @param FileSourceInterface $source
      * @inheritdoc
      */
-    public function format(FileSourceInterface $source)
+    public function format(FileSourceInterface $source, StorageInterface $storage)
     {
         if ($this->isProcess) {
             throw new InvalidConfigException("The '{$this->getName()}' formatter of '{$this->getContext()->getName()}' context has an infinite cycle in own formatters hierarchy.");
@@ -92,7 +106,7 @@ class FromFormatter extends AbstractFormatter
         $this->isProcess = true;
 
         try {
-            $result = $this->process($source);
+            $result = $this->process($source, $storage);
         } catch (\Exception $ex) {
             $this->isProcess = false;
             throw $ex;
@@ -109,34 +123,34 @@ class FromFormatter extends AbstractFormatter
      * The main logic of this formatter.
      * 
      * @param FileSourceInterface $source
+     * @param StorageInterface $storage
      * @return string|null
      */
-    protected function process(FileSourceInterface $source)
+    protected function process(FileSourceInterface $source, StorageInterface $storage)
     {
         $format = $this->source;
-        if ($format === null || $format === '') {
-            throw new InvalidConfigException('Property $source is required for `from` formatter.');
-        } elseif (!$this->ensureFormattedFileExists($source, $format)) {
+        if (!$this->ensureFormattedFileExists($source, $storage, $format)) {
             return null;
         }
 
         $fileSource = $this->getContext()->getSourceFactory()->formattedFile($source, $format);
         $formatter = $this->getFactory()->make($this->getContext(), $this->getName(), $this->formatter, $this->params);
 
-        return $formatter->format($fileSource);
+        return $formatter->format($fileSource, $storage);
     }
 
     /**
      * @param FileSourceInterface $source
+     * @param StorageInterface $storage
      * @param string $format
      * @return boolean
      * @throws FileSystemException
      */
-    protected function ensureFormattedFileExists(FileSourceInterface $source, $format)
+    protected function ensureFormattedFileExists(FileSourceInterface $source, StorageInterface $storage, $format)
     {
         if ($source->exists($format)) {
             return true;
-        } elseif ($this->getContext()->generateFormattedFile($source, $format)) {
+        } elseif ($storage->generateFormattedFile($source, $format)) {
             return true;
         } elseif ($this->required) {
             throw new FileSystemException("Cannot generate formatted as '$format' version of '{$source->relativePath()}' file.");

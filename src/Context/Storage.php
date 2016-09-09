@@ -202,7 +202,7 @@ class Storage implements Contracts\Storage
     public function generateFormattedFile(Contracts\FileSource $source, $format)
     {
         $formatter = $this->context()->getFormatter($format);
-        $tmpPath = $formatter->format($source);
+        $tmpPath = $formatter->format($source, $this);
         if (!$tmpPath) {
             return false;
         }

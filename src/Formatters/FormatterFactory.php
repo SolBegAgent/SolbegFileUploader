@@ -22,7 +22,9 @@ class FormatterFactory implements FormatterFactoryInterface
     protected $aliases = [
         'from' => FromFormatter::class,
         'inline' => InlineFormatter::class,
+
         'image/fit' => Image\FitFormatter::class,
+        'image/resize' => Image\ResizeFormatter::class,
     ];
 
     /**
@@ -112,10 +114,10 @@ class FormatterFactory implements FormatterFactoryInterface
     protected function parseStringConfig($string)
     {
         if (false !== $pos = mb_strpos($string, ':', 0, 'UTF-8')) {
-            $class = mb_substr($string, 0, $pos, 'UTF-8');
-            $paramsString = mb_substr($string, $pos + 1, null, 'UTF-8');
+            $class = trim(mb_substr($string, 0, $pos, 'UTF-8'));
+            $paramsString = ltrim(mb_substr($string, $pos + 1, null, 'UTF-8'));
         } else {
-            list($class, $paramsString) = [$string, ''];
+            list($class, $paramsString) = [trim($string), ''];
         }
 
         $parts = preg_split('/(\,\s*)/u', $paramsString, null, PREG_SPLIT_NO_EMPTY);
@@ -123,13 +125,36 @@ class FormatterFactory implements FormatterFactoryInterface
         foreach ($parts as $part) {
             $keyValuePair = preg_split('/(\s*\=\s*)/u', $part);
             if (isset($keyValuePair[0], $keyValuePair[1])) {
-                $result[$keyValuePair[0]] = $keyValuePair[1];
+                $result[$keyValuePair[0]] = $this->typecastParsedValue($keyValuePair[1]);
             } else {
                 $result[$part] = true;
             }
         }
 
         return array_merge([$class], $result);
+    }
+
+    /**
+     * @param string $value
+     * @return mixed
+     */
+    protected function typecastParsedValue($value)
+    {
+        if (!is_string($value)) {
+            return $value;
+        } elseif ($value === '' || strcasecmp($value, 'null') === 0) {
+            return null;
+        } elseif (preg_match('/^\-?(?:0|[1-9]\d*)$/', $value)) {
+            return (int) $value;
+        } elseif (is_numeric($value)) {
+            return (float) $value;
+        } elseif (strcasecmp($value, 'true') === 0) {
+            return true;
+        } elseif (strcasecmp($value, 'false') === 0) {
+            return false;
+        } else {
+            return $value;
+        }
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Bicycle\FilesManager\Formatters;
 use Bicycle\FilesManager\Contracts\Context as ContextInterface;
 use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
 use Bicycle\FilesManager\Contracts\Formatter as FormatterInterface;
+use Bicycle\FilesManager\Contracts\Storage as StorageInterface;
 use Bicycle\FilesManager\Helpers\ConfigurableTrait;
 
 /**
@@ -39,7 +40,7 @@ abstract class AbstractFormatter implements FormatterInterface
     /**
      * @inheritdoc
      */
-    abstract public function format(FileSourceInterface $source);
+    abstract public function format(FileSourceInterface $source, StorageInterface $storage);
 
     /**
      * @param string $name
@@ -85,7 +86,7 @@ abstract class AbstractFormatter implements FormatterInterface
      * @param string|null $extension
      * @return string
      */
-    protected function generateNewTempFilename($extension = null)
+    public function generateNewTempFilename($extension = null)
     {
         return $this->getContext()->getManager()->generateNewTempFilename($extension);
     }
@@ -93,7 +94,7 @@ abstract class AbstractFormatter implements FormatterInterface
     /**
      * @param FileSourceInterface $source
      */
-    protected function generateExtension(FileSourceInterface $source)
+    public function generateExtension(FileSourceInterface $source)
     {
         if ($this->forceExtension !== false) {
             return $this->forceExtension;
