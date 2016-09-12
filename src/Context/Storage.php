@@ -5,6 +5,7 @@ namespace Bicycle\FilesManager\Context;
 use Bicycle\FilesManager\Contracts;
 use Bicycle\FilesManager\Exceptions;
 use Bicycle\FilesManager\File\NameGenerators\RandomNameGenerator;
+use Bicycle\FilesManager\File\ContentStreams;
 use Bicycle\FilesManager\Helpers;
 
 use Illuminate\Contracts\Container\Container;
@@ -186,8 +187,13 @@ class Storage implements Contracts\Storage
         $relativePath = $this->getNameGenerator()->generatePathForNewFile($source);
         $fullpath = $this->getNameGenerator()->getFileFullPath($relativePath, null);
 
-        if (!$this->disk()->put($fullpath, $source->contents())) {
-            throw new Exceptions\FileSystemException("Cannot write file by path: '$fullpath'.");
+        $contents = $source->contents();
+        try {
+            if (!$this->disk()->put($fullpath, $contents->stream())) {
+                throw new Exceptions\FileSystemException("Cannot write file by path: '$fullpath'.");
+            }
+        } finally {
+            $contents->close();
         }
         $resultSource = $this->context()->getSourceFactory()->storedFile($relativePath, $this);
 
@@ -215,16 +221,18 @@ class Storage implements Contracts\Storage
         }
 
         $tmpSource = $this->context()->getSourceFactory()->simpleFile(new File($tmpPath));
+        $tmpContents = $tmpSource->contents();
         try {
             $fullPath = implode('/', [
                 $this->getRootDir(),
                 $this->getNameGenerator()->generatePathForNewFormattedFile($source->relativePath(), $format, $tmpSource),
             ]);
-            if (!$this->disk()->put($fullPath, $tmpSource->contents())) {
+            if (!$this->disk()->put($fullPath, $tmpContents->stream())) {
                 throw new Exceptions\FileSystemException("Cannot write file by path: '$fullPath'.");
             }
             return true;
         } finally {
+            $tmpContents->close();
             $tmpSource->delete();
         }
     }
@@ -337,7 +345,12 @@ class Storage implements Contracts\Storage
     public function fileContents($relativePath, $format = null)
     {
         return $this->operateWithFile(function ($path) {
-            return $this->disk()->get($path);
+            $disk = $this->disk();
+            $driver = $disk->getDriver();
+            if (method_exists($driver, 'readStream')) {
+                return new ContentStreams\Stream($driver->readStream($path));
+            }
+            return new ContentStreams\Content($disk->get($path));
         }, 'contents', $relativePath, $format);
     }
 

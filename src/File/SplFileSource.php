@@ -51,12 +51,7 @@ class SplFileSource implements FileSourceInterface
      */
     protected function originContents()
     {
-        $path = $this->getFile()->getPathname();
-        $result = @file_get_contents($path);
-        if ($result === false || $result === null) {
-            throw new FileSystemException("Cannot read file '$path'.");
-        }
-        return $result;
+        return new ContentStreams\Path($this->getFile()->getPathname());
     }
 
     /**

@@ -23,7 +23,7 @@ trait WithoutFormatting
      */
     abstract protected function originExists();
     /**
-     * @return string
+     * @return \Bicycle\FilesManager\Contracts\ContentStream
      */
     abstract protected function originContents();
     /**

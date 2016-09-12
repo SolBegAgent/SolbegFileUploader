@@ -53,7 +53,7 @@ class ContentFileSource implements FileSourceInterface
      */
     protected function originContents()
     {
-        return $this->content;
+        return new ContentStreams\Content($this->content);
     }
 
     /**

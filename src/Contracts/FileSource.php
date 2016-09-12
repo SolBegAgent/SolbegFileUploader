@@ -18,7 +18,7 @@ interface FileSource
      * 
      * @param string|null $format the name of formatted version of the file.
      * Null means original version.
-     * @return string
+     * @return ContentStream
      */
     public function contents($format = null);
 

@@ -81,12 +81,7 @@ class UrlFileSource implements FileSourceInterface
     protected function originContents()
     {
         $path = $this->isLocal ? $this->localPath() : $this->url;
-
-        $contents = @file_get_contents($path);
-        if ($contents === false || $contents === null) {
-            throw new FileSystemException("Cannot read contents by path: '$path'.");
-        }
-        return $contents;
+        return new ContentStreams\Path($path);
     }
 
     /**
@@ -106,11 +101,17 @@ class UrlFileSource implements FileSourceInterface
             return (new SymfonyFile($this->localPath()))->getSize();
         }
 
-        $result = $this->fetchUrlHeader('Content-Length');
-        if ($result === null) {
-            $result = mb_strlen($this->contents(), '8bit');
+        $header = $this->fetchUrlHeader('Content-Length');
+        if ($header !== null) {
+            return $header;
         }
-        return $result;
+
+        $contents = $this->contents();
+        try {
+            return mb_strlen($contents->contents(), '8bit');
+        } finally {
+            $contents->close();
+        }
     }
 
     /**

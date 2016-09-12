@@ -53,14 +53,20 @@ abstract class BaseImageFormatter extends Formatters\AbstractFormatter
      */
     public function format(Contracts\FileSource $source, Contracts\Storage $storage)
     {
-        $img = $this->getImageManager()->make($source->contents());
-        $result = $this->processImage($img, $source, $storage);
+        $contents = $source->contents();
 
-        if ($result instanceof Image) {
-            $extension = $this->generateExtension($source);
-            $tmpFile = $this->generateNewTempFilename($extension);
-            $result->save($tmpFile, $this->quality);
-            $result = $tmpFile;
+        try {
+            $img = $this->getImageManager()->make($contents->stream());
+            $result = $this->processImage($img, $source, $storage);
+
+            if ($result instanceof Image) {
+                $extension = $this->generateExtension($source);
+                $tmpFile = $this->generateNewTempFilename($extension);
+                $result->save($tmpFile, $this->quality);
+                $result = $tmpFile;
+            }
+        } finally {
+            $contents->close();
         }
 
         return $result;

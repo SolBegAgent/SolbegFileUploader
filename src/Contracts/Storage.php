@@ -50,7 +50,7 @@ interface Storage
      * 
      * @param string $relativePath relative path to origin file
      * @param string|null $format the name of format. Null is meaning origin file.
-     * @return string file contents
+     * @return ContentStream file contents
      */
     public function fileContents($relativePath, $format = null);
 
