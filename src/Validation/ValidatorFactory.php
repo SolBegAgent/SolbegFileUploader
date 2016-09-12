@@ -22,6 +22,7 @@ class ValidatorFactory implements Contracts\ValidatorFactory
         'extensions' => ExtensionValidator::class,
         'types' => MimeTypeValidator::class,
         'size' => SizeValidator::class,
+        'image' => ImageSizeValidator::class,
     ];
 
     /**

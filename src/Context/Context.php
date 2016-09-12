@@ -309,6 +309,10 @@ class Context implements Contracts\Context, Contracts\ContextInfo
     {
         $failed = $messages = [];
         foreach ($this->getValidators() as $rule => $validator) {
+            if ($validator->skipOnError() && ($failed || $messages)) {
+                continue;
+            }
+
             $error = $validator->validate($source);
             if ($error !== null) {
                 $messages[$rule] = $error;

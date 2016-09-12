@@ -37,14 +37,14 @@ abstract class BaseImageFormatter extends Formatters\AbstractFormatter
     abstract protected function processImage(Image $image, Contracts\FileSource $source, Contracts\Storage $storage);
 
     /**
-     * @param ImageManager $imageManager
+     * @param ImageManager $image
      * @param string $name
      * @param Contracts\Context $context
      * @param array $config
      */
-    public function __construct(ImageManager $imageManager, $name, Contracts\Context $context, array $config = [])
+    public function __construct(ImageManager $image, $name, Contracts\Context $context, array $config = [])
     {
-        $this->imageManager = $imageManager;
+        $this->imageManager = $image;
         parent::__construct($name, $context, $config);
     }
 

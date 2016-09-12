@@ -9,4 +9,9 @@ interface Validator
      * @return string|null
      */
     public function validate(FileSource $source);
+
+    /**
+     * @return boolean
+     */
+    public function skipOnError();
 }

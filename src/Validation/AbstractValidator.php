@@ -17,6 +17,11 @@ abstract class AbstractValidator implements Contracts\Validator
     use Helpers\ConfigurableTrait;
 
     /**
+     * @var boolean
+     */
+    protected $skipOnError = false;
+
+    /**
      * @var TranslatorInterface
      */
     private $translator;
@@ -54,6 +59,14 @@ abstract class AbstractValidator implements Contracts\Validator
      * @inheritdoc
      */
     abstract public function validate(Contracts\FileSource $source);
+
+    /**
+     * @inheritdoc
+     */
+    public function skipOnError()
+    {
+        return $this->skipOnError;
+    }
 
     /**
      * @return Contracts\Context
