@@ -9,7 +9,7 @@ use Bicycle\FilesManager\Contracts;
  *
  * @author Alexey Sejnov <alexey.sejnov@solbeg.com>
  */
-class ExtensionValidator extends AbstractValidator
+class ExtensionValidator extends AbstractValidator implements Contracts\Validators\ExtensionValidator
 {
     use DefaultMessageTrait;
 

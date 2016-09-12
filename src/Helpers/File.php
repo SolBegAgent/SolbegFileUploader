@@ -93,4 +93,47 @@ class File
         return substr_compare($filename, $extWithDot, -$extWithDotLength, $extWithDotLength) === 0 ||
             mb_strrpos($filename, ".$extension.", 0, 'UTF-8') !== false;
     }
+
+    /**
+     * @param string $sizeStr
+     * @return integer in bytes
+     */
+    public static function parseSize($sizeStr)
+    {
+        if ($sizeStr === null) {
+            return null;
+        } elseif (!is_scalar($sizeStr)) {
+            throw new \InvalidArgumentException("Size param must be either null or integer or string.");
+        } elseif (is_string($sizeStr) && preg_match('/^(\d+)([KMG])/i', $sizeStr, $matches)) {
+            $bytes = (int) $matches[1];
+            switch (strtoupper($matches[2])) {
+                case 'G':
+                    $bytes *= 1024; // no break
+                case 'M':
+                    $bytes *= 1024; // no break
+                case 'K':
+                    $bytes *= 1024; // no break
+            }
+            return $bytes;
+        }
+        return (int) $sizeStr;
+    }
+
+    /**
+     * @param integer $bytes
+     * @param integer $precision
+     * @return string
+     */
+    public static function formatBytes($bytes, $precision = 2)
+    {
+        if ($bytes > 0) {
+            $bytes = (int) $bytes;
+            $base = log($bytes) / log(1024);
+            $suffixes = [' B', ' KB', ' MB', ' GB', ' TB'];
+            $suffix = isset($suffixes[floor($base)]) ? $suffixes[floor($base)] : ' TB';
+            return round(pow(1024, $base - floor($base)), $precision) . $suffix;
+        } else {
+            return $bytes;
+        }
+    }
 }

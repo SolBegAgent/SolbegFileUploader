@@ -3,23 +3,26 @@
 namespace Bicycle\FilesManager\Validation;
 
 use Bicycle\FilesManager\Contracts;
+use Bicycle\FilesManager\Helpers;
 
 /**
  * SizeValidator validates min/max file's size.
  *
  * @author Alexey Sejnov <alexey.sejnov@solbeg.com>
  */
-class SizeValidator extends AbstractValidator
+class SizeValidator extends AbstractValidator implements
+    Contracts\Validators\MinSizeValidator,
+    Contracts\Validators\MaxSizeValidator
 {
     /**
      * @var integer|null in bytes
      */
-    public $min;
+    protected $min;
 
     /**
      * @var integer|null in bytes
      */
-    public $max;
+    protected $max;
 
     /**
      * @var string|null
@@ -30,6 +33,11 @@ class SizeValidator extends AbstractValidator
      * @var string|null
      */
     protected $maxMessage;
+
+    /**
+     * @var integer
+     */
+    protected $formatPrecision = 2;
 
     /**
      * @inheritdoc
@@ -51,17 +59,16 @@ class SizeValidator extends AbstractValidator
             return $this->{$msgProperty};
         }
 
-        $size = $this->{$attr};
-        $bytes = $this->parseSizeValue($size);
+        $method = 'get' . ucfirst($attr) . 'Size';
         $fileBytes = $source->size();
 
         return $this->trans()->trans("filesmanager::validation.$attr-size", [
             'file' => $source->name(),
             'fileBytes' => $fileBytes,
-            'fileSize' => $this->formatBytes($fileBytes),
-            'size' => $size,
-            'bytes' => $bytes,
-            'limit' => $this->formatBytes($bytes),
+            'fileSize' => Helpers\File::formatBytes($fileBytes, $this->formatPrecision),
+            'size' => $this->{$attr},
+            'bytes' => $this->{$method}(false),
+            'limit' => $this->{$method}(true),
         ]);
     }
 
@@ -73,10 +80,13 @@ class SizeValidator extends AbstractValidator
         $fileSize = $source->size();
         $messages = [];
 
-        if ($this->min !== null && $fileSize < $this->min) {
+        $min = $this->getMinSize(false);
+        if ($min !== null && $fileSize < $min) {
             $messages[] = $this->message('min', $source);
         }
-        if ($this->max !== null && $fileSize > $this->max) {
+
+        $max = $this->getMaxSize(false);
+        if ($max !== null && $fileSize > $max) {
             $messages[] = $this->message('max', $source);
         }
 
@@ -84,43 +94,20 @@ class SizeValidator extends AbstractValidator
     }
 
     /**
-     * @param string $sizeStr
-     * @return integer in bytes
+     * @inheritdoc
      */
-    public function parseSizeValue($sizeStr)
+    public function getMinSize($formatted = false)
     {
-        if ($sizeStr === null || !is_scalar($sizeStr)) {
-            return $sizeStr;
-        } elseif (is_string($sizeStr) && preg_match('/^(\d+)([KMG])/i', $sizeStr, $matches)) {
-            $bytes = (int) $matches[1];
-            switch (strtoupper($matches[2])) {
-                case 'G':
-                    $bytes *= 1024; // no break
-                case 'M':
-                    $bytes *= 1024; // no break
-                case 'K':
-                    $bytes *= 1024; // no break
-            }
-            return $bytes;
-        }
-        return (int) $sizeStr;
+        $size = Helpers\File::parseSize($this->min);
+        return (!$formatted || $size === null) ? $size : Helpers\File::formatBytes($size, $this->formatPrecision);
     }
 
     /**
-     * @param integer $bytes
-     * @param integer $precision
-     * @return string
+     * @inheritdoc
      */
-    public function formatBytes($bytes, $precision = 2)
+    public function getMaxSize($formatted = false)
     {
-        if ($bytes > 0) {
-            $bytes = (int) $bytes;
-            $base = log($bytes) / log(1024);
-            $suffixes = [' B', ' KB', ' MB', ' GB', ' TB'];
-            $suffix = isset($suffixes[floor($base)]) ? $suffixes[floor($base)] : ' TB';
-            return round(pow(1024, $base - floor($base)), $precision) . $suffix;
-        } else {
-            return $bytes;
-        }
+        $size = Helpers\File::parseSize($this->max);
+        return (!$formatted || $size === null) ? $size : Helpers\File::formatBytes($size, $this->formatPrecision);
     }
 }

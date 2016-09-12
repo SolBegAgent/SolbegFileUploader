@@ -188,4 +188,12 @@ class File implements FileSourceInterface
     {
         return $this->source->formats();
     }
+
+    /**
+     * @return ContextInterface
+     */
+    public function context()
+    {
+        return $this->context;
+    }
 }

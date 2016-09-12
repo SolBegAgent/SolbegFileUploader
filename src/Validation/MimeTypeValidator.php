@@ -10,7 +10,7 @@ use Bicycle\FilesManager\Helpers;
  *
  * @author Alexey Sejnov <alexey.sejnov@solbeg.com>
  */
-class MimeTypeValidator extends AbstractValidator
+class MimeTypeValidator extends AbstractValidator implements Contracts\Validators\MimeTypeValidator
 {
     use DefaultMessageTrait;
 

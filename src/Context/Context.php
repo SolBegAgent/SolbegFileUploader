@@ -12,7 +12,7 @@ use Bicycle\FilesManager\Helpers;
 /**
  * @author Alexey Sejnov <alexey.sejnov@solbeg.com>
  */
-class Context implements Contracts\Context
+class Context implements Contracts\Context, Contracts\ContextInfo
 {
     use Helpers\ConfigurableTrait;
 
@@ -317,6 +317,54 @@ class Context implements Contracts\Context
         }
         if ($failed && $messages) {
             throw new Exceptions\ValidationException($this, $source, $messages, $failed);
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function allowedMimeTypes()
+    {
+        foreach ($this->getValidators() as $validator) {
+            if ($validator instanceof Contracts\Validators\MimeTypeValidator) {
+                return $validator->getTypes();
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function allowedExtensions()
+    {
+        foreach ($this->getValidators() as $validator) {
+            if ($validator instanceof Contracts\Validators\ExtensionValidator) {
+                return $validator->getExtensions();
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function allowedMinSize($formatted = false)
+    {
+        foreach ($this->getValidators() as $validator) {
+            if ($validator instanceof Contracts\Validators\MinSizeValidator) {
+                return $validator->getMinSize($formatted);
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function allowedMaxSize($formatted = false)
+    {
+        foreach ($this->getValidators() as $validator) {
+            if ($validator instanceof Contracts\Validators\MaxSizeValidator) {
+                return $validator->getMaxSize($formatted);
+            }
         }
     }
 }
