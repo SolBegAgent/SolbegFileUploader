@@ -10,12 +10,12 @@ namespace Bicycle\FilesManager\Context\FileNotFound;
 trait AllowedFormatsTrait
 {
     /**
-     * @var array|null
+     * @var array|string|null
      */
     protected $onlyFormats = null;
 
     /**
-     * @var array|null
+     * @var array|string|null
      */
     protected $exceptFormats = null;
 
@@ -28,12 +28,12 @@ trait AllowedFormatsTrait
         $format = $exception->getFormat();
         if ($format === null) {
             return false;
-        } elseif (is_array($this->exceptFormats) && in_array($format, $this->exceptFormats, true)) {
+        } elseif ($this->exceptFormats !== null && in_array($format, (array) $this->exceptFormats, true)) {
             return false;
-        } elseif (!is_array($this->onlyFormats)) {
+        } elseif ($this->onlyFormats === null) {
             return true;
         } else {
-            return in_array($format, $this->onlyFormats, true);
+            return in_array($format, (array) $this->onlyFormats, true);
         }
     }
 }

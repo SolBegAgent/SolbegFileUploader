@@ -28,4 +28,12 @@ interface FormatterFactory
      * @return Formatter|null
      */
     public function parse(Context $context, $name);
+
+    /**
+     * Changes parses so you may configure your own logic of parsing format names.
+     * 
+     * @param array[]|string[]|\Closure[]|FormatterParser[] $parsers
+     * @param boolean $replaceAll whether should be replaced all parsers or only passed in $parsers.
+     */
+    public function parsers(array $parsers, $replaceAll = true);
 }

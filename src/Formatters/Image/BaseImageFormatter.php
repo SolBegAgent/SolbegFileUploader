@@ -23,7 +23,7 @@ abstract class BaseImageFormatter extends Formatters\AbstractFormatter
     /**
      * @inheritdoc
      */
-    protected $defaultExtension = 'jpg';
+    protected $defaultExtension = 'png';
 
     /**
      * @var ImageManager

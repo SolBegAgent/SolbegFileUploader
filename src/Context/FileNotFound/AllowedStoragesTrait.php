@@ -10,12 +10,12 @@ namespace Bicycle\FilesManager\Context\FileNotFound;
 trait AllowedStoragesTrait
 {
     /**
-     * @var array|null
+     * @var array|string|null
      */
     protected $onlyStorages = null;
 
     /**
-     * @var array|null
+     * @var array|string|null
      */
     protected $exceptStorages = null;
 
@@ -26,12 +26,12 @@ trait AllowedStoragesTrait
     protected function isAllowedStorage($exception)
     {
         $storageName = $exception->getStorage()->name();
-        if (is_array($this->exceptStorages) && in_array($storageName, $this->exceptStorages, true)) {
+        if ($this->exceptStorages !== null && in_array($storageName, (array) $this->exceptStorages, true)) {
             return false;
-        } elseif (!is_array($this->onlyStorages)) {
+        } elseif ($this->onlyStorages === null) {
             return true;
         } else {
-            return in_array($storageName, $this->onlyStorages, true);
+            return in_array($storageName, (array) $this->onlyStorages, true);
         }
     }
 }

@@ -7,6 +7,7 @@ use Illuminate\Contracts\Container\Container;
 use Bicycle\FilesManager\Contracts\Context as ContextInterface;
 use Bicycle\FilesManager\Contracts\Formatter as FormatterInterface;
 use Bicycle\FilesManager\Contracts\FormatterFactory as FormatterFactoryInterface;
+use Bicycle\FilesManager\Contracts\FormatterParser as ParserInterface;
 use Bicycle\FilesManager\Exceptions\InvalidConfigException;
 use Bicycle\FilesManager\Helpers;
 
@@ -17,15 +18,30 @@ use Bicycle\FilesManager\Helpers;
  */
 class FormatterFactory implements FormatterFactoryInterface
 {
+    const ALIAS_FROM = 'from';
+    const ALIAS_INLINE = 'inline';
+    const ALIAS_IMAGE_FIT = 'image/fit';
+    const ALIAS_IMAGE_RESIZE = 'image/resize';
+    const ALIAS_IMAGE_THUMB = 'image/thumb';
+
     /**
      * @var array
      */
     protected $aliases = [
-        'from' => FromFormatter::class,
-        'inline' => InlineFormatter::class,
+        self::ALIAS_FROM => FromFormatter::class,
+        self::ALIAS_INLINE => InlineFormatter::class,
 
-        'image/fit' => Image\FitFormatter::class,
-        'image/resize' => Image\ResizeFormatter::class,
+        self::ALIAS_IMAGE_FIT => Image\FitFormatter::class,
+        self::ALIAS_IMAGE_RESIZE => Image\ResizeFormatter::class,
+        self::ALIAS_IMAGE_THUMB => Image\ThumbnailFormatter::class,
+    ];
+
+    /**
+     * @var array
+     */
+    protected $parsers = [
+        'num' => Parsers\NumParser::class,
+        'num_x_num' => Parsers\NumXNumParser::class,
     ];
 
     /**
@@ -50,6 +66,8 @@ class FormatterFactory implements FormatterFactoryInterface
             return $this->inline($context, $name, $config);
         } elseif (is_string($config)) {
             $config = $this->parseStringConfig($config);
+        } elseif ($config instanceof FormatterInterface) {
+            return $config;
         }
 
         if (!isset($config[0])) {
@@ -101,6 +119,7 @@ class FormatterFactory implements FormatterFactoryInterface
 
     /**
      * @inheritdoc
+     * @return static $this
      */
     public function alias($alias, $class)
     {
@@ -125,10 +144,78 @@ class FormatterFactory implements FormatterFactoryInterface
 
     /**
      * @inheritdoc
+     * @return static $this
+     */
+    public function parsers(array $parsers, $replaceAll = true)
+    {
+        if (!$replaceAll) {
+            $parsers = array_merge($this->parsers, $parsers);
+        }
+        foreach ($parsers as $key => $parser) {
+            if ($parser === null) {
+                unset($parsers[$key]);
+            }
+        }
+        $this->parsers = $parsers;
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return ParserInterface|Parsers\AbstractParser
+     */
+    public function parser($name)
+    {
+        if (!isset($this->parsers[$name])) {
+            throw new \InvalidArgumentException("Parser '$name' was not found.");
+        }
+        $parser = $this->parsers[$name];
+        if (!$parser instanceof ParserInterface) {
+            $this->parsers[$name] = $parser = $this->createParser($parser);
+        }
+        return $parser;
+    }
+
+    /**
+     * @inheritdoc
      */
     public function parse(ContextInterface $context, $name)
     {
+        foreach (array_keys($this->parsers) as $key) {
+            $parsed = $this->parser($key)->parse($name, $context);
+            if ($parsed !== null) {
+                return $this->build($context, $name, $parsed);
+            }
+        }
         return null;
+    }
+
+    /**
+     * @param mixed $config
+     * @return ParserInterface
+     * @throws InvalidConfigException
+     */
+    protected function createParser($config)
+    {
+        if ($config instanceof \Closure) {
+            list($class, $config) = [Parsers\InlineParser::class, ['callback' => $config]];
+        } elseif (is_string($config)) {
+            list($class, $config) = [$config, []];
+        } elseif (!is_array($config) || !isset($config[0])) {
+            throw new InvalidConfigException('Invalid config of parser. The first element of an array required and must keep the name of parser class.');
+        } else {
+            $class = $config[0];
+            unset($config[0]);
+        }
+
+        $result = $this->getContainer()->make($class, [
+            'factory' => $this,
+            'config' => $config,
+        ]);
+        if (!$result instanceof ParserInterface) {
+            throw new InvalidConfigException("Invalid config of parser '$class'. It must implement '" . ParserInterface::class . '\' interface.');
+        }
+        return $result;
     }
 
     /**

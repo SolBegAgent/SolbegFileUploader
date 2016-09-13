@@ -18,14 +18,14 @@ use Intervention\Image\Image;
 class ResizeFormatter extends BaseImageFormatter
 {
     /**
-     * The new width of the image (required).
+     * The new width of the image.
      * 
      * @var integer
      */
     protected $width;
 
     /**
-     * The new height of the image (required).
+     * The new height of the image.
      * 
      * @var integer
      */
@@ -50,8 +50,8 @@ class ResizeFormatter extends BaseImageFormatter
      */
     protected function init()
     {
-        if (!$this->width || !$this->height) {
-            throw new Exceptions\InvalidConfigException('The properties "width" and "height" must be set in "' . $this->getName() . '" formatter.');
+        if (!$this->width && !$this->height) {
+            throw new Exceptions\InvalidConfigException('At least one of the properties "width" or "height" must be set in "' . $this->getName() . '" formatter.');
         }
         return parent::init();
     }
@@ -61,7 +61,7 @@ class ResizeFormatter extends BaseImageFormatter
      */
     protected function processImage(Image $image, Contracts\FileSource $source, Contracts\Storage $storage)
     {
-        return $image->resize($this->width, $this->height, function ($constraint) {
+        return $image->resize($this->width ?: null, $this->height ?: null, function ($constraint) {
             /* @var $constraint \Intervention\Image\Constraint */
             if ($this->aspectRatio) {
                 $constraint->aspectRatio();

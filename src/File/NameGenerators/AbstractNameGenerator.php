@@ -7,6 +7,7 @@ use Illuminate\Filesystem\FilesystemAdapter;
 use Bicycle\FilesManager\Contracts\Context as ContextInterface;
 use Bicycle\FilesManager\Contracts\FileNameGenerator as GeneratorInterface;
 use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
+use Bicycle\FilesManager\Exceptions\InvalidConfigException;
 use Bicycle\FilesManager\Helpers\ConfigurableTrait;
 use Bicycle\FilesManager\Helpers\File as FileHelper;
 
@@ -156,6 +157,10 @@ abstract class AbstractNameGenerator implements GeneratorInterface
      */
     public function generatePathForNewFormattedFile($relativePathToOrigin, $format, FileSourceInterface $source)
     {
+        if (!$this->isValidFormatName($format)) {
+            throw new InvalidConfigException("Invalid name of format: '$format', " . FileHelper::basename(static::class) . ' allows only names that are valid directory names.');
+        }
+
         $extension = $source->extension();
         $filename = $extension === null ? $format : "$format.$extension";
         return "{$this->generateFormatsRelativeDir($relativePathToOrigin)}/$filename";
@@ -325,5 +330,18 @@ abstract class AbstractNameGenerator implements GeneratorInterface
             }
         }
         return true;
+    }
+
+    /**
+     * Validates formatter name.
+     * @param string $formatName
+     * @return boolean whether the name is valid or not.
+     */
+    protected function isValidFormatName($formatName)
+    {
+        if (!is_string($formatName) || in_array($formatName, ['', '.', '..'], true)) {
+            return false;
+        }
+        return !$this->containsSpecialChar($formatName);
     }
 }

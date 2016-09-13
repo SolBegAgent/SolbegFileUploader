@@ -23,6 +23,7 @@ class FitFormatter extends BaseImageFormatter
 {
     /**
      * The width the image will be resized to after cropping out the best fitting aspect ratio.
+     * If no width is given, method will use same value as height.
      * 
      * @var integer|null
      */
