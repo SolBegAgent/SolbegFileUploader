@@ -42,6 +42,7 @@ class FilesManagerServiceProvider extends ServiceProvider
     {
         $this->registerTranslations();
         $this->registerValidators();
+        $this->publishConfig();
     }
 
     /**
@@ -85,5 +86,19 @@ class FilesManagerServiceProvider extends ServiceProvider
     protected function registerTranslations()
     {
         $this->loadTranslationsFrom(__DIR__ . '/resources/lang', 'filesmanager');
+    }
+
+    /**
+     * Publishes the main config of filesmanager.
+     */
+    protected function publishConfig()
+    {
+        $path = __DIR__ . '/resources/config/filemanager.php';
+        $configKey = 'filemanager';
+
+        $this->mergeConfigFrom($path, $configKey);
+        $this->publishes([
+            $path => config_path("$configKey.php"),
+        ], 'config');
     }
 }

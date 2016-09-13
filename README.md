@@ -1,3 +1,16 @@
+*The plugin and documentation under development!*
+
+INSTALLATION
+============
+
+Schema:
+
+- composer install
+- use service provider
+- publish filemanager config
+- configure contexts & models (where docs about generating context config)
+
+
 Configure file contexts:
 
 // app/config/filecontexts.php

@@ -2,13 +2,14 @@
 
 namespace Bicycle\FilesManager\Formatters;
 
-use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Foundation\Application;
 
 use Bicycle\FilesManager\Contracts\Context as ContextInterface;
 use Bicycle\FilesManager\Contracts\Formatter as FormatterInterface;
 use Bicycle\FilesManager\Contracts\FormatterFactory as FormatterFactoryInterface;
 use Bicycle\FilesManager\Contracts\FormatterParser as ParserInterface;
 use Bicycle\FilesManager\Exceptions\InvalidConfigException;
+use Bicycle\FilesManager\Exceptions\FormatterParserNotFoundException;
 use Bicycle\FilesManager\Helpers;
 
 /**
@@ -39,22 +40,20 @@ class FormatterFactory implements FormatterFactoryInterface
     /**
      * @var array
      */
-    protected $parsers = [
-        'num' => Parsers\NumParser::class,
-        'num_x_num' => Parsers\NumXNumParser::class,
-    ];
+    protected $parsers;
 
     /**
-     * @var Container
+     * @var Application
      */
-    private $container;
+    private $app;
 
     /**
-     * @param Container $container
+     * @param Application $app
      */
-    public function __construct(Container $container)
+    public function __construct(Application $app)
     {
-        $this->container = $container;
+        $this->app = $app;
+        $this->parsers = $app['config']['format_parsers'] ?: [];
     }
 
     /**
@@ -163,11 +162,12 @@ class FormatterFactory implements FormatterFactoryInterface
     /**
      * @param string $name
      * @return ParserInterface|Parsers\AbstractParser
+     * @throws FormatterParserNotFoundException
      */
     public function parser($name)
     {
         if (!isset($this->parsers[$name])) {
-            throw new \InvalidArgumentException("Parser '$name' was not found.");
+            throw new FormatterParserNotFoundException($name);
         }
         $parser = $this->parsers[$name];
         if (!$parser instanceof ParserInterface) {
@@ -219,10 +219,10 @@ class FormatterFactory implements FormatterFactoryInterface
     }
 
     /**
-     * @return Container
+     * @return \Illuminate\Contracts\Container\Container
      */
     public function getContainer()
     {
-        return $this->container;
+        return $this->app;
     }
 }

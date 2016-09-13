@@ -2,22 +2,22 @@
 
 namespace Bicycle\FilesManager\Exceptions;
 
-class UnknownContextTypeException extends \Exception
+class FormatterParserNotFoundException extends \Exception
 {
     /**
      * @var string
      */
-    private $contextType;
+    private $parserName;
 
     /**
-     * @param string $contextType
+     * @param string $parserName
      * @param string|null $message
      * @param integer $code
      * @param \Exception $previous
      */
-    public function __construct($contextType, $message = null, $code = 0, \Exception $previous = null)
+    public function __construct($parserName, $message = null, $code = 0, \Exception $previous = null)
     {
-        $this->contextType = $contextType;
+        $this->parserName = $parserName;
         if ($message === null || $message === '') {
             $message = $this->generateMessage();
         }
@@ -27,16 +27,16 @@ class UnknownContextTypeException extends \Exception
     /**
      * @return string
      */
-    public function getContextType()
+    protected function generateMessage()
     {
-        return $this->contextType;
+        return "Parser '{$this->getParserName()}' was not found.";
     }
 
     /**
      * @return string
      */
-    protected function generateMessage()
+    public function getParserName()
     {
-        return "Unknown files context type: '{$this->getContextType()}'.";
+        return $this->parserName;
     }
 }

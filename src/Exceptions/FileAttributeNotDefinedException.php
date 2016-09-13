@@ -7,12 +7,12 @@ class FileAttributeNotDefinedException extends \Exception
     /**
      * @var string
      */
-    protected $modelClass;
+    private $modelClass;
 
     /**
      * @var string
      */
-    protected $attributeName;
+    private $attributeName;
 
     /**
      * @param string $modelClass
@@ -39,5 +39,21 @@ class FileAttributeNotDefinedException extends \Exception
     protected function generateMessage()
     {
         return "File attribute '$this->attributeName' is not defined in `{$this->modelClass}::filesAttributes()`.";
+    }
+
+    /**
+     * @return string
+     */
+    public function getModelClass()
+    {
+        return $this->modelClass;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAttributeName()
+    {
+        return $this->attributeName;
     }
 }

@@ -57,7 +57,7 @@ class ContextFactory implements Contracts\ContextFactory
      */
     public function make($name, array $config = [])
     {
-        $type = isset($config['type']) ? $config['type'] : static::TYPE_DEFAULT;
+        $type = isset($config['type']) ? $config['type'] : $this->app['config']['filemanager.default_type'];
         unset($config['type']);
         $resultConfig = Helpers\Config::merge($this->resolveTypeConfig($type), $config);
 
@@ -148,41 +148,17 @@ class ContextFactory implements Contracts\ContextFactory
      */
     protected function resolveTypeConfig($type)
     {
-        $defaultTypes = $this->defaultTypes();
         $appGlobalConfig = $this->app['config']['filemanager.global'];
         $appTypeConfig = $this->app['config']["filemanager.types.$type"];
 
-        if (!isset($defaultTypes[$type]) && !is_array($appTypeConfig) && !isset($this->types[$type])) {
+        if (!is_array($appTypeConfig) && !isset($this->types[$type])) {
             throw new Exceptions\UnknownContextTypeException($type);
         }
 
         return Helpers\Config::merge(
             $appGlobalConfig ?: [],
-            isset($defaultTypes[$type]) ? $defaultTypes[$type] : [],
             $appTypeConfig ?: [],
             isset($this->types[$type]) ? $this->types[$type] : []
         );
-    }
-
-    /**
-     * Default configuration of types.
-     * 
-     * @return array
-     */
-    protected function defaultTypes()
-    {
-        return [
-            static::TYPE_DEFAULT => [],
-            'image' => [
-                'validate' => [
-                    'types' => 'image/*',
-                    'extensions' => implode(', ', [ // imploding for useful merging if user wants to override this config
-                        'jpg',
-                        'jpeg',
-                        'png',
-                    ]),
-                ],
-            ],
-        ];
     }
 }
