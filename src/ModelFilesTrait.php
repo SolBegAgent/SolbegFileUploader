@@ -37,9 +37,15 @@ trait ModelFilesTrait
      *  return [
      *      'logo' => 'product-logo', // means using 'product-logo' context for 'logo' attribute
      *      'photo' => [ // current config will be used for 'photo' attribute
-     *          'mime_types' => 'image/jpeg, image/png',
-     *          'extensions' => ['jpg', 'jpeg', 'png'],
-     *          // ...
+     *          'formats' => [
+     *              'thumbnail' => 'image/thumb: width = 200, height = 300',
+     *          ],
+     * 
+     *          'validate' => [
+     *              'types' => 'image/jpeg, image/png',
+     *              'extensions' => ['jpg', 'jpeg', 'png'],
+     *              // ...
+     *          ],
      *      ],
      *  ];
      * ```

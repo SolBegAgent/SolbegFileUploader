@@ -40,7 +40,7 @@ class Storage implements Contracts\Storage
     protected $name;
 
     /**
-     * If this param is true the context will auto generate all formatted versions of file on fly.
+     * If this param is true the storage will auto generate all formatted versions of file on fly.
      * 
      * @var mixed may be one of the followings:
      * - true (default), means all formatted versions of file will be generated,

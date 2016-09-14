@@ -33,6 +33,7 @@ class FilesManagerServiceProvider extends ServiceProvider
     {
         $this->registerManager();
         $this->registerMiddleware();
+        $this->registerConfigMakeCommand();
     }
 
     /**
@@ -100,5 +101,18 @@ class FilesManagerServiceProvider extends ServiceProvider
         $this->publishes([
             $path => config_path("$configKey.php"),
         ], 'config');
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerConfigMakeCommand()
+    {
+        $this->app->singleton('command.filecontext-config.make', function ($app) {
+            return new Console\ContextConfigMakeCommand($app['files']);
+        });
+        $this->commands(['command.filecontext-config.make']);
     }
 }

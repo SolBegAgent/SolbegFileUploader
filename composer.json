@@ -13,6 +13,7 @@
         "php": ">=5.5.9",
         "illuminate/container": "5.2.*|5.3.*",
         "illuminate/contracts": "5.2.*|5.3.*",
+        "illuminate/console": "5.2.*|5.3.*",
         "illuminate/database": "5.2.*|5.3.*",
         "illuminate/events": "5.2.*|5.3.*",
         "illuminate/filesystem": "5.2.*|5.3.*",
