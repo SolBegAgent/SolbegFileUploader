@@ -1,5 +1,9 @@
 <?php
 
+use Bicycle\FilesManager\Context\FileNotFound;
+use Bicycle\FilesManager\File\NameGenerators;
+use Bicycle\FilesManager\Formatters;
+
 return [
 
     /**
@@ -67,10 +71,10 @@ return [
      * - '200': it is analog of using 'image/resize' formatter and width = 200px
      * - '200x300': it is analog of using 'image/thumb' formatter with (width & height) = (200px & 300px)
      */
-    //'format_parsers' => [
-    //    'num' => \Bicycle\FilesManager\Formatters\Parsers\NumParser::class,
-    //    'num_x_num' => \Bicycle\FilesManager\Formatters\Parsers\NumXNumParser::class,
-    //],
+    'format_parsers' => [
+        'num' => Formatters\Parsers\NumParser::class,
+        'num_x_num' => Formatters\Parsers\NumXNumParser::class,
+    ],
 
     /**
      * Temp directory is used for storing temporary files when formatted versions 

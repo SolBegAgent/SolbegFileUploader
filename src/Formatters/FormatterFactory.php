@@ -40,7 +40,10 @@ class FormatterFactory implements FormatterFactoryInterface
     /**
      * @var array
      */
-    protected $parsers;
+    protected $parsers = [
+        'num' => Parsers\NumParser::class,
+        'num_x_num' => Parsers\NumXNumParser::class,
+    ];
 
     /**
      * @var Application
@@ -53,7 +56,11 @@ class FormatterFactory implements FormatterFactoryInterface
     public function __construct(Application $app)
     {
         $this->app = $app;
-        $this->parsers = $app['config']['format_parsers'] ?: [];
+
+        $configParsers = $app['config']['filemanager.format_parsers'];
+        if (is_array($configParsers)) {
+            $this->parsers = $configParsers;
+        }
     }
 
     /**
