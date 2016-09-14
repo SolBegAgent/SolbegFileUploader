@@ -1,75 +1,176 @@
 *The plugin and documentation under development!*
 
+DESCRIPTION
+===========
+
+Files manager for laravel 5.2/5.3.
+It is helpful to simply upload and use in future files,
+and work with them like with another simple attributes.
+
+It flexible so you may customize your validation, formatted versions of files (e.g. thumbnails),
+default urls, storages as you want.
+You may separate your files by contexts, and contexts by types.
+Also you may configure global setting that will be used for all contexts.
+
+Bicycle/file-manager uses standard [laravel's filesystem](https://laravel.com/docs/5.3/filesystem) to storing files,
+so you may use it with any storage driver like local, amazon S3, rackspace or others.
+
+For manipulating with images this package uses [Intervention/image plugin](http://image.intervention.io/).
+
+REQUIREMENTS
+============
+
+- PHP >= 5.5.9
+- Fileinfo Extension
+- Laravel Framework 5.2.* or 5.3.*
+- [Intervention/image plugin](http://image.intervention.io/) (only for working with images)
+
 INSTALLATION
 ============
 
-Schema:
+The best way to install this plugin is using [Composer](http://getcomposer.org/).
 
-- composer install
-- use service provider
-- publish filemanager config
-- configure contexts & models (where docs about generating context config)
+To install the most recent version, run the following command:
 
-
-Configure file contexts:
-
-// app/config/filecontexts.php
-
-```php
-return [
-    'product-logo' => [
-        'disk' => 'public', // using laravel's filesystem, here should be the name of disk defined in app/config/filesystems.php
-        'mimeTypes' => 'image/*', // or ['image/jpg', 'image/png'] - internal validation
-        'maxSize' => 5 * 1024 * 1024, // 5 megabytes
-        'defaultUrl' => '/public/path/to/no-photo.jpg',
-        'formatters' => [ // examples
-            'small' => ['image/thumb', 'width' => 200, 'height' => 200],
-            'thumbnail' => ['from', 'small', 'formatter' => ['image/thumb', 'width' => 100]],
-            'watermarked' => ['image/watermark', 'filename' => '/path/to/watermark', 'x' => 'right', 'y' => 'bottom'],
-            'grayscaled' => ['image/grayscale'],
-
-            'some_format_1' => function ($readFilePath) {
-                // return path to formatted file
-            }
-            'some_format_2' => CUSTOM\FORMATTER\CLASS\NAME::class,
-            'some_format_3' => [
-                'class' => CUSTOM\FORMATTER\CLASS\NAME::class,
-                'param1' => 'value1',
-                'params2' => 'value2',
-            ],
-            'some_format_4' => ['chain', 'formatters' => [
-                ['image/thumb', ...], // config for formatter 1
-                ['image/thumb', ...], // config for formatter 2
-                ...
-            ]],
-        ],
-    ],
-];
+```
+$ php composer.phar require bicycle/files-manager
 ```
 
-// configure Eloquent model
+After you have installed this vendor, add the following lines.
+
+In your Laravel config file `config/app.php` in the `$providers` array
+add the service provider for this package.
 
 ```php
+    // ...
+    Bicycle\FilesManager\FilesManagerServiceProvider::class,
+    // ...
+```
+
+In your application `Kernel.php` class in the `web` middleware group
+add middleware for this package.
+
+```php
+    // ...
+    \Bicycle\FilesManager\StoreUploadedFilesMiddleware::class,
+    // ...
+```
+
+INSTALLATION OF INTERVENTION/IMAGE
+==================================
+
+If you want to work with images, you likely want to install `intervention/image` plugin.
+Because all formatters of this files manager that work with images require it.
+
+For installing `intervention/image` plugin follow the next instructions
+or read official documentation (Composer Installation and Integration in Laravel):
+[here](http://image.intervention.io/getting_started/installation).
+
+Install it via composer:
+
+```
+$ php composer.phar require intervention/image
+```
+
+After you have installed Intervention Image, open your Laravel config file `config/app.php` and add the following lines.
+
+In the `$providers` array add the service providers for this package.
+
+```php
+    // ...
+    Intervention\Image\ImageServiceProvider::class,
+    // ...
+```
+
+Add the facade of this package to the `$aliases` array.
+
+```php
+    // ...
+    'Image' => Intervention\Image\Facades\Image::class,
+    // ...
+```
+
+CONFIGURE
+=========
+
+At first we suggest publish `config/filemanager.php` config file,
+so you may quickly configure the plugin as you want.
+
+You may do it with artisan console command.
+
+```
+$ php ./artisan vendor:publish --provider="Bicycle\FilesManager\FilesManagerServiceProvider" --tag=config
+```
+
+All files in this plugin are separated by contexts.
+For example: you probably want to have 'product-logo' and 'user-avatar' contexts,
+so each of them have own custom config (validation, formatters and others).
+
+So you likely want to create your the first context.
+You may do it in two ways: add config in your config folder or define it inline in your model.
+We recommend the first way because it keeps your models cleaner.
+
+For quickly creating context you may use artisan console command:
+
+```
+$ php ./artisan make:filecontext {context-name}
+```
+
+Where `context-name` you should replace with your name of of a new context, e.g. `product-logo`.
+
+Then see file `config/filecontexts/{context-name}.php` for more info about available settings.
+
+CONFIGURE MODEL
+===============
+
+You likely want to work with files names of which stored in database.
+So you should configure your Eloquent model.
+
+For it you need include `Bicycle\FilesManager\ModelFilesTrait` in you Eloquent model
+and add `filesAttributes()` method.
+
+Example:
+
+
+```php
+
+use Bicycle\FilesManager\ModelFilesTrait;
+
 class Product extends ...\Eloquent\Model
 {
-    use FilesTrait;
+    use ModelFilesTrait;
 
     protected $fillable = [..., 'logo_photo', ...];
 
     protected function filesAttributes()
     {
         return [
-            // attribute name => the name of context from filecontexts.php
+            // attribute name => the name of context
             'logo_photo' => 'product-logo',
+
+            // or context config right here
+            //'logo_photo' => [
+            //    'formats' => [
+            //        'thumbnail' => 'image/thumb: width = 200, height = 300',
+            //    ],
+            //
+            //    'validate' => [
+            //        'types' => 'image/jpeg, image/png',
+            //        'extensions' => ['jpg', 'jpeg', 'png'],
+            //        // ...
+            //    ],
+            //],
         ];
     }
 }
 ```
 
-// Usage
+USAGE
+=====
+
 ```php
     $product = new Product;
-    $product->fill($request->all();
+    $product->fill($request->all());
 
     // File from input (if passed) will be saved automatically in `public/uploads/product-logo/hashed-subfolder-123/some-hashed-name.jpg`
     // Formatted 'thumbnail' version (for example) will be generated on fly and saved in `public/uploads/product-logo/hashed-subfolder-123/formats/some-hashed-name.jpg/thumbnail.jpg`
@@ -78,12 +179,11 @@ class Product extends ...\Eloquent\Model
 
     $product = Product::find(1);
     $product->logo_photo = null; // or ''
-    $product->save(); // file will be removed from database, but not from disk
-
-    $product = Product::find(1);
-    $product->logo_photo = 'some-exists/file-in-disk.jpg'; // only in current product-logo context
-    $product->save();
+    $product->save(); // file will be removed from database and from disk
 ```
+
+FEATURES UNDER DEVELOPMENT
+==========================
 
 ```twig
     // in blade
