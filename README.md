@@ -116,14 +116,14 @@ For quickly creating context you may use artisan console command:
 $ php ./artisan make:filecontext {context-name}
 ```
 
-Where `context-name` you should replace with your name of of a new context, e.g. `product-logo`.
+Where `context-name` you should replace with your name of a new context, e.g. `product-logo`.
 
 Then see file `config/filecontexts/{context-name}.php` for more info about available settings.
 
 CONFIGURE MODEL
 ===============
 
-You likely want to work with files names of which stored in database.
+You likely want to work with files, names of which stored in database.
 So you should configure your Eloquent model.
 
 For it you need include `Bicycle\FilesManager\ModelFilesTrait` in you Eloquent model
@@ -180,6 +180,19 @@ USAGE
     $product = Product::find(1);
     $product->logo_photo = null; // or ''
     $product->save(); // file will be removed from database and from disk
+
+    // getting url / size and others things
+    $product->logo_photo->url(); // returns url to origin file
+    $product->logo_photo->url('thumbnail'); // returns url of formatted as `thumbnail` versions of file
+
+    $product->logo_photo->exists(); // whether file exists
+    $product->logo_photo->exists('thumbnail'); // whether formatted file exists
+    $product->logo_photo->isEmpty(/* null or 'thumbnail' */); // reverse of `exists()` method
+
+    $product->logo_photo->size(); // size of origin file in bytes
+    $product->logo_photo->size('thumbnail'); // size of formatted file in bytes
+    $product->logo_photo->mimeType(); // MIME type of origin file
+    $product->logo_photo->mimeType('thumbnail'); // MIME type of formatted file
 ```
 
 FEATURES UNDER DEVELOPMENT
