@@ -240,3 +240,10 @@ FEATURES UNDER DEVELOPMENT
     //      ...
     //  ];
 ```
+
+DOCUMENTATION
+=============
+
+Read more about:
+
+- [Contexts](./docs/01.contexts.md)
