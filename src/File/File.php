@@ -154,7 +154,11 @@ class File implements FileSourceInterface
             return;
         }
 
-        $this->setData($storage->saveNewFile($source, $options));
+        if ($source->exists()) {
+            $this->setData($storage->saveNewFile($source, $options));
+        } else {
+            $this->setData(null);
+        }
 
         if (!isset($options['deleteOld']) || $options['deleteOld']) {
             foreach ($this->oldSources as $oldSource) {

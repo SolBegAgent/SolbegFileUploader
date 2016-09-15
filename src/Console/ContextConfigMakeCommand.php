@@ -61,7 +61,7 @@ class ContextConfigMakeCommand extends GeneratorCommand
     protected function replaceClass($stub, $name)
     {
         return strtr(parent::replaceClass($stub, $name), [
-            'dummy-type' => $this->option('type'),
+            'dummy-type' => $this->option('type') ?: $this->getDefaultContextType(),
         ]);
     }
 
@@ -88,6 +88,14 @@ class ContextConfigMakeCommand extends GeneratorCommand
     }
 
     /**
+     * @return string
+     */
+    protected function getDefaultContextType()
+    {
+        return $this->laravel['config']['filemanager.default_type'] ?: 'default';
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -95,7 +103,7 @@ class ContextConfigMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['type', 't', InputOption::VALUE_OPTIONAL, 'The type of a new context.', 'default'],
+            ['type', 't', InputOption::VALUE_OPTIONAL, 'The type of a new context.', null],
         ];
     }
 }

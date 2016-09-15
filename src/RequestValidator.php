@@ -56,7 +56,7 @@ class RequestValidator
         if (!is_array($parameters) || !isset($parameters[0])) {
             throw new Exceptions\InvalidConfigException('File context validator must have context name as the first parameter.');
         }
-        return $parameters[0];
+        return trim($parameters[0]);
     }
 
     /**

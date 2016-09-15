@@ -15,8 +15,6 @@ use Bicycle\FilesManager\Helpers;
  */
 class ContextFactory implements Contracts\ContextFactory
 {
-    const TYPE_DEFAULT = 'default';
-
     /**
      * @var Application
      */
