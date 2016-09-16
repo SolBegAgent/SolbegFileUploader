@@ -252,3 +252,5 @@ Read more about:
 
 - [Contexts](./docs/01.contexts.md)
 - [Formatting](./docs/02.formatting.md)
+- [Validation](./docs/03.validation.md)
+- [File Not Found Handlers](./docs/04.file-not-found-handlers.md)

@@ -70,6 +70,8 @@ class FitFormatter extends BaseImageFormatter
             throw new Exceptions\InvalidConfigException('At least one of the properties "width" or "height" must be set in "' . $this->getName() . '" formatter.');
         } elseif (!$this->width) {
             $this->width = $this->height;
+        } elseif (!$this->height) {
+            $this->height = $this->width;
         }
         return parent::init();
     }
