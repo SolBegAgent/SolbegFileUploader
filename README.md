@@ -1,6 +1,7 @@
-*The plugin and documentation under development!*
+THE PLUGIN AND DOCUMENTATION UNDER DEVELOPMENT!
+===============================================
 
-DESCRIPTION
+Description
 ===========
 
 Files manager for laravel 5.2/5.3.
@@ -12,12 +13,15 @@ default urls, storages as you want.
 You may separate your files by contexts, and contexts by types.
 Also you may configure global setting that will be used for all contexts.
 
+This plugin also allows to save file in temporary directory between requests.
+So if validation of request's data was failed user must not upload a file again.
+
 Bicycle/file-manager uses standard [laravel's filesystem](https://laravel.com/docs/5.3/filesystem) to storing files,
 so you may use it with any storage driver like local, amazon S3, rackspace or others.
 
 For manipulating with images this package uses [Intervention/image plugin](http://image.intervention.io/).
 
-REQUIREMENTS
+Requirements
 ============
 
 - PHP >= 5.5.9
@@ -25,7 +29,7 @@ REQUIREMENTS
 - Laravel Framework 5.2.* or 5.3.*
 - [Intervention/image plugin](http://image.intervention.io/) (only for working with images)
 
-INSTALLATION
+Installation
 ============
 
 The best way to install this plugin is using [Composer](http://getcomposer.org/).
@@ -56,7 +60,7 @@ add middleware for this package.
     // ...
 ```
 
-INSTALLATION OF INTERVENTION/IMAGE
+Installation of intervention/image
 ==================================
 
 If you want to work with images, you likely want to install `intervention/image` plugin.
@@ -90,7 +94,7 @@ Add the facade of this package to the `$aliases` array.
     // ...
 ```
 
-CONFIGURE
+Configure
 =========
 
 At first we suggest publish `config/filemanager.php` config file,
@@ -120,7 +124,7 @@ Where `context-name` you should replace with your name of a new context, e.g. `p
 
 Then see file `config/filecontexts/{context-name}.php` for more info about available settings.
 
-CONFIGURE MODEL
+Configure model
 ===============
 
 You likely want to work with files, names of which stored in database.
@@ -165,7 +169,7 @@ class Product extends ...\Eloquent\Model
 }
 ```
 
-USAGE
+Usage
 =====
 
 ```php
@@ -195,7 +199,7 @@ USAGE
     $product->logo_photo->mimeType('thumbnail'); // MIME type of formatted file
 ```
 
-FEATURES UNDER DEVELOPMENT
+Features under development
 ==========================
 
 ```twig
@@ -241,7 +245,7 @@ FEATURES UNDER DEVELOPMENT
     //  ];
 ```
 
-DOCUMENTATION
+Documentation
 =============
 
 Read more about:
