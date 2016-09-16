@@ -251,3 +251,4 @@ Documentation
 Read more about:
 
 - [Contexts](./docs/01.contexts.md)
+- [Formatting](./docs/02.formatting.md)
