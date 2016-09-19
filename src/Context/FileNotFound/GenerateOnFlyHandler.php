@@ -27,7 +27,7 @@ class GenerateOnFlyHandler implements Contracts\FileNotFoundHandler
      */
     public function handle(Contracts\FileNotFoundException $exception)
     {
-        if (!$this->isAllowedFormat($exception) || !$this->isAllowedStorage($exception)) {
+        if (!$this->isAllowedFormat($exception, false) || !$this->isAllowedStorage($exception)) {
             return null;
         } elseif (!$exception->isOriginFileExists() || $exception->isRequestedFileExists()) {
             return null;

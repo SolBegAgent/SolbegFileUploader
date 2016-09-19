@@ -23,6 +23,11 @@ class LogExceptionHandler implements Contracts\FileNotFoundHandler
     protected $level = 'error';
 
     /**
+     * @var boolean
+     */
+    protected $logPrevious = true;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -51,12 +56,32 @@ class LogExceptionHandler implements Contracts\FileNotFoundHandler
             return null;
         }
 
-        $this->logger()->{$this->level}($exception instanceof \Exception ? $exception : $exception->getMessage(), [
+        $exceptionContext = $this->buildExceptionContext($exception);
+
+        if ($this->logPrevious && $exception->getPrevious() instanceof \Exception) {
+            $this->logger()->{$this->level}($exception->getPrevious(), $exceptionContext);
+        }
+
+        $this->logger()->{$this->level}(
+            $exception instanceof \Exception
+                ? $exception
+                : $exception->getMessage(),
+            $exceptionContext
+        );
+    }
+
+    /**
+     * @param Contracts\FileNotFoundException $exception
+     * @return array
+     */
+    protected function buildExceptionContext(Contracts\FileNotFoundException $exception)
+    {
+        return [
             'relativePath' => $exception->getRelativePath(),
             'format' => $exception->getFormat(),
             'storage' => $exception->getStorage()->name(),
             'context' => $exception->getStorage()->context()->getName(),
-        ]);
+        ];
     }
 
     /**

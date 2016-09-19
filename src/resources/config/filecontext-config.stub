@@ -52,6 +52,7 @@ return [
      * 
      * You may define handlers in two ways:
      * - without key, value is name of handler class
+     * - without key, array value with `class` key is handler config
      * - key is the name of handler class, value is handler config
      * See examples below.
      */

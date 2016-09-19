@@ -207,7 +207,7 @@ class Context implements Contracts\Context, Contracts\ContextInfo
     {
         foreach ($this->fileNotFoundHandlers as $key => $value) {
             if (!$value instanceof Contracts\FileNotFoundHandler) {
-                list($class, $config) = is_int($key) ? [$value, []] : [$key, (array) $value];
+                list($class, $config) = $this->resolveFileNotFoundConfig($key, $value);
                 $this->fileNotFoundHandlers[$key] = $value = $this->createFileNotFoundHandler($class, $config);
             }
 
@@ -227,6 +227,29 @@ class Context implements Contracts\Context, Contracts\ContextInfo
             }
         }
         return null;
+    }
+
+    /**
+     * @param mixed $key
+     * @param mixed $value
+     * @return array with 2 elements:
+     *  - string, class name
+     *  - array, handler config
+     * @throws Exceptions\InvalidConfigException
+     */
+    protected function resolveFileNotFoundConfig($key, $value)
+    {
+        if (!is_int($key) && is_array($value)) {
+            return [$key, $value];
+        } elseif (!is_array($value)) {
+            return [$value, []];
+        } elseif (!isset($value['class'])) {
+            throw new Exceptions\InvalidConfigException("Invalid handler #$key config, 'class' property is required.");
+        }
+
+        $class = $value['class'];
+        unset($value['class']);
+        return [$class, $value];
     }
 
     /**

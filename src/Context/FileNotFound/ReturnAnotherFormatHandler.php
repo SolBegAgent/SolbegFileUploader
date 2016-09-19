@@ -42,7 +42,7 @@ class ReturnAnotherFormatHandler implements Contracts\FileNotFoundHandler
      */
     public function handle(Contracts\FileNotFoundException $exception)
     {
-        if (!$this->isAllowedFormat($exception) || !$this->isAllowedStorage($exception)) {
+        if (!$this->isAllowedFormat($exception, false) || !$this->isAllowedStorage($exception)) {
             return null;
         } elseif ($exception->getFormat() === $this->returnFormat) {
             return null;

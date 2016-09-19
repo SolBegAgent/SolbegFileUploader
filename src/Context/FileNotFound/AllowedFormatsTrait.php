@@ -21,19 +21,20 @@ trait AllowedFormatsTrait
 
     /**
      * @param \Bicycle\FilesManager\Contracts\FileNotFoundException $exception
+     * @param boolean $allowOrigin
      * @return boolean
      */
-    protected function isAllowedFormat($exception)
+    protected function isAllowedFormat($exception, $allowOrigin = true)
     {
         $format = $exception->getFormat();
-        if ($format === null) {
+        if (!$allowOrigin && $format === null) {
             return false;
-        } elseif ($this->exceptFormats !== null && in_array($format, (array) $this->exceptFormats, true)) {
+        } elseif ($this->exceptFormats !== null && in_array($format, (array) $this->exceptFormats, !$allowOrigin)) {
             return false;
         } elseif ($this->onlyFormats === null) {
             return true;
         } else {
-            return in_array($format, (array) $this->onlyFormats, true);
+            return in_array($format, (array) $this->onlyFormats, !$allowOrigin);
         }
     }
 }
