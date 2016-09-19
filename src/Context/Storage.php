@@ -35,7 +35,7 @@ class Storage implements Contracts\Storage
     protected $nameGenerator;
 
     /**
-     * @var string
+     * @var string 'main'|'temp'
      */
     protected $name;
 
@@ -81,7 +81,7 @@ class Storage implements Contracts\Storage
     }
 
     /**
-     * @return string
+     * @return string 'main'|'temp'
      */
     public function name()
     {

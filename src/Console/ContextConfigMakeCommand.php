@@ -103,7 +103,10 @@ class ContextConfigMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['type', 't', InputOption::VALUE_OPTIONAL, 'The type of a new context.', null],
+            ['type', 't', InputOption::VALUE_OPTIONAL, implode(' ', [
+                'The type of a new context.',
+                'The value of `default_type` in your `filemanager.php` config will be used by default.',
+            ]), null],
         ];
     }
 }

@@ -199,6 +199,11 @@ Usage
     $product->logo_photo->mimeType('thumbnail'); // MIME type of formatted file
 ```
 
+Requests validation
+===================
+
+WIP
+
 Features under development
 ==========================
 
@@ -254,3 +259,5 @@ Read more about:
 - [Formatting](./docs/02.formatting.md)
 - [Validation](./docs/03.validation.md)
 - [File Not Found Handlers](./docs/04.file-not-found-handlers.md)
+- [Storages](./docs/05.storages.md)
+- [Name Generators](./docs/06.name-generators.md)
