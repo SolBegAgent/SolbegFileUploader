@@ -15,12 +15,12 @@ class SizeValidator extends AbstractValidator implements
     Contracts\Validators\MaxSizeValidator
 {
     /**
-     * @var integer|null in bytes
+     * @var integer|string|null in bytes
      */
     protected $min;
 
     /**
-     * @var integer|null in bytes
+     * @var integer|string|null in bytes
      */
     protected $max;
 

@@ -202,7 +202,32 @@ Usage
 Requests validation
 ===================
 
-WIP
+When you validate your requests using
+[laravel's validation system](https://laravel.com/docs/5.3/validation#form-request-validation),
+you not need write validation rules again.
+
+Simply use `filecontext` validator, and file will be validates by context validation rules:
+
+```php
+// ...
+$this->validate($request, [
+    // ...
+    'logo_photo' => 'required|filecontext:product-logo',
+    // ...
+]);
+// ...
+```
+
+If file is valid, but any other attributes was failed,
+the uploaded file will be saved in temporary storage.
+So you may use `old('logo_photo')` in your form:
+
+```twig
+@if (old('logo_photo'))
+    <input type='hidden' name='logo_photo' value='{{ old('logo_photo')->relativePath() }}' />
+    <img src='{{ old('logo_photo')->url() }}' />
+@endif
+```
 
 Features under development
 ==========================
