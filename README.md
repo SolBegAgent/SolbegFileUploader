@@ -220,7 +220,7 @@ $this->validate($request, [
 
 If file is valid, but any other attributes was failed,
 the uploaded file will be saved in temporary storage.
-So you may use `old('logo_photo')` in your form:
+So you may use `old($fileAttribute)` in your form:
 
 ```twig
 @if (old('logo_photo'))
