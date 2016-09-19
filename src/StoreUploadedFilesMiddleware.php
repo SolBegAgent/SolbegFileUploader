@@ -145,10 +145,10 @@ class StoreUploadedFilesMiddleware
             return $names;
         }
 
-        $attrs = preg_split('/(\s*\;\s*)/', $names, null, PREG_SPLIT_NO_EMPTY);
+        $attrs = Helpers\Config::explode(';', $names, true);
         $result = [];
         foreach ($attrs as $attr) {
-            $parts = preg_split('/(\s*\=\>\s*)/', $attr, null, PREG_SPLIT_NO_EMPTY);
+            $parts = Helpers\Config::explode('=>', $attr, true);
             if (isset($parts[0], $parts[1])) {
                 $result[$parts[0]] = $parts[1];
             } elseif (isset($parts[0])) {

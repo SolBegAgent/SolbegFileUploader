@@ -75,10 +75,10 @@ class Config
      */
     public static function parse($string)
     {
-        $parts = preg_split('/(\s*\,\s*)/u', $string, null, PREG_SPLIT_NO_EMPTY);
+        $parts = static::explode(',', $string, true);
         $result = [];
         foreach ($parts as $part) {
-            $keyValuePair = preg_split('/(\s*\=\s*)/u', $part);
+            $keyValuePair = static::explode('=', $part);
             if (isset($keyValuePair[0], $keyValuePair[1])) {
                 $result[$keyValuePair[0]] = static::typecastParsedValue($keyValuePair[1]);
             } else {
@@ -122,7 +122,7 @@ class Config
         if ($value == $pattern) {
             return true;
         } elseif (mb_strpos($pattern, '*', 0, 'UTF-8') === false) {
-            return false;
+            return !$caseSensitive &&  mb_strtolower($value, 'UTF-8') === mb_strtolower($pattern, 'UTF-8');
         }
 
         $parts = explode('*', $pattern);
@@ -136,5 +136,22 @@ class Config
         }
 
         return preg_match('#^' . implode('.*', $parts) . '\z#' . $modificators, $value);
+    }
+
+    /**
+     * @param string $separator
+     * @param string $string
+     * @param boolean $excludeEmpty
+     * @param boolean $caseSensitive
+     * @return string[]
+     */
+    public static function explode($separator, $string, $excludeEmpty = false, $caseSensitive = true)
+    {
+        $flags = $excludeEmpty ? PREG_SPLIT_NO_EMPTY : 0;
+        $pattern = '/(\s*' . preg_quote($separator, '/') . '\s*)/u';
+        if (!$caseSensitive) {
+            $pattern .= 'i';
+        }
+        return preg_split($pattern, $string, null, $flags);
     }
 }

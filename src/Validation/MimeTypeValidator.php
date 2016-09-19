@@ -48,7 +48,7 @@ class MimeTypeValidator extends AbstractValidator implements Contracts\Validator
             return null;
         }
 
-        $sourceType = mb_strtolower($source->mimeType(), 'UTF-8');
+        $sourceType = $source->mimeType();
         foreach ($types as $type) {
             if (Helpers\Config::matchWildcards($sourceType, $type, false)) {
                 return null;
@@ -71,7 +71,7 @@ class MimeTypeValidator extends AbstractValidator implements Contracts\Validator
     public function setTypes($types)
     {
         if (is_scalar($types)) {
-            $types = preg_split('/(\s*\,\s*)/', $types);
+            $types = Helpers\Config::explode(',', $types, true);
         }
         $this->types = $types ?: null;
     }

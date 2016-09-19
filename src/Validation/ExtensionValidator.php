@@ -3,6 +3,7 @@
 namespace Bicycle\FilesManager\Validation;
 
 use Bicycle\FilesManager\Contracts;
+use Bicycle\FilesManager\Helpers;
 
 /**
  * ExtensionValidator validates file extensions.
@@ -77,7 +78,7 @@ class ExtensionValidator extends AbstractValidator implements Contracts\Validato
     public function setExtensions($extensions)
     {
         if (is_scalar($extensions)) {
-            $extensions = preg_split('/(\s*\,\s*)/', $extensions);
+            $extensions = Helpers\Config::explode(',', $extensions);
         }
         $this->extensions = $extensions ?: null;
     }
