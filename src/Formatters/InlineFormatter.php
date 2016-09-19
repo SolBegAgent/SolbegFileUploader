@@ -10,16 +10,16 @@ use Bicycle\FilesManager\Exceptions\InvalidConfigException;
 use Illuminate\Contracts\Container\Container;
 
 /**
- * InlineFormatter uses Closure to format file.
+ * InlineFormatter uses a callable to format file.
  *
  * @author Alexey Sejnov <alexey.sejnov@solbeg.com>
  */
 class InlineFormatter extends AbstractFormatter
 {
     /**
-     * @var \Closure
+     * @var callable
      */
-    protected $closure;
+    protected $callback;
 
     /**
      * @var Container
@@ -41,8 +41,8 @@ class InlineFormatter extends AbstractFormatter
      */
     protected function init()
     {
-        if (!is_callable($this->closure)) {
-            throw new InvalidConfigException('Invalid closure was passed in "' . $this->getName() . '" formatter.');
+        if (!is_callable($this->callback)) {
+            throw new InvalidConfigException('Invalid callable was passed in "' . $this->getName() . '" formatter.');
         }
         return parent::init();
     }
@@ -52,7 +52,7 @@ class InlineFormatter extends AbstractFormatter
      */
     public function format(FileSourceInterface $source, StorageInterface $storage)
     {
-        return $this->getContainer()->call($this->closure, [
+        return $this->getContainer()->call($this->callback, [
             'source' => $source,
             'storage' => $storage,
             'formatter' => $this,

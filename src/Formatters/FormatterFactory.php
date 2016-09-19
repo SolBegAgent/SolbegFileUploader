@@ -88,13 +88,13 @@ class FormatterFactory implements FormatterFactoryInterface
     /**
      * @param ContextInterface $context
      * @param string $name
-     * @param callable $closure
+     * @param callable $callback
      * @return InlineFormatter
      */
-    public function inline(ContextInterface $context, $name, callable $closure)
+    public function inline(ContextInterface $context, $name, callable $callback)
     {
         return $this->make($context, $name, 'inline', [
-            'closure' => $closure,
+            'callback' => $callback,
         ]);
     }
 
