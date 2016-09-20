@@ -124,13 +124,16 @@ return [
             'global_prefix' => 'uploads',
 
             // The length of new generated random filenames
-            'length' => 16,
+            'length' => 8,
+
+            // The length of common subdir
+            'common_subdir_length' => 4,
 
             // The length of new generated subdirectories
-            'subdirs_length' => 4,
+            'file_subdir_length' => 16,
 
             // Max count of files in one subfolder
-            'max_subdir_files_count' => 1000,
+            'max_common_subdir_files_count' => 1000,
 
             // All files and subdirs names will be lowerized before saving.
             // It may be useful when project developers are working on defferent OS (linux/windows)

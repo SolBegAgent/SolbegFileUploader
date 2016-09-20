@@ -26,19 +26,20 @@ abstract class AbstractNameGenerator implements GeneratorInterface
     protected $globalPrefix = null;
 
     /**
-     * @var string the subdirectory for saving formatted versions of files.
+     * @var integer length for new generated subdirectories, that are storing files subdirectories.
+     * The subdirs will have format \d{length}, e.g. `0035`.
      */
-    protected $formatsSubdir = 'formats';
+    protected $commonSubdirLength = 4;
 
     /**
      * @var integer|null max count of files in one subderictory of `$dir` directory.
      */
-    protected $maxSubdirFilesCount = 1000;
+    protected $maxCommonSubdirFilesCount = 1000;
 
     /**
-     * @var integer length for new generated subdirectories.
+     * @var integer length for new generated subdirectories, that are storing origin file.
      */
-    protected $subdirsLength = 4;
+    protected $fileSubdirLength = 16;
 
     /**
      * @var string regular expression. Used in `isValidExtension()` method.
@@ -76,6 +77,7 @@ abstract class AbstractNameGenerator implements GeneratorInterface
 
     /**
      * @var boolean whether new generated names should be lowerize or not.
+     * Used in `normalizeCase()` method.
      */
     protected $lowerize = true;
 
@@ -135,7 +137,48 @@ abstract class AbstractNameGenerator implements GeneratorInterface
         if ($this->globalPrefix) {
             $result = rtrim($this->globalPrefix, '\/') . "/$result";
         }
-        return $this->lowerize ? strtolower($result) : $result;
+        return $this->normalizeCase($result);
+    }
+
+    /**
+     * Generates common subdirectory for new file.
+     * 
+     * @return string subdirectory name
+     */
+    protected function getCommonSubdirForNewFile()
+    {
+        $rootDir = $this->generateRootDirectory();
+
+        $maxSubdirNum = 0;
+        foreach ($this->getDisk()->directories($rootDir) as $subdirPath) {
+            $subdir = FileHelper::filename($subdirPath);
+            if ($this->isValidCommonSubdir($subdir) && intval($subdir) > $maxSubdirNum) {
+                $maxSubdirNum = (int) $subdir;
+            }
+        }
+        $maxSubdir = $this->normalizeCommonSubdir($maxSubdirNum);
+
+        if ($this->calcSubdirsCount("$rootDir/$maxSubdir") < $this->maxCommonSubdirFilesCount) {
+            return $maxSubdir;
+        }
+        return $this->normalizeCommonSubdir($maxSubdirNum + 1);
+    }
+
+    /**
+     * Generates subdirectory where origin file will be stored.
+     * 
+     * @param string $commonSubdir
+     * @return string generated subdir name
+     */
+    protected function generateNewFileSubdir($commonSubdir)
+    {
+        $rootDir = $this->generateRootDirectory();
+        $disk = $this->getDisk();
+        do {
+            $random = FileHelper::generateRandomBasename($this->fileSubdirLength);
+            $result = $this->normalizeCase($random);
+        } while($disk->exists("$rootDir/$commonSubdir/$result"));
+        return $result;
     }
 
     /**
@@ -143,13 +186,10 @@ abstract class AbstractNameGenerator implements GeneratorInterface
      */
     public function generatePathForNewFile(FileSourceInterface $source)
     {
-        $filename = $this->generateNewFilename($source);
-        if ($this->lowerize) {
-            $filename = mb_strtolower($filename, 'UTF-8');
-        }
-
-        $subdir = $this->getSubdirForNewFile($filename, $source);
-        return "$subdir/$filename";
+        $filename = $this->normalizeCase($this->generateNewFilename($source));
+        $commonSubdir = $this->getCommonSubdirForNewFile();
+        $fileSubdir = $this->generateNewFileSubdir($commonSubdir);
+        return "$commonSubdir/$fileSubdir/$filename";
     }
 
     /**
@@ -161,9 +201,14 @@ abstract class AbstractNameGenerator implements GeneratorInterface
             throw new InvalidConfigException("Invalid name of format: '$format', " . FileHelper::basename(static::class) . ' allows only names that are valid directory names.');
         }
 
-        $extension = $source->extension();
-        $filename = $extension === null ? $format : "$format.$extension";
-        return "{$this->generateFormatsRelativeDir($relativePathToOrigin)}/$filename";
+        $originSubdir = FileHelper::dirname($relativePathToOrigin);
+        $originBasename = FileHelper::basename($relativePathToOrigin);
+        $extension = $this->normalizeCase($source->extension());
+        return implode('/', [
+            $originSubdir,
+            $format,
+            $extension === null ? $originBasename : "$originBasename.$extension",
+        ]);
     }
 
     /**
@@ -176,9 +221,10 @@ abstract class AbstractNameGenerator implements GeneratorInterface
             return "$rootDir/$relativePathToOrigin";
         }
 
-        $formatsSubdir = $this->generateFormatsRelativeDir($relativePathToOrigin);
-        foreach ($this->getDisk()->files("$rootDir/$formatsSubdir") as $file) {
-            if ($format === FileHelper::basename($file)) {
+        $originSubdir = FileHelper::dirname($relativePathToOrigin);
+        $originBasename = FileHelper::basename($relativePathToOrigin);
+        foreach ($this->getDisk()->files("$rootDir/$originSubdir/$format") as $file) {
+            if ($originBasename === FileHelper::basename($file)) {
                 return $file;
             }
         }
@@ -191,26 +237,20 @@ abstract class AbstractNameGenerator implements GeneratorInterface
     public function getListOfFormattedFiles($relativePathToOrigin)
     {
         $rootDir = rtrim($this->generateRootDirectory(), '\/');
-        $formatsSubdir = $this->generateFormatsRelativeDir($relativePathToOrigin);
+        $originSubdir = FileHelper::dirname($relativePathToOrigin);
+        $originBasename = FileHelper::basename($relativePathToOrigin);
 
+        $disk = $this->getDisk();
         $result = [];
-        foreach ($this->getDisk()->files("$rootDir/$formatsSubdir") as $file) {
-            $result[$file] = FileHelper::basename($file);
+        foreach ($disk->directories("$rootDir/$originSubdir") as $formatPath) {
+            $format = FileHelper::filename($formatPath);
+            foreach ($disk->files($formatPath) as $file) {
+                if ($originBasename === FileHelper::basename($file)) {
+                    $result[$file] = $format;
+                }
+            }
         }
         return $result;
-    }
-
-    /**
-     * Generates relative path to subdirectory with formatted version of origin file.
-     * 
-     * @param string $relativePathToOrigin
-     * @return string
-     */
-    protected function generateFormatsRelativeDir($relativePathToOrigin)
-    {
-        $originSubdir = FileHelper::dirname($relativePathToOrigin);
-        $originFilename = FileHelper::filename($relativePathToOrigin);
-        return "$originSubdir/$this->formatsSubdir/$originFilename";
     }
 
     /**
@@ -221,52 +261,45 @@ abstract class AbstractNameGenerator implements GeneratorInterface
         switch (true) { // OR
             case !is_string($path); // no break
             case $path === ''; // no break
-            case count($parts = explode('/', $path)) !== 2; // no break
-            case !preg_match('/^[a-z0-9]+$/i', $parts[0]); // no break
-            case in_array($parts[1], ['', '.', '..'], true); // no break
-            case $this->containsSpecialChar($parts[1]); // no break
+            case count($parts = explode('/', $path)) !== 3; // no break
+            case !$this->isValidCommonSubdir($parts[0], false); // no break
+            case !$this->isValidFileSubdir($parts[1], false); // no break
+            case in_array($parts[2], ['', '.', '..'], true); // no break
+            case $this->containsSpecialChar($parts[2]); // no break
                 return false;
         }
         return true;
     }
 
     /**
-     * Generates subdirectory for file with passed `$filename`.
-     * 
-     * @param string $filename
-     * @param FileSourceInterface $source
-     * @return string subdirectory name
+     * @param string $directory
+     * @return integer
      */
-    protected function getSubdirForNewFile($filename, FileSourceInterface $source)
+    protected function calcSubdirsCount($directory)
     {
-        $rootDir = $this->generateRootDirectory();
-        $resultDir = null;
+        $disk = $this->getDisk();
+        return (int) array_sum([
+            count($disk->files($directory)),
+            count($disk->directories($directory)),
+        ]);
+    }
 
-        $subdirs = $this->getDisk()->directories($rootDir);
-        if (count($subdirs) > 1) {
-            shuffle($subdirs);
-        }
+    /**
+     * @param string|integer $subdir
+     * @return string
+     */
+    protected function normalizeCommonSubdir($subdir)
+    {
+        return str_pad($subdir, $this->commonSubdirLength, '0', STR_PAD_LEFT);
+    }
 
-        foreach ($subdirs as $subdir) {
-            if ($this->getDisk()->exists("$subdir/$filename")) {
-                continue;
-            } elseif (count($this->getDisk()->files($subdir)) >= $this->maxSubdirFilesCount) {
-                continue;
-            }
-            $resultDir = FileHelper::filename($subdir);
-            break;
-        }
-
-        while ($resultDir === null) {
-            $resultDir = FileHelper::generateRandomBasename($this->subdirsLength);
-            if ($this->lowerize) {
-                $resultDir = strtolower($resultDir);
-            }
-            if ($this->getDisk()->exists("$rootDir/$resultDir")) {
-                $resultDir = null;
-            }
-        }
-        return $resultDir;
+    /**
+     * @param string $name
+     * @return string
+     */
+    protected function normalizeCase($name)
+    {
+        return $this->lowerize ? mb_strtolower($name, 'UTF-8') : $name;
     }
 
     /**
@@ -284,6 +317,28 @@ abstract class AbstractNameGenerator implements GeneratorInterface
             }
         }
         return false;
+    }
+
+    /**
+     * @param string $subdir
+     * @param boolean $checkLength
+     * @return boolean
+     */
+    protected function isValidCommonSubdir($subdir, $checkLength = true)
+    {
+        $pattern = '/^\d' . ($checkLength ? "{{$this->commonSubdirLength}}" : '+') . '$/';
+        return (bool) preg_match($pattern, $subdir);
+    }
+
+    /**
+     * @param string $subdir
+     * @param boolean $checkLength
+     * @return boolean
+     */
+    protected function isValidFileSubdir($subdir, $checkLength = true)
+    {
+        $pattern = '/^[a-z0-9]' . ($checkLength ? "{{$this->fileSubdirLength}}" : '+') . '$/i';
+        return (bool) preg_match($pattern, $subdir);
     }
 
     /**

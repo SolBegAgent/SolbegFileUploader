@@ -2,6 +2,7 @@
 
 namespace Bicycle\FilesManager\File\NameGenerators;
 
+use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
 use Bicycle\FilesManager\Helpers\File as FileHelper;
 
 /**
@@ -14,12 +15,12 @@ class RandomNameGenerator extends AbstractNameGenerator
     /**
      * @var integer
      */
-    protected $length = 16;
+    protected $length = 8;
 
     /**
      * @inheritdoc
      */
-    protected function generateNewFilename(\Bicycle\FilesManager\Contracts\FileSource $source)
+    protected function generateNewFilename(FileSourceInterface $source)
     {
         $extension = $source->extension();
         if (!$this->isValidExtension($extension)) {

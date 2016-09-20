@@ -62,7 +62,7 @@ class UrlFileSource implements FileSourceInterface
             return (new SymfonyFile($this->localPath(), false))->isFile();
         } else {
             $header = $this->fetchUrlHeader(null);
-            return preg_match('#^HTTP/[\d\.]+\s+2\d\d\s+#i', $header);
+            return (bool) preg_match('#^HTTP/[\d\.]+\s+2\d\d\s+#i', $header);
         }
     }
 

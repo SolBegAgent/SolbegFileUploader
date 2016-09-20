@@ -135,7 +135,7 @@ class Config
             $modificators .= 'i';
         }
 
-        return preg_match('#^' . implode('.*', $parts) . '\z#' . $modificators, $value);
+        return (bool) preg_match('#^' . implode('.*', $parts) . '\z#' . $modificators, $value);
     }
 
     /**
