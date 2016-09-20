@@ -42,6 +42,8 @@ abstract class AbstractNameGenerator implements GeneratorInterface
     protected $fileSubdirLength = 16;
 
     /**
+     * Suffix that will be added to subdirectory that stores formatted versions of file.
+     * 
      * @var string
      */
     protected $formatSubdirSuffix = '-format';

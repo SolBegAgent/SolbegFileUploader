@@ -63,7 +63,7 @@ class Context implements Contracts\Context, Contracts\ContextInfo
         'name' => 'temp',
         'generate_formats_on_save' => false,
         'name_generator' => [
-            'class' => File\NameGenerators\OriginNameGenerator::class,
+            'class' => File\NameGenerators\SlugNameGenerator::class,
             'global_prefix' => 'temp',
         ],
     ];

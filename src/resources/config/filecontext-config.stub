@@ -115,10 +115,15 @@ return [
          * - NameGenerators\OriginNameGenerator: for keeping origin file names.
          * But origin file names will be validated before for security reasons.
          * If origin name contains any special char or very long then random will be generated.
+         * 
+         * - NameGenerators\SlugNameGenerator: is the same as OriginNameGenerator,
+         * but it slugify origin file names.
+         * 
+         * - NameGenerators\FixedNameGenerator: all files have fixed name, default is 'file.{extension}'.
          */
         'name_generator' => [
             // The name of generator class
-            'class' => NameGenerators\RandomNameGenerator::class, // or NameGenerators\OriginNameGenerator::class,
+            'class' => NameGenerators\RandomNameGenerator::class,
 
             // Folder for keeping all uploads of all contexts
             'global_prefix' => 'uploads',
@@ -126,14 +131,17 @@ return [
             // The length of new generated random filenames
             'length' => 8,
 
-            // The length of common subdir
+            // The length of common subdir, it is meaning numerical subdirs (e.g.`0035`)
             'common_subdir_length' => 4,
 
-            // The length of new generated subdirectories
+            // Max count of subdirs in one common subdir
+            'max_common_subdir_files_count' => 1000,
+
+            // The length of new generated subdirectories, it is meaning subdir that stores the file
             'file_subdir_length' => 16,
 
-            // Max count of files in one subfolder
-            'max_common_subdir_files_count' => 1000,
+            // Suffix that will be added to subdirectory that stores formatted versions of file
+            'format_subdir_suffix' => '-format',
 
             // All files and subdirs names will be lowerized before saving.
             // It may be useful when project developers are working on defferent OS (linux/windows)
@@ -166,7 +174,7 @@ return [
          */
         'name_generator' => [
             // The name of generator class
-            'class' => NameGenerators\OriginNameGenerator::class, // or NameGenerators\RandomNameGenerator::class,
+            'class' => NameGenerators\SlugNameGenerator::class,
 
             // Folder for keeping all temporary files of all contexts
             'global_prefix' => 'temp',
