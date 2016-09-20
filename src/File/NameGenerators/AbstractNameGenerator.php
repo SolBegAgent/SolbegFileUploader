@@ -42,6 +42,11 @@ abstract class AbstractNameGenerator implements GeneratorInterface
     protected $fileSubdirLength = 16;
 
     /**
+     * @var string
+     */
+    protected $formatSubdirSuffix = '-format';
+
+    /**
      * @var string regular expression. Used in `isValidExtension()` method.
      * Note, this expression limits extension length too.
      */
@@ -187,6 +192,10 @@ abstract class AbstractNameGenerator implements GeneratorInterface
     public function generatePathForNewFile(FileSourceInterface $source)
     {
         $filename = $this->normalizeCase($this->generateNewFilename($source));
+        do {
+            $filename = $this->cutFormatSubdirSuffix($oldFilename = $filename, false);
+        } while ($filename !== $oldFilename);
+
         $commonSubdir = $this->getCommonSubdirForNewFile();
         $fileSubdir = $this->generateNewFileSubdir($commonSubdir);
         return "$commonSubdir/$fileSubdir/$filename";
@@ -198,7 +207,10 @@ abstract class AbstractNameGenerator implements GeneratorInterface
     public function generatePathForNewFormattedFile($relativePathToOrigin, $format, FileSourceInterface $source)
     {
         if (!$this->isValidFormatName($format)) {
-            throw new InvalidConfigException("Invalid name of format: '$format', " . FileHelper::basename(static::class) . ' allows only names that are valid directory names.');
+            throw new InvalidConfigException(implode(' ', [
+                "Invalid name of format: '$format'.",
+                FileHelper::basename(static::class) . ' allows only names that are valid directory names.',
+            ]));
         }
 
         $originSubdir = FileHelper::dirname($relativePathToOrigin);
@@ -206,7 +218,7 @@ abstract class AbstractNameGenerator implements GeneratorInterface
         $extension = $this->normalizeCase($source->extension());
         return implode('/', [
             $originSubdir,
-            $format,
+            $format . $this->formatSubdirSuffix,
             $extension === null ? $originBasename : "$originBasename.$extension",
         ]);
     }
@@ -223,7 +235,7 @@ abstract class AbstractNameGenerator implements GeneratorInterface
 
         $originSubdir = FileHelper::dirname($relativePathToOrigin);
         $originBasename = FileHelper::basename($relativePathToOrigin);
-        foreach ($this->getDisk()->files("$rootDir/$originSubdir/$format") as $file) {
+        foreach ($this->getDisk()->files("$rootDir/$originSubdir/$format$this->formatSubdirSuffix") as $file) {
             if ($originBasename === FileHelper::basename($file)) {
                 return $file;
             }
@@ -243,7 +255,10 @@ abstract class AbstractNameGenerator implements GeneratorInterface
         $disk = $this->getDisk();
         $result = [];
         foreach ($disk->directories("$rootDir/$originSubdir") as $formatPath) {
-            $format = FileHelper::filename($formatPath);
+            $format = $this->cutFormatSubdirSuffix(FileHelper::filename($formatPath));
+            if ($format === null) {
+                continue;
+            }
             foreach ($disk->files($formatPath) as $file) {
                 if ($originBasename === FileHelper::basename($file)) {
                     $result[$file] = $format;
@@ -317,6 +332,25 @@ abstract class AbstractNameGenerator implements GeneratorInterface
             }
         }
         return false;
+    }
+
+    /**
+     * @param string $formatSubdir
+     * @param boolean $required
+     * @return string|null
+     */
+    protected function cutFormatSubdirSuffix($formatSubdir, $required = true)
+    {
+        $suffix = $this->formatSubdirSuffix;
+        $suffixLength = strlen($suffix);
+        if (!$suffixLength) {
+            return $formatSubdir;
+        } elseif (substr_compare($formatSubdir, $suffix, -$suffixLength) !== 0) {
+            return $required ? null : $formatSubdir;
+        }
+
+        $result = substr($formatSubdir, 0, -$suffixLength);
+        return $result === '' ? ($required ? null : $formatSubdir) : $result;
     }
 
     /**
