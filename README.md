@@ -172,6 +172,8 @@ class Product extends ...\Eloquent\Model
 Usage
 =====
 
+In your controller:
+
 ```php
     $product = new Product;
     $product->fill($request->all());
@@ -185,18 +187,61 @@ Usage
     $product->logo_photo = null; // or ''
     $product->save(); // file will be removed from database and from disk
 
-    // getting url / size and others things
-    $product->logo_photo->url(); // returns url to origin file
-    $product->logo_photo->url('thumbnail'); // returns url of formatted as `thumbnail` versions of file
+    // returning url to origin file
+    $product->logo_photo->url();
+    $product->logo_photo->url;
+    $product->logo_photo->href;
+    (string) $product->logo_photo;
 
+    // returning url of formatted as `thumbnail` versions of file
+    $product->logo_photo->url('thumbnail');
+    $product->logo_photo->asThumbnail;
+
+    // Check whether file is empty or not
     $product->logo_photo->exists(); // whether file exists
     $product->logo_photo->exists('thumbnail'); // whether formatted file exists
     $product->logo_photo->isEmpty(/* null or 'thumbnail' */); // reverse of `exists()` method
 
+    // Fetch other params
     $product->logo_photo->size(); // size of origin file in bytes
     $product->logo_photo->size('thumbnail'); // size of formatted file in bytes
     $product->logo_photo->mimeType(); // MIME type of origin file
     $product->logo_photo->mimeType('thumbnail'); // MIME type of formatted file
+    $product->logo_photo->image()->width(); // origin image width in pixels
+    $product->logo_photo->image('thumbnail')->width(); // formatted image width in pixels
+    $product->logo_photo->image()->height(); // origin image height in pixels
+    $product->logo_photo->image('thumbnail')->height(); // formatted image height in pixels
+```
+
+In your blade template:
+
+```twig
+    {{-- Output <img ... /> tag --}}
+    <img src="{{ $product->logo_photo }}" alt='' />
+    <img src="{{ $product->logo_photo->asThumbnail }}" alt='' />
+    <img src="{{ $product->logo_photo->url() }}" alt='' />
+    <img src="{{ $product->logo_photo->url('thumbnail') }}" alt='' />
+
+    {{ $product->logo_photo->img() }} <!-- outputs 'img' tag -->
+    {{ $product->logo_photo->img('thumbnail') }} <!-- outputs 'img' tag -->
+    {{ $product->logo_photo->img(null, ['id' => 'some-tag-id']) }} <!-- outputs 'img' tag -->
+    {{ $product->logo_photo->link() }} <!-- outputs 'a' tag -->
+    {{ $product->logo_photo->link('thumbnail') }} <!-- outputs 'a' tag -->
+    {{ $product->logo_photo->link(null, 'Download Title', ['class' => 'some-css-class']) <!-- outputs 'a' tag -->
+    {{ $product->logo_photo->link(null, $product->logo_photo->img('thumbnail')) <!-- outputs link with image -->
+
+    {{-- Check if file is not empty --}}
+    @if($product->logo_photo->exists())
+    // ...
+    @endif
+    @if($product->logo_photo->isEmpty())
+    // ...
+    @endif
+
+    {{-- Output other characteristics --}}
+    Size: {{ $product->logo_photo->size() }}
+    Mime Type: {{ $product->logo_photo->mimeType() }}
+    ...
 ```
 
 Requests validation
@@ -235,27 +280,8 @@ Features under development
 
 ```twig
     // in blade
-    // output <img ... /> tag
-    <img src="{{ $product->logo_photo }}" />
-    <img src="{{ $product->logo_photo->asThumbnail }}" />
-    <img src="{{ $product->logo_photo->url() }}" />
-    <img src="{{ $product->logo_photo->url('thumbnail') }}" />
-    {!! $product->logo_photo->img() !!}
     @img($product->logo_photo)
     @img($product->logo_photo, 'thumbnail')
-
-    // check if file is not empty
-    @if($product->logo_photo->exists())
-    // ...
-    @endif
-    @if($product->logo_photo->isEmpty())
-    // ...
-    @endif
-
-    // output other characteristics
-    Size: {{ $product->logo_photo->size() }}
-    Mime Type: {{ $product->logo_photo->mimeType() }}
-    ...
 ```
 
 ```php

@@ -4,7 +4,6 @@ namespace Bicycle\FilesManager\File;
 
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
-use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
 use Bicycle\FilesManager\Exceptions\FileSystemException;
 
 /**
@@ -12,9 +11,11 @@ use Bicycle\FilesManager\Exceptions\FileSystemException;
  *
  * @author Alexey Sejnov <alexey.sejnov@solbeg.com>
  */
-class SplFileSource implements FileSourceInterface
+class SplFileSource extends AbstractFileSource
 {
-    use Traits\NotSupported, Traits\WithoutFormatting, Traits\WithoutRelativePath;
+    use Traits\NotSupported;
+    use Traits\WithoutFormatting;
+    use Traits\WithoutRelativePath;
 
     /**
      * @var \SplFileInfo

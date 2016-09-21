@@ -4,8 +4,6 @@ namespace Bicycle\FilesManager\File;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
-use Bicycle\FilesManager\Contracts\FileSource;
-
 /**
  * UploadedFileSource
  *
@@ -13,7 +11,7 @@ use Bicycle\FilesManager\Contracts\FileSource;
  * 
  * @method SymfonyUploadedFile getFile()
  */
-class UploadedFileSource extends SplFileSource implements FileSource
+class UploadedFileSource extends SplFileSource
 {
     /**
      * @param SymfonyUploadedFile $uploadedFile

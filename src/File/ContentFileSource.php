@@ -2,16 +2,16 @@
 
 namespace Bicycle\FilesManager\File;
 
-use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
-
 /**
  * ContentsFileSource keeps file content.
  *
  * @author Alexey Sejnov <alexey.sejnov@solbeg.com>
  */
-class ContentFileSource implements FileSourceInterface
+class ContentFileSource extends AbstractFileSource
 {
-    use Traits\NotSupported, Traits\WithoutFormatting, Traits\WithoutRelativePath;
+    use Traits\NotSupported;
+    use Traits\WithoutFormatting;
+    use Traits\WithoutRelativePath;
 
     /**
      * @var string

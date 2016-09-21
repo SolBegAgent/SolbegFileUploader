@@ -2,7 +2,6 @@
 
 namespace Bicycle\FilesManager\File;
 
-use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
 use Bicycle\FilesManager\Exceptions\FileSystemException;
 use Bicycle\FilesManager\Exceptions\InvalidConfigException;
 use Bicycle\FilesManager\Helpers\File as FileHelper;
@@ -12,9 +11,11 @@ use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 /**
  * @author Alexey Sejnov <alexey.sejnov@solbeg.com>
  */
-class UrlFileSource implements FileSourceInterface
+class UrlFileSource extends AbstractFileSource
 {
-    use Traits\NotSupported, Traits\WithoutFormatting, Traits\WithoutRelativePath;
+    use Traits\NotSupported;
+    use Traits\WithoutFormatting;
+    use Traits\WithoutRelativePath;
 
     /**
      * @var string

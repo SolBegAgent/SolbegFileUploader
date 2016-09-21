@@ -10,9 +10,11 @@ use Bicycle\FilesManager\Exceptions\NotSupportedException;
  *
  * @author Alexey Sejnov <alexey.sejnov@solbeg.com>
  */
-class FixedFormatFileSource implements SourceInterface
+class FixedFormatFileSource extends AbstractFileSource
 {
-    use Traits\NotSupported, Traits\WithoutFormatting, Traits\WithoutRelativePath;
+    use Traits\NotSupported;
+    use Traits\WithoutFormatting;
+    use Traits\WithoutRelativePath;
 
     /**
      * @var boolean

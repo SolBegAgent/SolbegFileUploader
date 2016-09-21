@@ -2,7 +2,6 @@
 
 namespace Bicycle\FilesManager\File;
 
-use Bicycle\FilesManager\Contracts\FileSource;
 use Bicycle\FilesManager\Exceptions\NotSupportedException;
 
 /**
@@ -10,8 +9,10 @@ use Bicycle\FilesManager\Exceptions\NotSupportedException;
  *
  * @author Alexey Sejnov <alexey.sejnov@solbeg.com>
  */
-class EmptyFileSource implements FileSource
+class EmptyFileSource extends AbstractFileSource
 {
+    use Traits\RelativePathToString;
+
     /**
      * @var callable|null
      */
@@ -124,7 +125,7 @@ class EmptyFileSource implements FileSource
 
     /**
      * @param string|null $format
-     * @return FileSource|null
+     * @return \Bicycle\FilesManager\Contracts\FileSource|null
      * @throws NotSupportedException
      */
     protected function process($method, $format = null)

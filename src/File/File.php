@@ -13,6 +13,9 @@ use Bicycle\FilesManager\Contracts\StoredFileSource as StoredFileInterface;
  */
 class File implements FileSourceInterface
 {
+    use Traits\FormatsAsProperties;
+    use Traits\HelperMethods;
+
     /**
      * @var FileSourceInterface|null
      */
@@ -199,5 +202,18 @@ class File implements FileSourceInterface
     public function context()
     {
         return $this->context;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        try {
+            return (string) $this->url();
+        } catch (\Exception $ex) {
+            trigger_error((string) $ex, E_USER_ERROR);
+            return '';
+        }
     }
 }

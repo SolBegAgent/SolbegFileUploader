@@ -12,8 +12,10 @@ use Bicycle\FilesManager\Helpers\File as FileHelper;
  *
  * @author Alexey Sejnov <alexey.sejnov@solbeg.com>
  */
-class StoredFileSource implements Contracts\StoredFileSource
+class StoredFileSource extends AbstractFileSource implements Contracts\StoredFileSource
 {
+    use Traits\RelativePathToString;
+
     /**
      * @var string relative path to origin file in context
      */
