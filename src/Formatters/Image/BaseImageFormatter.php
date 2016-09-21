@@ -26,6 +26,12 @@ abstract class BaseImageFormatter extends Formatters\AbstractFormatter
     protected $defaultExtension = 'png';
 
     /**
+     * @var boolean whether the image must be auto orientated by command:
+     * http://image.intervention.io/api/orientate
+     */
+    protected $orientate = true;
+
+    /**
      * @var ImageManager
      */
     private $imageManager;
@@ -53,10 +59,14 @@ abstract class BaseImageFormatter extends Formatters\AbstractFormatter
      */
     public function format(Contracts\FileSource $source, Contracts\Storage $storage)
     {
-        $contents = $source->contents();
-
         try {
-            $img = $this->getImageManager()->make($contents->stream());
+            if ($this->orientate) {
+                $img = $this->orientate($source);
+            } else {
+                $contents = $source->contents();
+                $img = $this->getImageManager()->make($contents->stream());
+            }
+
             $result = $this->processImage($img, $source, $storage);
 
             if ($result instanceof Image) {
@@ -66,10 +76,35 @@ abstract class BaseImageFormatter extends Formatters\AbstractFormatter
                 $result = $tmpFile;
             }
         } finally {
-            $contents->close();
+            if (isset($contents)) {
+                $contents->close();
+            }
         }
 
         return $result;
+    }
+
+    /**
+     * @param Contracts\FileSource $source
+     * @return Image
+     */
+    public function orientate(Contracts\FileSource $source)
+    {
+        // It is required to save file to local file system,
+        // because otherwise intervention/image exif command
+        // cannot read orientation.
+        $tmpPath = $this->generateNewTempFilename($source->extension());
+        $contents = $source->contents();
+        $handle = fopen($tmpPath, 'wb');
+
+        try {
+            stream_copy_to_stream($contents->stream(), $handle);
+            return $this->getImageManager()->make($tmpPath)->orientate();
+        } finally {
+            $contents->close();
+            @fclose($handle);
+            @unlink($tmpPath);
+        }
     }
 
     /**

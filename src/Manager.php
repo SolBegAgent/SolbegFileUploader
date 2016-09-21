@@ -156,7 +156,7 @@ class Manager implements Contracts\Manager
      */
     protected function getTempFilePrefix()
     {
-        return '__php_' . strtolower(str_replace('\\', '_', static::class));
+        return '__php_' . strtolower(str_replace('\\', '_', static::class)) . '_';
     }
 
     /**
