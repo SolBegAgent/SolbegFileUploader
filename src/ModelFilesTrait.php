@@ -196,6 +196,21 @@ trait ModelFilesTrait
     }
 
     /**
+     * @inheritdoc
+     */
+    public function attributesToArray()
+    {
+        $result = parent::attributesToArray();
+        $this->initFilesAttributesConfig();
+        foreach (array_keys($this->filesAttributesConfig) as $attribute) {
+            if (isset($result[$attribute]) || array_key_exists($attribute, $result)) {
+                $result[$attribute] = $this->getFileAttributeValue($attribute)->jsonSerialize();
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Saves all initialized file attributes.
      */
     public function saveFileAttributes()

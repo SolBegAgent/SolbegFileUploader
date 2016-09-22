@@ -55,4 +55,9 @@ interface Context
      * @throws ValidationException
      */
     public function validate(FileSource $source);
+
+    /**
+     * @return FileToArrayConverter
+     */
+    public function getToArrayConverter();
 }

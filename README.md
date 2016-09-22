@@ -244,6 +244,30 @@ In your blade template:
     ...
 ```
 
+In JSON action:
+
+```php
+    return response()->json($product);
+    /* Returns something like:
+        {
+            // ...
+            "logo_photo": {
+                "url": "http://...",
+                "path" => "0001/...",
+                "formats": {
+                    "thumbnail": "http://...",
+                    "small": "http://...",
+                    ...
+                }
+            },
+            // ...
+        }
+```
+
+You may read more about exporting files to array and json [here](./docs/07.in-rest-api.md);
+Read also [how to configure](./docs/07.in-rest-api.md#configure-converter)
+which properties of file must be exported.
+
 Requests validation
 ===================
 
@@ -284,24 +308,6 @@ Features under development
     @img($product->logo_photo, 'thumbnail')
 ```
 
-```php
-    // in JSON API
-    return json_encode($product);
-    //  returns [
-    //      ...
-    //      'logo_photo' => [
-    //          'url' => 'http://domain/path/to/original.jpg',
-    //          'size' => 12312312,
-    //          'mimeType' => 'image/jpeg',
-    //          'formats' => [
-    //              'small' => 'http://domain/path/to/small.jpg',
-    //              'thumbnail' => 'http://domain/path/to/thumbnail.jpg',
-    //          ],
-    //      ],
-    //      ...
-    //  ];
-```
-
 Documentation
 =============
 
@@ -313,3 +319,4 @@ Read more about:
 - [File Not Found Handlers](./docs/04.file-not-found-handlers.md)
 - [Storages](./docs/05.storages.md)
 - [Name Generators](./docs/06.name-generators.md)
+- [Using in REST Api](./docs/07.in-rest-api.md)

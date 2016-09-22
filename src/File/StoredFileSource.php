@@ -3,6 +3,9 @@
 namespace Bicycle\FilesManager\File;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 
 use Bicycle\FilesManager\Contracts;
 use Bicycle\FilesManager\Helpers\File as FileHelper;
@@ -12,7 +15,12 @@ use Bicycle\FilesManager\Helpers\File as FileHelper;
  *
  * @author Alexey Sejnov <alexey.sejnov@solbeg.com>
  */
-class StoredFileSource extends AbstractFileSource implements Contracts\StoredFileSource
+class StoredFileSource extends AbstractFileSource implements
+    Contracts\StoredFileSource,
+    Contracts\ExportableFileSource,
+    Arrayable,
+    Jsonable,
+    \JsonSerializable
 {
     use Traits\RelativePathToString;
 
@@ -67,6 +75,15 @@ class StoredFileSource extends AbstractFileSource implements Contracts\StoredFil
     public function url($format = null)
     {
         return $this->storage->fileUrl($this->relativePath(), $format);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function absoluteUrl($format = null, $secure = null)
+    {
+        $url = $this->url($format, false);
+        return app(UrlGenerator::class)->asset($url, $secure);
     }
 
     /**
@@ -171,5 +188,37 @@ class StoredFileSource extends AbstractFileSource implements Contracts\StoredFil
 
         $this->storage = $storage;
         $this->relativePath = $data['path'];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isStored()
+    {
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function toArray()
+    {
+        return $this->getStorage()->context()->getToArrayConverter()->convertToArray($this);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function toJson($options = 0)
+    {
+        return json_encode($this->jsonSerialize(), $options);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize()
+    {
+        return $this->getStorage()->context()->getToArrayConverter()->jsonSerialize($this);
     }
 }

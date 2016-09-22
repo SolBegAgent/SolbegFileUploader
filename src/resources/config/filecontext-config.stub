@@ -180,4 +180,37 @@ return [
             'global_prefix' => 'temp',
         ],
     ],
+
+    // This converter exports file objects to array and/or JSON, when it is necessary
+    'to_array_converter' => [
+        // The name of converter class
+        'class' => \Bicycle\FilesManager\Context\FileToArrayConverter::class,
+
+        // Which fields of origin files will be exported (may be an array or string).
+        // Possible value see in PHPDoc to the FileToArrayConverter::$originExport property.
+        'origin_export' => [
+            'url',
+            'path',
+            'formats',
+        ],
+
+        // Which fields of origin files will be exported (may be an array or string).
+        // Possible value see in PHPDoc to the FileToArrayConverter::$formatExport property.
+        'format_export' => 'url',
+
+        // Whether urls must be an absolute or not.
+        // If false then only `absoluteUrl` key will return absolute url.
+        'absolute_urls' => true,
+
+        // The protocol (http or https) from request url will be used by default
+        'secure_urls' => null,
+
+        // You may pass array of format names here, so only these formats will be exported
+        // Otherwise (if null) all formats specified in `formats` setting will be used.
+        'format_names' => null,
+
+        // Independently from `format_names` value, if this property is true,
+        // all already generated format versions will be exported too
+        'append_existing_formats' => true,
+    ],
 ];

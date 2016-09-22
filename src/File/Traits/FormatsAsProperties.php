@@ -26,6 +26,7 @@ use Bicycle\FilesManager\Exceptions\UnknownPropertyException;
  * Added "magic" properties:
  * @property-read string $url url to the original file
  * @property-read string $href url to the origin file
+ * @property-read string $src url to the origin file
  */
 trait FormatsAsProperties
 {
@@ -53,7 +54,7 @@ trait FormatsAsProperties
         if (strlen($property) > 2 && strncasecmp($property, 'as', 2) === 0) {
             $format = substr($property, 2);
             return $this->normalizeFormatName($format);
-        } elseif (strcasecmp($property, 'url') === 0 || strcasecmp($property, 'href') === 0) {
+        } elseif (in_array(strtolower($property), ['url', 'href', 'src'], true)) {
             return null;
         }
         return false;

@@ -105,6 +105,13 @@ class Context implements Contracts\Context, Contracts\ContextInfo
     protected $validate = [];
 
     /**
+     * @var string|array
+     */
+    protected $toArrayConverter = [
+        'class' => FileToArrayConverter::class,
+    ];
+
+    /**
      * @var File\FileSourceFactory|null
      */
     private $sourceFactory;
@@ -345,6 +352,41 @@ class Context implements Contracts\Context, Contracts\ContextInfo
         if ($failed && $messages) {
             throw new Exceptions\ValidationException($this, $source, $messages, $failed);
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getToArrayConverter()
+    {
+        if (!$this->toArrayConverter instanceof Contracts\FileToArrayConverter) {
+            $this->toArrayConverter = $this->createToArrayConverter($this->toArrayConverter);
+        }
+        return $this->toArrayConverter;
+    }
+
+    /**
+     * @param mixed $config
+     * @return Contracts\FileToArrayConverter
+     * @throws Exceptions\InvalidConfigException
+     */
+    protected function createToArrayConverter($config)
+    {
+        if (is_array($config)) {
+            $class = isset($config['class']) ? $config['class'] : FileToArrayConverter::class;
+            unset($config['class']);
+        } else {
+            list($class, $config) = [$config, []];
+        }
+
+        $result = $this->container->make($class, [
+            'context' => $this,
+            'config' => $config,
+        ]);
+        if (!$result instanceof Contracts\FileToArrayConverter) {
+            throw new Exceptions\InvalidConfigException("Invalid config of `to_array_converter` in '{$this->getName()}' context.");
+        }
+        return $result;
     }
 
     /**

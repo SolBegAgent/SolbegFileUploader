@@ -3,21 +3,26 @@
 namespace Bicycle\FilesManager\File;
 
 use Bicycle\FilesManager\Contracts\Context as ContextInterface;
+use Bicycle\FilesManager\Contracts\ExportableFileSource as FileInterface;
 use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
 use Bicycle\FilesManager\Contracts\StoredFileSource as StoredFileInterface;
+
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 
 /**
  * File objects that will be instantiated for each file attribute.
  *
  * @author Alexey Sejnov <alexey.sejnov@solbeg.com>
  */
-class File implements FileSourceInterface
+class File implements FileInterface, Arrayable, Jsonable, \JsonSerializable
 {
     use Traits\FormatsAsProperties;
     use Traits\HelperMethods;
 
     /**
-     * @var FileSourceInterface|null
+     * @var FileSourceInterface[]
      */
     private $oldSources = [];
 
@@ -76,10 +81,22 @@ class File implements FileSourceInterface
 
     /**
      * @inheritdoc
+     * @param boolean $absolute
      */
-    public function url($format = null)
+    public function url($format = null, $absolute = false)
     {
-        return $this->source->url($format);
+        return $absolute
+            ? $this->absoluteUrl($format)
+            : $this->source->url($format);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function absoluteUrl($format = null, $secure = null)
+    {
+        $url = $this->url($format, false);
+        return app(UrlGenerator::class)->asset($url, $secure);
     }
 
     /**
@@ -144,28 +161,45 @@ class File implements FileSourceInterface
     }
 
     /**
-     * Saves this file if not saved.
+     * @inheritdoc
+     */
+    public function isStored()
+    {
+        return $this->isStoredSource($this->source);
+    }
+
+    /**
+     * @param FileSourceInterface $source
+     * @return boolean
+     */
+    protected function isStoredSource($source)
+    {
+        $storage = $this->context()->storage(false);
+        return $source instanceof StoredFileInterface && $source->getStorage() === $storage;
+    }
+
+    /**
+     * @inheritdoc
      * @param array $options You may use the followings options:
      *  - 'deleteOld': boolean (default = true), whether old stored files should be also removed
      *  - 'validate': boolean (default = true), whether the file should be validated before saving
      */
     public function save(array $options = [])
     {
-        $source = $this->source;
-        $storage = $this->context->storage(false);
-        if ($source instanceof StoredFileInterface && $source->getStorage() === $storage) {
+        if ($this->isStored()) {
             return;
         }
 
-        if ($source->exists()) {
-            $this->setData($storage->saveNewFile($source, $options));
+        if ($this->source->exists()) {
+            $newRelativePath = $this->context->storage(false)->saveNewFile($this->source, $options);
+            $this->setData($newRelativePath);
         } else {
             $this->setData(null);
         }
 
         if (!isset($options['deleteOld']) || $options['deleteOld']) {
             foreach ($this->oldSources as $oldSource) {
-                if ($oldSource instanceof StoredFileInterface && $oldSource->getStorage() === $storage) {
+                if ($this->isStoredSource($oldSource)) {
                     $oldSource->delete();
                 }
             }
@@ -215,5 +249,30 @@ class File implements FileSourceInterface
             trigger_error((string) $ex, E_USER_ERROR);
             return '';
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function toArray()
+    {
+        return $this->context()->getToArrayConverter()->convertToArray($this);
+    }
+
+    /**
+     * @ineritdoc
+     */
+    public function toJson($options = 0)
+    {
+        return json_encode($this->jsonSerialize(), $options);
+    }
+
+    /**
+     * @ineritdoc
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return $this->context()->getToArrayConverter()->jsonSerialize($this);
     }
 }
