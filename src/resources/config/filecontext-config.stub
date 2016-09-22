@@ -21,9 +21,10 @@ return [
         //'thumb' => 'image/thumb: width = 200, height = 300',
         //'small' => ['image/thumb', 'width' => 500, 'height' => 500, 'aspect_ratio' => false],
         //'format-name1' => function ($source, $context, $formatter) {},
-        //'format-name2' => 'from: source=small, formatter=image/resize, width=150, upsize',
-        //'format-name3' => 'Your\Custom\FormatterClass: property1 = value1, property2 = value2, bool_property',
-        //'format-name4' => [Your\Custom\FormatterClass::class, 'property1' => 'value1', 'property2' => 'value2', 'bool_property' => true],
+        //'format-name2' => function (Intervention\Image\Image $image) {},
+        //'format-name3' => 'from: source=small, formatter=image/resize, width=150, upsize',
+        //'format-name4' => 'Your\Custom\FormatterClass: property1 = value1, property2 = value2, bool_property',
+        //'format-name5' => [Your\Custom\FormatterClass::class, 'property1' => 'value1', 'property2' => 'value2', 'bool_property' => true],
     ],
 
     /**

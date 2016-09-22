@@ -12,11 +12,6 @@ use Illuminate\Container\Container;
 trait ModelFilesTrait
 {
     /**
-     * @var boolean whether old files should be deleted when new file will be saved.
-     */
-    protected $deleteOldFiles = true;
-
-    /**
      * @var array[]
      */
     private $filesAttributesConfig = null;
@@ -211,13 +206,21 @@ trait ModelFilesTrait
     }
 
     /**
+     * @return boolean
+     */
+    protected function isDeleteOldFiles()
+    {
+        return !property_exists($this, 'deleteOldFiles') || $this->deleteOldFiles;
+    }
+
+    /**
      * Saves all initialized file attributes.
      */
     public function saveFileAttributes()
     {
         foreach ($this->filesInstances as $attribute => $file) {
             $file->save([
-                'deleteOld' => (bool) $this->deleteOldFiles,
+                'deleteOld' => (bool) $this->isDeleteOldFiles(),
             ]);
             $this->attributes[$attribute] = $file->relativePath();
         }
@@ -229,7 +232,7 @@ trait ModelFilesTrait
      */
     public function deleteFileAttributes(array $options = [])
     {
-        if (!$this->deleteOldFiles) {
+        if (!$this->isDeleteOldFiles()) {
             return;
         }
 

@@ -2,8 +2,6 @@
 
 namespace Bicycle\FilesManager\Formatters;
 
-use Illuminate\Contracts\Foundation\Application;
-
 use Bicycle\FilesManager\Contracts\Context as ContextInterface;
 use Bicycle\FilesManager\Contracts\Formatter as FormatterInterface;
 use Bicycle\FilesManager\Contracts\FormatterFactory as FormatterFactoryInterface;
@@ -11,6 +9,10 @@ use Bicycle\FilesManager\Contracts\FormatterParser as ParserInterface;
 use Bicycle\FilesManager\Exceptions\InvalidConfigException;
 use Bicycle\FilesManager\Exceptions\FormatterParserNotFoundException;
 use Bicycle\FilesManager\Helpers;
+
+use Illuminate\Contracts\Foundation\Application;
+
+use Intervention\Image\Image as InterventionImage;
 
 /**
  * FormatterFactory builds formatters instances.
@@ -21,6 +23,7 @@ class FormatterFactory implements FormatterFactoryInterface
 {
     const ALIAS_FROM = 'from';
     const ALIAS_INLINE = 'inline';
+    const ALIAS_IMAGE_INLINE = 'image/inline';
     const ALIAS_IMAGE_FIT = 'image/fit';
     const ALIAS_IMAGE_RESIZE = 'image/resize';
     const ALIAS_IMAGE_THUMB = 'image/thumb';
@@ -32,6 +35,7 @@ class FormatterFactory implements FormatterFactoryInterface
         self::ALIAS_FROM => FromFormatter::class,
         self::ALIAS_INLINE => InlineFormatter::class,
 
+        self::ALIAS_IMAGE_INLINE => Image\InlineFormatter::class,
         self::ALIAS_IMAGE_FIT => Image\FitFormatter::class,
         self::ALIAS_IMAGE_RESIZE => Image\ResizeFormatter::class,
         self::ALIAS_IMAGE_THUMB => Image\ThumbnailFormatter::class,
@@ -93,9 +97,47 @@ class FormatterFactory implements FormatterFactoryInterface
      */
     public function inline(ContextInterface $context, $name, callable $callback)
     {
-        return $this->make($context, $name, 'inline', [
+        $alias = $this->isImageInlineCallback($callback)
+            ? self::ALIAS_IMAGE_INLINE
+            : self::ALIAS_INLINE;
+        return $this->make($context, $name, $alias, [
             'callback' => $callback,
         ]);
+    }
+
+    /**
+     * @param callable $callback
+     * @return boolean
+     */
+    protected function isImageInlineCallback(callable $callback)
+    {
+        foreach ($this->getCallbackReflector($callback)->getParameters() as $parameter) {
+            /* @var $parameter \ReflectionParameter */
+            $parameterClass = $parameter->getClass();
+            if (!$parameterClass && $parameter->name === 'image') {
+                return true;
+            } elseif ($parameterClass && $parameterClass->name === InterventionImage::class) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get the proper reflection instance for the given callback.
+     *
+     * @param  callable  $callback
+     * @return \ReflectionFunctionAbstract
+     */
+    protected function getCallbackReflector(callable $callback)
+    {
+        if (is_string($callback) && strpos($callback, '::') !== false) {
+            $callback = explode('::', $callback);
+        }
+        if (is_array($callback)) {
+            return new \ReflectionMethod($callback[0], $callback[1]);
+        }
+        return new \ReflectionFunction($callback);
     }
 
     /**
