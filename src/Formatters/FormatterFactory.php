@@ -21,6 +21,7 @@ use Intervention\Image\Image as InterventionImage;
  */
 class FormatterFactory implements FormatterFactoryInterface
 {
+    const ALIAS_CHAIN = 'chain';
     const ALIAS_FROM = 'from';
     const ALIAS_INLINE = 'inline';
     const ALIAS_IMAGE_INLINE = 'image/inline';
@@ -32,6 +33,7 @@ class FormatterFactory implements FormatterFactoryInterface
      * @var array
      */
     protected $aliases = [
+        self::ALIAS_CHAIN => ChainFormatter::class,
         self::ALIAS_FROM => FromFormatter::class,
         self::ALIAS_INLINE => InlineFormatter::class,
 
