@@ -238,11 +238,14 @@ class Storage implements Contracts\Storage
     }
 
     /**
+     * @param boolean $throwExceptions
      * @return FilesCleaner
      */
-    protected function createFilesCleaner()
+    protected function createFilesCleaner($throwExceptions = true)
     {
-        return new FilesCleaner($this->disk(), $this->getNameGenerator());
+        $result = new FilesCleaner($this->disk(), $this->getNameGenerator());
+        $result->throwExceptions = $throwExceptions;
+        return $result;
     }
 
     /**
@@ -251,7 +254,8 @@ class Storage implements Contracts\Storage
      */
     public function deleteFile($relativePath, $format = null, array $options = [])
     {
-        $cleaner = $this->createFilesCleaner();
+        $throwExceptions = isset($options['throwExceptions']) ? $options['throwExceptions'] : true;
+        $cleaner = $this->createFilesCleaner($throwExceptions);
 
         if ($format === null) {
             $clearFormattedFiles = isset($options['clearFormattedFiles']) ? $options['clearFormattedFiles'] : true;

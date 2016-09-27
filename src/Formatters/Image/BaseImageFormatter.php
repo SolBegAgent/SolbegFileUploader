@@ -59,26 +59,19 @@ abstract class BaseImageFormatter extends Formatters\AbstractFormatter
      */
     public function format(Contracts\FileSource $source, Contracts\Storage $storage)
     {
-        try {
-            if ($this->orientate) {
-                $img = $this->orientate($source);
-            } else {
-                $contents = $source->contents();
-                $img = $this->getImageManager()->make($contents->stream());
-            }
+        if ($this->orientate) {
+            $img = $this->orientate($source);
+        } else {
+            $img = $this->makeImageFromSource($source);
+        }
 
-            $result = $this->processImage($img, $source, $storage);
+        $result = $this->processImage($img, $source, $storage);
 
-            if ($result instanceof Image) {
-                $extension = $this->generateExtension($source);
-                $tmpFile = $this->generateNewTempFilename($extension);
-                $result->save($tmpFile, $this->quality);
-                $result = $tmpFile;
-            }
-        } finally {
-            if (isset($contents)) {
-                $contents->close();
-            }
+        if ($result instanceof Image) {
+            $extension = $this->generateExtension($source);
+            $tmpFile = $this->generateNewTempFilename($extension);
+            $result->save($tmpFile, $this->quality);
+            $result = $tmpFile;
         }
 
         return $result;
@@ -113,5 +106,23 @@ abstract class BaseImageFormatter extends Formatters\AbstractFormatter
     public function getImageManager()
     {
         return $this->imageManager;
+    }
+
+    /**
+     * @param Contracts\FileSource $source
+     * @return Image
+     */
+    public function makeImageFromSource(Contracts\FileSource $source)
+    {
+        if (method_exists($source, 'image')) {
+            return $source->image();
+        }
+
+        $contents = $source->contents();
+        try {
+            return $this->getImageManager()->make($contents->stream());
+        } finally {
+            $contents->close();
+        }
     }
 }

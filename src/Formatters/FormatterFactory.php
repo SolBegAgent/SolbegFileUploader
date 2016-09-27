@@ -24,10 +24,12 @@ class FormatterFactory implements FormatterFactoryInterface
     const ALIAS_CHAIN = 'chain';
     const ALIAS_FROM = 'from';
     const ALIAS_INLINE = 'inline';
+
     const ALIAS_IMAGE_INLINE = 'image/inline';
     const ALIAS_IMAGE_FIT = 'image/fit';
     const ALIAS_IMAGE_RESIZE = 'image/resize';
     const ALIAS_IMAGE_THUMB = 'image/thumb';
+    const ALIAS_IMAGE_WATERMARK = 'image/watermark';
 
     /**
      * @var array
@@ -41,6 +43,7 @@ class FormatterFactory implements FormatterFactoryInterface
         self::ALIAS_IMAGE_FIT => Image\FitFormatter::class,
         self::ALIAS_IMAGE_RESIZE => Image\ResizeFormatter::class,
         self::ALIAS_IMAGE_THUMB => Image\ThumbnailFormatter::class,
+        self::ALIAS_IMAGE_WATERMARK => Image\WatermarkFormatter::class,
     ];
 
     /**

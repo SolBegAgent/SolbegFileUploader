@@ -161,10 +161,16 @@ class ImageSizeValidator extends AbstractValidator
      */
     protected function fetchFileSizes(Contracts\FileSource $source)
     {
+        if (method_exists($source, 'image')) {
+            $image = $source->image();
+            /* @var $image \Intervention\Image\Image */
+            return [(int) $image->width(), (int) $image->height()];
+        }
+
         $contents = $source->contents();
         try {
-            $img = $this->imageManager()->make($contents->stream());
-            return [(int) $img->width(), (int) $img->height()];
+            $image = $this->imageManager()->make($contents->stream());
+            return [(int) $image->width(), (int) $image->height()];
         } finally {
             $contents->close();
         }

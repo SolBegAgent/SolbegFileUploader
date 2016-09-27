@@ -183,6 +183,7 @@ class File implements FileInterface, Arrayable, Jsonable, \JsonSerializable
      * @param array $options You may use the followings options:
      *  - 'deleteOld': boolean (default = true), whether old stored files should be also removed
      *  - 'validate': boolean (default = true), whether the file should be validated before saving
+     *  - 'deleteOptions': array (default = [])
      */
     public function save(array $options = [])
     {
@@ -198,9 +199,10 @@ class File implements FileInterface, Arrayable, Jsonable, \JsonSerializable
         }
 
         if (!isset($options['deleteOld']) || $options['deleteOld']) {
+            $deleteOptions = isset($options['deleteOptions']) ? $options['deleteOptions'] : [];
             foreach ($this->oldSources as $oldSource) {
                 if ($this->isStoredSource($oldSource)) {
-                    $oldSource->delete();
+                    $oldSource->delete(null, $deleteOptions);
                 }
             }
             $this->oldSources = [];
@@ -212,6 +214,7 @@ class File implements FileInterface, Arrayable, Jsonable, \JsonSerializable
      * @param array $options You may use the followings options:
      *  - 'clearFormattedFiles': boolean (default = true), whether formatted files should be also removed.
      *  - 'clearEmptyDirs': boolean (default = true), whether empty directories should be also removed.
+     *  - 'throwExceptions': boolean (default = false)
      */
     public function delete($format = null, array $options = [])
     {

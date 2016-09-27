@@ -88,24 +88,29 @@ trait HelperMethods
      */
     public function image($format = null)
     {
-        if (isset($this->imageObjects[$format])) {
-            return $this->imageObjects[$format];
+        if (!isset($this->imageObjects[$format])) {
+            $manager = app('image');
+            if (!$manager instanceof ImageManager) {
+                throw new Exceptions\NotSupportedException(implode(' ', [
+                    'The "intervention/image" plugin is not installed.',
+                    'So the "' . __FUNCTION__ . '" method is not supported.',
+                ]));
+            }
+
+            $contents = $this->contents($format);
+            try {
+                $img = $manager->make($contents->stream());
+                $img->backup();
+                $this->imageObjects[$format] = $img;
+            } finally {
+                $contents->close();
+            }
         }
 
-        $manager = app('image');
-        if (!$manager instanceof ImageManager) {
-            throw new Exceptions\NotSupportedException(implode(' ', [
-                'The "intervention/image" plugin is not installed.',
-                'So the "' . __FUNCTION__ . '" method is not supported.',
-            ]));
-        }
-
-        $contents = $this->contents($format);
-        try {
-            $img = $manager->make($contents->contents());
-        } finally {
-            $contents->close();
-        }
-        return $this->imageObjects[$format] = $img;
+        // There is need to backup image before clone and reset after,
+        // because simple cloning is working incorrectly
+        // in intervention/image with transparent images
+        $result = clone $this->imageObjects[$format];
+        return $result->reset();
     }
 }

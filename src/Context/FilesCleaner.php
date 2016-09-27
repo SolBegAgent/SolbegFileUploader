@@ -31,6 +31,11 @@ class FilesCleaner
     protected $processedDirs = [];
 
     /**
+     * @var boolean
+     */
+    public $throwExceptions = true;
+
+    /**
      * @param FilesystemAdapter $disk
      * @param GeneratorInterface $generator
      */
@@ -54,7 +59,9 @@ class FilesCleaner
                 break;
             }
 
-            $this->remove($path);
+            if (!$this->remove($path)) {
+                break;
+            }
             $oldPath = $path;
         } while (true);
         return $this;
@@ -67,9 +74,7 @@ class FilesCleaner
     public function deleteAllFormattedFiles($relativePath)
     {
         $files = $this->generator->getListOfFormattedFiles($relativePath);
-        foreach (array_keys($files) as $path) {
-            $this->remove($path);
-        }
+        $this->remove(array_keys($files));
         return $this;
     }
 
@@ -100,7 +105,7 @@ class FilesCleaner
         foreach (array_keys($this->processedDirs) as $dir) {
             $dir = str_replace('\\', '/', rtrim($dir, '/'));
             while (trim($dir, '.') && $dir !== $rootDir && $this->dirIsEmpty($dir)) {
-                if (!$this->disk->deleteDirectory($dir)) {
+                if (!$this->removeDirectory($dir)) {
                     break;
                 }
                 $dir = FileHelper::dirname($dir);
@@ -121,16 +126,60 @@ class FilesCleaner
     }
 
     /**
-     * @param string $path
-     * @return static $this
+     * @param string|string[] $paths
+     * @return boolean
      * @throws FileSystemException
      */
-    protected function remove($path)
+    protected function remove($paths)
     {
-        if (!$this->disk->delete($path)) {
-            throw new FileSystemException("Cannot delete file by path: '$path'.");
+        $onException = function ($exception) {
+            if ($this->throwExceptions) {
+                throw $exception;
+            }
+            return false;
+        };
+
+        try {
+            if (!$this->disk->delete($paths)) {
+                throw new FileSystemException('Cannot delete file by path(s): ' . implode(', ', array_map(function ($path) {
+                    return "'$path'";
+                }, (array) $paths)) . '.');
+            }
+        } catch (\Exception $ex) {
+            return $onException($ex);
+        } catch (\Throwable $ex) {
+            return $onException($ex);
         }
-        $this->processedDirs[FileHelper::dirname($path)] = true;
-        return $this;
+
+        foreach ((array) $paths as $path) {
+            $this->processedDirs[FileHelper::dirname($path)] = true;
+        }
+        return true;
+    }
+
+    /**
+     * @param string $dirPath
+     * @return boolean
+     * @throws FileSystemException
+     */
+    protected function removeDirectory($dirPath)
+    {
+        $onException = function ($exception) {
+            if ($this->throwExceptions) {
+                throw $exception;
+            }
+            return false;
+        };
+
+        try {
+            if (!$this->disk->deleteDirectory($dirPath)) {
+                throw new FileSystemException("Cannot delete directory by path: '$dirPath'.");
+            }
+        } catch (\Exception $ex) {
+            return $onException($ex);
+        } catch (\Throwable $ex) {
+            return $onException($ex);
+        }
+        return true;
     }
 }

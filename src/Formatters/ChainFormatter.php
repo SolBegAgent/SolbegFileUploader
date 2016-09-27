@@ -57,7 +57,7 @@ class ChainFormatter extends AbstractFormatter
     protected function init()
     {
         if (!$this->formatters || !is_array($this->formatters)) {
-            throw new Exceptions\InvalidConfigException("Property \$formatters required for the {$this->getName()} formatter.");
+            throw new Exceptions\InvalidConfigException("Property 'formatters' required for the {$this->getName()} formatter.");
         }
         return parent::init();
     }

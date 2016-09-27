@@ -32,7 +32,7 @@ class ResizeFormatter extends BaseImageFormatter
     protected $height;
 
     /**
-     * Constraint the current aspect-ratio if the image.
+     * Constraint the current aspect-ratio of the image.
      * 
      * @var boolean
      */

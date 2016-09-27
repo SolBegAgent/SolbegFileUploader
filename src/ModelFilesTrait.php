@@ -56,7 +56,9 @@ trait ModelFilesTrait
             $model->saveFileAttributes();
         });
         static::deleted(function ($model) {
-            $model->deleteFileAttributes();
+            $model->deleteFileAttributes([
+                'throwExceptions' => false,
+            ]);
         });
     }
 
@@ -221,6 +223,9 @@ trait ModelFilesTrait
         foreach ($this->filesInstances as $attribute => $file) {
             $file->save([
                 'deleteOld' => (bool) $this->isDeleteOldFiles(),
+                'deleteOptions' => [
+                    'throwExceptions' => false,
+                ],
             ]);
             $this->attributes[$attribute] = $file->relativePath();
         }
