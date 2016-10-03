@@ -18,7 +18,7 @@ interface Storage
     public function context();
 
     /**
-     * Saves new file to the context's storage.
+     * Saves new file to the the storage.
      * 
      * @param FileSource $source
      * @return StoredFileSource
@@ -37,12 +37,19 @@ interface Storage
     public function generateFormattedFile(FileSource $source, $format);
 
     /**
-     * Deletes file from context's storage.
+     * Deletes file from the storage.
      * 
      * @param string $relativePath relative path to origin file
      * @param string|null $format the name of format. Null is meaning deleting of origin file with all formatted versions.
      */
     public function deleteFile($relativePath, $format = null);
+
+    /**
+     * Deletes files from the storage.
+     * 
+     * @param string[] $relativePaths relative paths to origin files
+     */
+    public function deleteFiles(array $relativePaths);
 
     /**
      * Returns contents of the file.
@@ -55,7 +62,7 @@ interface Storage
     public function fileContents($relativePath, $format = null);
 
     /**
-     * Checks whether original or formatted version of file exists in this context.
+     * Checks whether original or formatted version of file exists in this storage.
      * 
      * @param string $relativePath relative path to origin file
      * @param string|null $format the name of format. Null is meaning origin file.
@@ -100,10 +107,26 @@ interface Storage
     public function fileSize($relativePath, $format = null);
 
     /**
+     * Returns timestamp of the last modified time of a file.
+     * 
+     * @param string $relativePath relative path to origin file
+     * @param string|null $format the name of format. Null is meaning origin file.
+     * @return integer
+     */
+    public function fileLastModified($relativePath, $format = null);
+
+    /**
      * Returns list of existing formatted versions of the file.
      * 
      * @param string $relativePath relative path to origin file
      * @return array list of format names.
      */
     public function fileFormats($relativePath);
+
+    /**
+     * Returns list of existing origin files.
+     * 
+     * @return array list of relative paths.
+     */
+    public function files();
 }

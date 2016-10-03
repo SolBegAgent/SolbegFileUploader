@@ -43,4 +43,13 @@ interface ContextFactory
      * @param array $config
      */
     public function configureType($type, array $config);
+
+    /**
+     * Returns the list of all defined context names.
+     * This method will not return contexts defined in models,
+     * because the factory cannot know about them.
+     * 
+     * @return string[]
+     */
+    public function names();
 }

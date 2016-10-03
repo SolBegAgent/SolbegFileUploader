@@ -207,6 +207,8 @@ In your controller:
     $product->logo_photo->size('thumbnail'); // size of formatted file in bytes
     $product->logo_photo->mimeType(); // MIME type of origin file
     $product->logo_photo->mimeType('thumbnail'); // MIME type of formatted file
+    $product->logo_photo->lastModified(); // the last modified timestamp of origin file
+    $product->logo_photo->lastModified('thumbnail'); // the last modified timestamp formatted file
     $product->logo_photo->image()->width(); // origin image width in pixels
     $product->logo_photo->image('thumbnail')->width(); // formatted image width in pixels
     $product->logo_photo->image()->height(); // origin image height in pixels
@@ -320,3 +322,4 @@ Read more about:
 - [Storages](./docs/05.storages.md)
 - [Name Generators](./docs/06.name-generators.md)
 - [Using in REST Api](./docs/07.in-rest-api.md)
+- [Garbage Collector](./docs/08.garbage-collector.md)

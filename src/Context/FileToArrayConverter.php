@@ -17,16 +17,17 @@ class FileToArrayConverter implements Contracts\FileToArrayConverter
     /**
      * Possible values:
      *  - 'url'|'href'|'src', urls will be absolute by default
-     *  - 'absoluteUrl'
-     *  - 'size'
-     *  - 'mimeType'
-     *  - 'name'
+     *  - 'absoluteUrl'|'absolute'
+     *  - 'size'|'length'|'bytes'
+     *  - 'lastModified'|'timestamp'|'modified'|'modifiedAt'
+     *  - 'mimeType'|'mime'|'type'
+     *  - 'name'|'filename'
      *  - 'basename'
-     *  - 'extension'
+     *  - 'extension'|'ext'
      *  - 'width'
      *  - 'height'
      *  - 'relativePath'|'path'
-     *  - 'formats'
+     *  - 'formats'|'versions'
      * 
      * @var string[]|string
      */
@@ -35,12 +36,13 @@ class FileToArrayConverter implements Contracts\FileToArrayConverter
     /**
      * Possible values:
      *  - 'url'|'href'|'src', urls will be absolute by default
-     *  - 'absoluteUrl'
-     *  - 'size'
-     *  - 'mimeType'
-     *  - 'name'
+     *  - 'absoluteUrl'|'absolute'
+     *  - 'size'|'length'|'bytes'
+     *  - 'lastModified'|'timestamp'|'modified'|'modifiedAt'
+     *  - 'mimeType'|'mime'|'type'
+     *  - 'name'|'filename'
      *  - 'basename'
-     *  - 'extension'
+     *  - 'extension'|'ext'
      *  - 'width'
      *  - 'height'
      * 
@@ -70,6 +72,31 @@ class FileToArrayConverter implements Contracts\FileToArrayConverter
     protected $appendExistingFormats = true;
 
     /**
+     * @var string[]
+     */
+    public static $defaultAliases = [
+        'href' => 'url',
+        'src' => 'url',
+        'absolute' => 'absoluteUrl',
+        'filename' => 'name',
+        'ext' => 'extension',
+        'mime' => 'mimeType',
+        'type' => 'mimeType',
+        'bytes' => 'size',
+        'length' => 'size',
+        'timestamp' => 'lastModified',
+        'modified' => 'lastModified',
+        'modifiedAt' => 'lastModified',
+        'path' => 'relativePath',
+        'versions' => 'formats',
+    ];
+
+    /**
+     * @var string[]
+     */
+    protected $aliases = [];
+
+    /**
      * @var Contracts\Context
      */
     private $context;
@@ -82,6 +109,8 @@ class FileToArrayConverter implements Contracts\FileToArrayConverter
     {
         $this->context = $context;
         $this->configure($config);
+
+        $this->aliases = array_filter(array_merge(self::$defaultAliases, $this->aliases));
     }
 
     /**
@@ -105,9 +134,13 @@ class FileToArrayConverter implements Contracts\FileToArrayConverter
         }
 
         $result = $this->generateFileData($file);
-        if (isset($result['formats']) && $result['formats'] === []) {
-            $result['formats'] = new \stdClass;
+
+        foreach (array_merge(['formats' => 'formats'], $this->aliases) as $alias => $key) {
+            if ($key === 'formats' && isset($result[$alias]) && $result[$alias] === []) {
+                $result[$alias] = new \stdClass;
+            }
         }
+
         return $result;
     }
 
@@ -141,14 +174,14 @@ class FileToArrayConverter implements Contracts\FileToArrayConverter
     {
         $normalized = $this->normalizeKey($key);
 
-        if ($this->absoluteUrls && (in_array($normalized, ['url', 'href', 'src'], true))) {
+        if ($this->absoluteUrls && $normalized === 'url') {
             $normalized = 'absoluteUrl';
         }
 
         if ($format === null) {
             if ($normalized === 'formats') {
                 return $this->generateFormatsData($file);
-            } elseif ($normalized === 'relativePath' || $normalized === 'path') {
+            } elseif ($normalized === 'relativePath') {
                 return $file->relativePath();
             }
         }
@@ -168,7 +201,8 @@ class FileToArrayConverter implements Contracts\FileToArrayConverter
      */
     protected function normalizeKey($key)
     {
-        return lcfirst(str_replace(' ', '', ucwords(str_replace(['_', '-'], ' ', $key))));
+        $result = lcfirst(str_replace(' ', '', ucwords(str_replace(['_', '-'], ' ', $key))));
+        return isset($this->aliases[$result]) ? $this->aliases[$result] : $result;
     }
 
     /**

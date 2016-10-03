@@ -82,4 +82,18 @@ return [
      * By default `sys_get_temp_dir()` will be used.
      */
     //'temp_directory' => '/path/to/custom/temp/directory',
+
+    /**
+     * You may specify here array of context names,
+     * that should be cleared by console command `filecontext:clear-garbage` by default.
+     * This may be useful when you are using inline contexts in your models,
+     * because the console command does not know anything about them.
+     */
+    'console_clean_contexts' => [
+        // Examples:
+        /*
+        'user-avatar',
+        'App\Models\SomeModelClass@logo',
+         */
+    ],
 ];

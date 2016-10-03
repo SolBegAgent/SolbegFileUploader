@@ -34,6 +34,7 @@ class FilesManagerServiceProvider extends ServiceProvider
         $this->registerManager();
         $this->registerMiddleware();
         $this->registerConfigMakeCommand();
+        $this->registerCleanGarbageCommand();
     }
 
     /**
@@ -104,7 +105,7 @@ class FilesManagerServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the command.
+     * Register the `make:filecontext` command.
      *
      * @return void
      */
@@ -114,5 +115,18 @@ class FilesManagerServiceProvider extends ServiceProvider
             return new Console\ContextConfigMakeCommand($app['files']);
         });
         $this->commands(['command.filecontext-config.make']);
+    }
+
+    /**
+     * Registers the `filecontext:clear-garbage` command.
+     * 
+     * @return void
+     */
+    protected function registerCleanGarbageCommand()
+    {
+        $this->app->singleton('command.filecontext-garbage.clear', function ($app) {
+            return new Console\CleanGarbageCommand($app['filesmanager']);
+        });
+        $this->commands(['command.filecontext-garbage.clear']);
     }
 }

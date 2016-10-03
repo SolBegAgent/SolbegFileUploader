@@ -39,6 +39,13 @@ interface FileNameGenerator
     public function getFileFullPath($relativePathToOrigin, $format = null);
 
     /**
+     * Gets list of all saved origin files.
+     * 
+     * @return array Values of this array are the full paths to origin files, keys are relative paths.
+     */
+    public function getListOfOriginFiles();
+
+    /**
      * Gets list of all generated formatted versions of file.
      * 
      * @param string $relativePathToOrigin

@@ -214,4 +214,30 @@ return [
         // all already generated format versions will be exported too
         'append_existing_formats' => true,
     ],
+
+    // The garbage collector cleans your temporary storage form an old files.
+    // The garbage collector will be run automatically, when anything accessed to temp storage.
+    // See also `gc_probability` & `gc_divisor` below.
+    'garbage_collector' => [
+        // The name of collector class.
+        'class' => \Bicycle\FilesManager\Context\GarbageCollector::class,
+        // Time in seconds after which a file will be considered as old.
+        'lifetime' => 24 * 60 * 60, // 1 day
+    ],
+
+    /**
+     * The `gc_probability` in conjunction with `gc_divisor`` is used to manage probability
+     * that the garbage collection routine is automatically started.
+     * See `gc_divisor` property for details.
+     */
+    'gc_probability' => 1,
+
+    /**
+     * The `gc_divisor` coupled with `gc_probability` defines the probability
+     * that the garbage collection process is started on every storage initialization.
+     * 
+     * The probability is calculated by using `gc_probability/gc_divisor`,
+     * e.g. 1/100 (default) means there is a 1% chance that the GC process starts on each request.
+     */
+    'gc_divisor' => 100,
 ];

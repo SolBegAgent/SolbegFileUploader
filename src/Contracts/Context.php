@@ -60,4 +60,9 @@ interface Context
      * @return FileToArrayConverter
      */
     public function getToArrayConverter();
+
+    /**
+     * @return GarbageCollector
+     */
+    public function getGarbageCollector();
 }

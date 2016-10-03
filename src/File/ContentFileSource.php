@@ -35,6 +35,11 @@ class ContentFileSource extends AbstractFileSource
     private $url;
 
     /**
+     * @var integer
+     */
+    private $lastModified;
+
+    /**
      * @param string $content
      * @param string $filename
      * @param string|null $mimeType
@@ -42,6 +47,7 @@ class ContentFileSource extends AbstractFileSource
      */
     public function __construct($content, $filename, $mimeType = null, $url = null)
     {
+        $this->lastModified = time();
         $this->content = (string) $content;
         $this->filename = (string) $filename;
         $this->mimeType = $mimeType;
@@ -90,6 +96,14 @@ class ContentFileSource extends AbstractFileSource
     protected function originSize()
     {
         return mb_strlen($this->content, '8bit');
+    }
+
+   /**
+    * @return integer
+    */
+    protected function originLastModified()
+    {
+        return $this->lastModified;
     }
 
     /**

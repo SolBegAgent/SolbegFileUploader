@@ -270,6 +270,25 @@ class Storage implements Contracts\Storage
     }
 
     /**
+     * Deletes files from context's storage.
+     * 
+     * @param string[] $relativePaths relative paths to origin files
+     * @param array $options
+     */
+    public function deleteFiles(array $relativePaths, array $options = [])
+    {
+        $throwExceptions = isset($options['throwExceptions']) ? $options['throwExceptions'] : true;
+        $clearFormattedFiles = isset($options['clearFormattedFiles']) ? $options['clearFormattedFiles'] : true;
+
+        $cleaner = $this->createFilesCleaner($throwExceptions);
+        $cleaner->deleteFile($relativePaths, $clearFormattedFiles);
+
+        if (!isset($options['clearEmptyDirs']) || $options['clearEmptyDirs']) {
+            $cleaner->clearEmptyDirs();
+        }
+    }
+
+    /**
      * @inheritdoc
      */
     public function fileExists($relativePath, $format = null)
@@ -304,7 +323,11 @@ class Storage implements Contracts\Storage
                 throw $this->createNotFoundException($relativePath, $format);
             }
             try {
-                return call_user_func($callback, $path);
+                $result = call_user_func($callback, $path);
+                if ($result === false) {
+                    throw new Exceptions\FileSystemException("Cannot calculate '$sourceMethod' of the '$relativePath' file.");
+                }
+                return $result;
             } catch (\Exception $ex) {
                 throw $this->createNotFoundException($relativePath, $format, $ex);
             }
@@ -381,6 +404,16 @@ class Storage implements Contracts\Storage
     /**
      * @inheritdoc
      */
+    public function fileLastModified($relativePath, $format = null)
+    {
+        return $this->operateWithFile(function ($path) {
+            return $this->disk()->lastModified($path);
+        }, 'lastModified', $relativePath, $format);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function fileMimeType($relativePath, $format = null)
     {
         return $this->operateWithFile(function ($path) {
@@ -395,5 +428,14 @@ class Storage implements Contracts\Storage
     {
         $list = $this->getNameGenerator()->getListOfFormattedFiles($relativePath);
         return array_values(array_unique(array_filter($list)));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function files()
+    {
+        $list = $this->getNameGenerator()->getListOfOriginFiles();
+        return array_keys($list);
     }
 }

@@ -134,6 +134,21 @@ class ContextFactory implements Contracts\ContextFactory
     /**
      * @inheritdoc
      */
+    public function names()
+    {
+        $names = array_keys($this->configs);
+
+        $configs = $this->app['config']['filecontexts'];
+        if ($configs) {
+            $names = array_merge($names, array_keys($configs));
+        }
+
+        return array_values(array_unique($names));
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function configureType($type, array $config)
     {
         $this->types[$type] = $config;

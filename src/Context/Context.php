@@ -2,7 +2,7 @@
 
 namespace Bicycle\FilesManager\Context;
 
-use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Foundation\Application;
 
 use Bicycle\FilesManager\Contracts;
 use Bicycle\FilesManager\Exceptions;
@@ -17,9 +17,9 @@ class Context implements Contracts\Context, Contracts\ContextInfo
     use Helpers\ConfigurableTrait;
 
     /**
-     * @var Container
+     * @var Application
      */
-    protected $container;
+    protected $app;
 
     /**
      * The owner manager of this context.
@@ -112,6 +112,35 @@ class Context implements Contracts\Context, Contracts\ContextInfo
     ];
 
     /**
+     * @var string|array
+     */
+    protected $garbageCollector = [
+        'class' => GarbageCollector::class,
+    ];
+
+
+    /**
+     * The `$gcProbability` in conjunction with `$gcDivisor`` is used to manage probability
+     * that the garbage collection routine is started.
+     * See `$gcDivisor` property for details.
+     * 
+     * 
+     * @var integer
+     */
+    protected $gcProbability = 1;
+
+    /**
+     * The `$gcDivisor` coupled with `$gcProbability` defines the probability
+     * that the garbage collection process is started on every storage initialization.
+     * 
+     * The probability is calculated by using `$gcProbability/$gcDivisor`,
+     * e.g. 1/100 (default) means there is a 1% chance that the GC process starts on each request.
+     * 
+     * @var integer
+     */
+    protected $gcDivisor = 100;
+
+    /**
      * @var File\FileSourceFactory|null
      */
     private $sourceFactory;
@@ -122,17 +151,22 @@ class Context implements Contracts\Context, Contracts\ContextInfo
     private $parsedFormatters = [];
 
     /**
+     * @var boolean
+     */
+    private $gcProcessed = false;
+
+    /**
      * Constructor for a new context instance.
      * 
-     * @param Container $container
+     * @param Application $app
      * @param Contracts\Manager $manager
      * @param string $name
      * @param array $config
      * @throws Exceptions\InvalidConfigException
      */
-    public function __construct(Container $container, Contracts\Manager $manager, $name, array $config = [])
+    public function __construct(Application $app, Contracts\Manager $manager, $name, array $config = [])
     {
-        $this->container = $container;
+        $this->app = $app;
         $this->manager = $manager;
         $this->name = $name;
 
@@ -168,7 +202,7 @@ class Context implements Contracts\Context, Contracts\ContextInfo
     public function getSourceFactory()
     {
         if ($this->sourceFactory === null) {
-            $this->sourceFactory = $this->container->make(File\FileSourceFactory::class, [
+            $this->sourceFactory = $this->app->make(File\FileSourceFactory::class, [
                 'context' => $this,
             ]);
         }
@@ -188,7 +222,7 @@ class Context implements Contracts\Context, Contracts\ContextInfo
         $property = $temp ? 'tempStorage' : 'mainStorage';
         $class = isset($result['class']) ? $result['class'] : Storage::class;
         unset($result['class']);
-        $result = $this->container->make($class, [
+        $result = $this->app->make($class, [
             'context' => $this,
             'config' => $result,
         ]);
@@ -196,7 +230,12 @@ class Context implements Contracts\Context, Contracts\ContextInfo
         if (!$result instanceof Contracts\Storage) {
             throw new Exceptions\InvalidConfigException("Invalid config of '$property' in the '{$this->getName()}' file context.");
         }
-        return $this->{$property} = $result;
+
+        $this->{$property} = $result;
+        if ($temp) {
+            $this->autoCollectGarbage();
+        }
+        return $result;
     }
 
     /**
@@ -205,6 +244,29 @@ class Context implements Contracts\Context, Contracts\ContextInfo
     public function tempStorage()
     {
         return $this->storage(true);
+    }
+
+    /**
+     * Automatically collects and cleans garbage.
+     */
+    protected function autoCollectGarbage()
+    {
+        if ($this->gcProcessed) {
+            return;
+        }
+        $this->gcProcessed = true;
+
+        switch (true) { // OR
+            case method_exists($this->app, 'runningInConsole') && $this->app->runningInConsole(); // no break
+            case $this->gcProbability < 1; // no break
+            case $this->gcDivisor < 1; // no break
+                return;
+        }
+
+        $rand = mt_rand(1, (int) $this->gcDivisor);
+        if ($rand && $rand <= (int) $this->gcProbability) {
+            $this->getGarbageCollector()->clean();
+        }
     }
 
     /**
@@ -267,7 +329,7 @@ class Context implements Contracts\Context, Contracts\ContextInfo
      */
     protected function createFileNotFoundHandler($class, array $config = [])
     {
-        $result = $this->container->make($class, [
+        $result = $this->app->make($class, [
             'context' => $this,
             'config' => $config,
         ]);
@@ -379,12 +441,48 @@ class Context implements Contracts\Context, Contracts\ContextInfo
             list($class, $config) = [$config, []];
         }
 
-        $result = $this->container->make($class, [
+        $result = $this->app->make($class, [
             'context' => $this,
             'config' => $config,
         ]);
         if (!$result instanceof Contracts\FileToArrayConverter) {
             throw new Exceptions\InvalidConfigException("Invalid config of `to_array_converter` in '{$this->getName()}' context.");
+        }
+        return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getGarbageCollector()
+    {
+        if (!$this->garbageCollector instanceof Contracts\GarbageCollector) {
+            $this->garbageCollector = $this->createGarbageCollector($this->garbageCollector);
+        }
+        return $this->garbageCollector;
+    }
+
+    /**
+     * @param mixed $config
+     * @return Contracts\GarbageCollector
+     * @throws Exceptions\InvalidConfigException
+     */
+    protected function createGarbageCollector($config)
+    {
+        if (is_array($config)) {
+            $class = isset($config['class']) ? $config['class'] : GarbageCollector::class;
+            unset($config['class']);
+        } else {
+            list($class, $config) = [$config, []];
+        }
+
+        $result = $this->app->make($class, [
+            'context' => $this,
+            'storage' => $this->tempStorage(),
+            'config' => $config,
+        ]);
+        if (!$result instanceof Contracts\GarbageCollector) {
+            throw new Exceptions\InvalidConfigException("Invalid config of `garbage_collector` in '{$this->getName()}' context.");
         }
         return $result;
     }

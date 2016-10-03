@@ -43,6 +43,10 @@ trait WithoutFormatting
      */
     abstract protected function originSize();
     /**
+     * @return integer
+     */
+    abstract protected function originLastModified();
+    /**
      * Deletes origin file.
      */
     abstract protected function deleteOrigin();
@@ -144,6 +148,16 @@ trait WithoutFormatting
     {
         $this->assertFormatIsNull($format);
         return $this->originSize();
+    }
+
+    /**
+     * @inheritdoc
+     * @throws NotSupportedException if `$format` is not null.
+     */
+    public function lastModified($format = null)
+    {
+        $this->assertFormatIsNull($format);
+        return $this->originLastModified();
     }
 
     /**

@@ -248,6 +248,32 @@ abstract class AbstractNameGenerator implements GeneratorInterface
     /**
      * @inheritdoc
      */
+    public function getListOfOriginFiles()
+    {
+        $rootDir = str_replace('\\', '/', trim($this->generateRootDirectory(), '\/'));
+        $rootLength = strlen($rootDir);
+
+        $disk = $this->getDisk();
+        $result = [];
+
+        foreach ($disk->allFiles($rootDir) as $filePath) {
+            $normalizedPath = str_replace('\\', '/', trim($filePath, '\/'));
+            if (strncmp($rootDir, $normalizedPath, $rootLength) !== 0) {
+                continue;
+            }
+
+            $relativePath = trim(substr($filePath, $rootLength), '\/');
+            if ($this->validatePathOfOriginFile($relativePath)) {
+                $result[$relativePath] = $filePath;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getListOfFormattedFiles($relativePathToOrigin)
     {
         $rootDir = rtrim($this->generateRootDirectory(), '\/');

@@ -108,6 +108,14 @@ class FixedFormatFileSource extends AbstractFileSource
     }
 
     /**
+     * @inheritdoc
+     */
+    protected function originLastModified()
+    {
+        return $this->getSource()->lastModified($this->getFixedFormat());
+    }
+
+    /**
      * @inheridoc
      */
     protected function deleteOrigin()

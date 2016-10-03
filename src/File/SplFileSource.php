@@ -95,6 +95,14 @@ class SplFileSource extends AbstractFileSource
     /**
      * @inheritdoc
      */
+    protected function originLastModified()
+    {
+        return (int) $this->getFile()->getMTime();
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function deleteOrigin()
     {
         $path = $this->getFile()->getPathname();

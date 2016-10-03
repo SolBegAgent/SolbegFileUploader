@@ -121,6 +121,14 @@ class StoredFileSource extends AbstractFileSource implements
     /**
      * @inheritdoc
      */
+    public function lastModified($format = null)
+    {
+        return $this->storage->fileLastModified($this->relativePath(), $format);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function extension($format = null)
     {
         return FileHelper::extension($this->name($format));

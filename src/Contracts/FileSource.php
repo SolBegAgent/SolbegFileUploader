@@ -75,6 +75,14 @@ interface FileSource
     public function size($format = null);
 
     /**
+     * Returns timestamp of the last modified time of the file.
+     * 
+     * @param string|null $format the name of formatted version of the file.
+     * @return integer
+     */
+    public function lastModified($format = null);
+
+    /**
      * Returns extension of the file.
      * 
      * @param string|null $format the name of formatted version of the file.

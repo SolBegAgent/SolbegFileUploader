@@ -118,17 +118,33 @@ class UrlFileSource extends AbstractFileSource
     /**
      * @inheritdoc
      */
+    protected function originLastModified()
+    {
+        if ($this->isLocal) {
+            return (new SymfonyFile($this->localPath()))->getMTime();
+        }
+
+        $header = $this->fetchUrlHeader('Last-Modified');
+        if ($header !== null) {
+            $header = strtotime($header) ?: null;
+        }
+        return $header ?: time();
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function originMimeType()
     {
         if ($this->isLocal) {
             return (new SymfonyFile($this->localPath()))->getMimeType() ?: null;
         }
 
-        $result = $this->fetchUrlHeader('Content-Type') ?: null;
+        $result = (string) $this->fetchUrlHeader('Content-Type');
         if (false !== $pos = strrpos($result, ';')) {
             $result = substr($result, 0, $pos);
         }
-        return trim($result);
+        return trim($result) ?: null;
     }
 
     /**

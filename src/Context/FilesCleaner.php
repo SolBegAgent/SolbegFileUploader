@@ -69,29 +69,45 @@ class FilesCleaner
 
     /**
      * @param string $relativePath
-     * @return static $this
+     * @return string[]
      */
-    public function deleteAllFormattedFiles($relativePath)
+    protected function findAllFormattedFiles($relativePath)
     {
         $files = $this->generator->getListOfFormattedFiles($relativePath);
-        $this->remove(array_keys($files));
-        return $this;
+        return array_keys($files);
     }
 
     /**
      * @param string $relativePath
+     * @return static $this
+     */
+    public function deleteAllFormattedFiles($relativePath)
+    {
+        $this->remove($this->findAllFormattedFiles($relativePath));
+        return $this;
+    }
+
+    /**
+     * @param string|string[] $relativePaths
      * @param boolean $clearFormattedFiles
      * @return static $this
      */
-    public function deleteFile($relativePath, $clearFormattedFiles = true)
+    public function deleteFile($relativePaths, $clearFormattedFiles = true)
     {
-        if ($clearFormattedFiles) {
-            $this->deleteAllFormattedFiles($relativePath);
+        $paths = [];
+
+        foreach ((array) $relativePaths as $relativePath) {
+            if ($clearFormattedFiles) {
+                foreach ($this->findAllFormattedFiles($relativePath) as $formattedPath) {
+                    $paths[$formattedPath] = true;
+                }
+            }
+
+            $originPath = $this->generator->getFileFullPath($relativePath, null);
+            $paths[$originPath] = true;
         }
 
-        $path = $this->generator->getFileFullPath($relativePath, null);
-        $this->remove($path);
-
+        $this->remove(array_keys($paths));
         return $this;
     }
 
@@ -164,21 +180,12 @@ class FilesCleaner
      */
     protected function removeDirectory($dirPath)
     {
-        $onException = function ($exception) {
-            if ($this->throwExceptions) {
-                throw $exception;
-            }
-            return false;
-        };
-
         try {
-            if (!$this->disk->deleteDirectory($dirPath)) {
-                throw new FileSystemException("Cannot delete directory by path: '$dirPath'.");
-            }
+            return (bool) $this->disk->deleteDirectory($dirPath);
         } catch (\Exception $ex) {
-            return $onException($ex);
+            return false;
         } catch (\Throwable $ex) {
-            return $onException($ex);
+            return false;
         }
         return true;
     }

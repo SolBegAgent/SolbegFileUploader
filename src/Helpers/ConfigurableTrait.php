@@ -34,15 +34,25 @@ trait ConfigurableTrait
             $normalized = lcfirst(str_replace(' ' , '', ucwords(str_replace('_', ' ', $key))));
             $setter = 'set' . ucfirst($normalized);
 
-            if ($reflection->hasMethod($setter) && !$reflection->getMethod($setter)->isPrivate()) {
-                $checkSnakeStyle($key);
-                $this->{$setter}($value);
-            } elseif ($reflection->hasProperty($normalized) && !$reflection->getProperty($normalized)->isPrivate()) {
-                $checkSnakeStyle($key);
-                $this->{$normalized} = $value;
-            } else {
-                throw new InvalidConfigException("Unknown config key '$key' for '$reflection->name' class.");
+            if ($reflection->hasMethod($setter)) {
+                $method = $reflection->getMethod($setter);
+                if (!$method->isPrivate() && !$method->isStatic()) {
+                    $checkSnakeStyle($key);
+                    $this->{$setter}($value);
+                    continue;
+                }
             }
+
+            if ($reflection->hasProperty($normalized)) {
+                $property = $reflection->getProperty($normalized);
+                if (!$property->isPrivate() && !$property->isStatic()) {
+                    $checkSnakeStyle($key);
+                    $this->{$normalized} = $value;
+                    continue;
+                }
+            }
+
+            throw new InvalidConfigException("Unknown config key '$key' for '$reflection->name' class.");
         }
     }
 }

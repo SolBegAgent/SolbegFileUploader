@@ -109,6 +109,15 @@ class EmptyFileSource extends AbstractFileSource
 
     /**
      * @inheritdoc
+     * @throws NotSupportedException
+     */
+    public function lastModified($format = null)
+    {
+        return $this->process(__FUNCTION__, $format);
+    }
+
+    /**
+     * @inheritdoc
      */
     public function delete($format = null)
     {

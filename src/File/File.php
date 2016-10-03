@@ -134,6 +134,14 @@ class File implements FileInterface, Arrayable, Jsonable, \JsonSerializable
     /**
      * @inheritdoc
      */
+    public function lastModified($format = null)
+    {
+        return $this->source->lastModified($format);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function extension($format = null)
     {
         return $this->source->extension($format);
