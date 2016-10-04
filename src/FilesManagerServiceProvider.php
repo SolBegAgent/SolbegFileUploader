@@ -33,9 +33,18 @@ class FilesManagerServiceProvider extends ServiceProvider
     {
         $this->registerManager();
         $this->registerMiddleware();
+        $this->registerConsoleCommands();
+    }
+
+    /**
+     * Register console commands
+     */
+    protected function registerConsoleCommands()
+    {
         $this->registerConfigMakeCommand();
         $this->registerCleanGarbageCommand();
         $this->registerCreateSymlinkCommand();
+        $this->registerGenerateFormatsCommand();
     }
 
     /**
@@ -112,10 +121,10 @@ class FilesManagerServiceProvider extends ServiceProvider
      */
     protected function registerConfigMakeCommand()
     {
-        $this->app->singleton('command.filecontext-config.make', function ($app) {
+        $this->app->singleton('command.filecontext.make-config', function ($app) {
             return new Console\ContextConfigMakeCommand($app['files']);
         });
-        $this->commands(['command.filecontext-config.make']);
+        $this->commands(['command.filecontext.make-config']);
     }
 
     /**
@@ -125,10 +134,10 @@ class FilesManagerServiceProvider extends ServiceProvider
      */
     protected function registerCleanGarbageCommand()
     {
-        $this->app->singleton('command.filecontext-garbage.clear', function ($app) {
+        $this->app->singleton('command.filecontext.clear-garbage', function ($app) {
             return new Console\CleanGarbageCommand($app['filesmanager']);
         });
-        $this->commands(['command.filecontext-garbage.clear']);
+        $this->commands(['command.filecontext.clear-garbage']);
     }
 
     /**
@@ -138,9 +147,22 @@ class FilesManagerServiceProvider extends ServiceProvider
      */
     protected function registerCreateSymlinkCommand()
     {
-        $this->app->singleton('command.filecontext-symlink.create', function ($app) {
+        $this->app->singleton('command.filecontext.create-symlink', function ($app) {
             return new Console\CreatePublicStorageSymlinkCommand($app['files']);
         });
-        $this->commands(['command.filecontext-symlink.create']);
+        $this->commands(['command.filecontext.create-symlink']);
+    }
+
+    /**
+     * Registers the `filecontext:generate-formats` command.
+     * 
+     * @return void
+     */
+    protected function registerGenerateFormatsCommand()
+    {
+        $this->app->singleton('command.filecontext.generate-formats', function ($app) {
+            return new Console\GenerateFormatsCommand($app['filesmanager']);
+        });
+        $this->commands(['command.filecontext.generate-formats']);
     }
 }

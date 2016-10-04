@@ -6,7 +6,7 @@ interface Formatter
 {
     /**
      * This method should format `$source` file and return path to temporary file.
-     * This file will be automatically in the future.
+     * This file will be automatically deleted in the future.
      * 
      * @param \Bicycle\FilesManager\Contracts\FileSource $source
      * @param \Bicycle\FilesManager\Contracts\Storage $storage
