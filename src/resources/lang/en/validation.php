@@ -12,4 +12,5 @@ return [
     'max-width' => 'The image width is too large: :fileSize pixel(s). The width cannot be larger than :requiredSize pixel(s).',
     'min-height' => 'The image height is too small: :fileSize pixel(s). The height cannot be smaller than :requiredSize pixel(s).',
     'max-height' => 'The image height is too large: :fileSize pixel(s). The height cannot be larger than :requiredSize pixel(s).',
+    'ratio' => 'The image ratio is invalid: :fileSize. Ratio of width / height must be equal to: :requiredSize.',
 ];

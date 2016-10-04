@@ -36,6 +36,19 @@ class ImageSizeValidator extends AbstractValidator
     protected $maxHeight;
 
     /**
+     * A ratio constraint should be represented as width divided by height.
+     * This can be specified either by a statement like 3/2 or a float like 1.5
+     * 
+     * @var string
+     */
+    protected $ratio;
+
+    /**
+     * @var float
+     */
+    protected $ratioPrecision = 1e-5;
+
+    /**
      * @var array
      */
     protected $messages = [];
@@ -132,6 +145,8 @@ class ImageSizeValidator extends AbstractValidator
             $messages[] = $this->validateSize($attribute, $fileName, $height, $width, $height);
         }
 
+        $messages[] = $this->validateRatio($fileName, $width, $height);
+
         return implode(' ', array_filter($messages)) ?: null;
     }
 
@@ -153,6 +168,32 @@ class ImageSizeValidator extends AbstractValidator
         } elseif (strncmp($attribute, 'max', 3) === 0) {
             return $fileSize > $requiredSize ? $this->sizeMessage($attribute, $fileName, $fileSize, $fileWidth, $fileHeight) : null;
         }
+    }
+
+    /**
+     * @param string $fileName
+     * @param integer $fileWidth
+     * @param integer $fileHeight
+     * @return string|null
+     */
+    protected function validateRatio($fileName, $fileWidth, $fileHeight)
+    {
+        $ratio = trim($this->ratio);
+        if ($ratio === '') {
+            return null;
+        }
+
+        list($numerator, $denominator) = array_replace(
+            [1, 1], array_filter(sscanf($ratio, '%f/%d'))
+        );
+        if (!$numerator || !$denominator || !$fileWidth || !$fileHeight) {
+            return null;
+        }
+
+        if (abs($fileWidth / $fileHeight - $numerator / $denominator) < $this->ratioPrecision) {
+            return null;
+        }
+        return $this->sizeMessage('ratio', $fileName, "$fileWidth/$fileHeight", $fileWidth, $fileHeight);
     }
 
     /**

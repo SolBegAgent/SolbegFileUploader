@@ -85,14 +85,18 @@ class StoreUploadedFilesMiddleware
     {
         $result = [];
         foreach ($fileContextsNames as $name => $contextName) {
-            $data = $request->hasFile($name) ? $request->file($name) : $request->get($name);
-            if (!$data) {
-                continue;
-            }
+            $datas = array_filter([
+                $request->hasFile($name) ? $request->file($name) : null,
+                $request->get($name, null),
+            ]);
+            $result[$name] = null;
 
-            $source = $this->saveFileInput($contextName, $data);
-            if ($source) {
-                $result[$name] = $source;
+            foreach ($datas as $data) {
+                $source = $this->saveFileInput($contextName, $data);
+                if ($source) {
+                    $result[$name] = $source;
+                    break;
+                }
             }
         }
         return $result;
