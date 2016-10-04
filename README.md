@@ -60,6 +60,16 @@ add middleware for this package.
     // ...
 ```
 
+If you will use standard laravel's public path,
+then you need to create symbolic link from `public/storage` to `storage/app/public` directory.
+You may read about this [here](https://laravel.com/docs/5.3/filesystem).
+
+If you are not create it yet, you may do it quickly through artisan command:
+
+```
+$ php artisan filecontext:create-symlink
+```
+
 Installation of intervention/image
 ==================================
 

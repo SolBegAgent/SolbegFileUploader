@@ -35,6 +35,7 @@ class FilesManagerServiceProvider extends ServiceProvider
         $this->registerMiddleware();
         $this->registerConfigMakeCommand();
         $this->registerCleanGarbageCommand();
+        $this->registerCreateSymlinkCommand();
     }
 
     /**
@@ -128,5 +129,18 @@ class FilesManagerServiceProvider extends ServiceProvider
             return new Console\CleanGarbageCommand($app['filesmanager']);
         });
         $this->commands(['command.filecontext-garbage.clear']);
+    }
+
+    /**
+     * Registers the `filecontext:create-symlink` command.
+     * 
+     * @return void
+     */
+    protected function registerCreateSymlinkCommand()
+    {
+        $this->app->singleton('command.filecontext-symlink.create', function ($app) {
+            return new Console\CreatePublicStorageSymlinkCommand($app['files']);
+        });
+        $this->commands(['command.filecontext-symlink.create']);
     }
 }
