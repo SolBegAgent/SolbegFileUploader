@@ -28,12 +28,12 @@ interface FileSourceFactory
 
     /**
      * @param string $content
-     * @param string $filename
+     * @param string $name
      * @param string|null $mimeType
      * @param string|null $url
      * @return FileSource
      */
-    public function contentFile($content, $filename, $mimeType = null, $url = null);
+    public function contentFile($content, $name, $mimeType = null, $url = null);
 
     /**
      * @param string $url

@@ -102,9 +102,9 @@ class File implements FileInterface, Arrayable, Jsonable, \JsonSerializable
     /**
      * @inheritdoc
      */
-    public function name($format = null)
+    public function filename($format = null)
     {
-        return $this->source->name($format);
+        return $this->source->filename($format);
     }
 
     /**

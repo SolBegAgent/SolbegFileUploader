@@ -21,8 +21,8 @@ class FileToArrayConverter implements Contracts\FileToArrayConverter
      *  - 'size'|'length'|'bytes'
      *  - 'lastModified'|'timestamp'|'modified'|'modifiedAt'
      *  - 'mimeType'|'mime'|'type'
-     *  - 'name'|'filename'
-     *  - 'basename'
+     *  - 'filename'
+     *  - 'basename'|'name'
      *  - 'extension'|'ext'
      *  - 'width'
      *  - 'height'
@@ -40,8 +40,8 @@ class FileToArrayConverter implements Contracts\FileToArrayConverter
      *  - 'size'|'length'|'bytes'
      *  - 'lastModified'|'timestamp'|'modified'|'modifiedAt'
      *  - 'mimeType'|'mime'|'type'
-     *  - 'name'|'filename'
-     *  - 'basename'
+     *  - 'filename'
+     *  - 'basename'|'name'
      *  - 'extension'|'ext'
      *  - 'width'
      *  - 'height'
@@ -78,7 +78,7 @@ class FileToArrayConverter implements Contracts\FileToArrayConverter
         'href' => 'url',
         'src' => 'url',
         'absolute' => 'absoluteUrl',
-        'filename' => 'name',
+        'name' => 'basename',
         'ext' => 'extension',
         'mime' => 'mimeType',
         'type' => 'mimeType',

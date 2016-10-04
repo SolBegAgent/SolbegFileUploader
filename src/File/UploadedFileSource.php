@@ -32,7 +32,7 @@ class UploadedFileSource extends SplFileSource
     /**
      * @inheritdoc
      */
-    protected function originName()
+    protected function originBasename()
     {
         return $this->getFile()->getClientOriginalName();
     }

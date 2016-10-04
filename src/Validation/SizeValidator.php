@@ -63,7 +63,7 @@ class SizeValidator extends AbstractValidator implements
         $fileBytes = $source->size();
 
         return $this->trans()->trans("filesmanager::validation.$attr-size", [
-            'file' => $source->name(),
+            'file' => $source->basename(),
             'fileBytes' => $fileBytes,
             'fileSize' => Helpers\File::formatBytes($fileBytes, $this->formatPrecision),
             'size' => $this->{$attr},

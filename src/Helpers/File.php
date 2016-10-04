@@ -10,59 +10,74 @@ namespace Bicycle\FilesManager\Helpers;
 class File
 {
     /**
+     * Returns the name of file with extension.
+     * 
      * @param string $path
      * @return string
      */
     public static function basename($path)
     {
-        $filename = static::filename($path);
-        $pos = mb_strrpos($filename, '.', 0, 'UTF-8');
-        return $pos === false ? $filename : mb_substr($filename, 0, $pos, 'UTF-8');
+        $normalized = rtrim(str_replace('\\', '/', $path), '/');
+        $pos = mb_strrpos($normalized, '/', 0, 'UTF-8');
+        return $pos === false ? $normalized : mb_substr($normalized, $pos + 1, null, 'UTF-8');
     }
 
     /**
+     * Returns the name of file without extension.
+     * 
      * @param string $path
      * @return string
      */
     public static function filename($path)
     {
-        $normalized = str_replace('\\', '/', $path);
-        $pos = mb_strrpos($normalized, '/', 0, 'UTF-8');
-        return $pos === false ? $path : mb_substr($normalized, $pos + 1, null, 'UTF-8');
+        $basename = static::basename($path);
+        $pos = mb_strrpos($basename, '.', 0, 'UTF-8');
+        return $pos === false ? $basename : mb_substr($basename, 0, $pos, 'UTF-8');
     }
 
     /**
+     * Returns the extension of file.
+     * 
      * @param string $path
      * @return string|null
      */
     public static function extension($path)
     {
-        $filename = static::filename($path);
-        $pos = mb_strrpos($filename, '.', 0, 'UTF-8');
-        return $pos === false ? null : mb_substr($filename, $pos + 1, null, 'UTF-8');
+        $basename = static::basename($path);
+        $pos = mb_strrpos($basename, '.', 0, 'UTF-8');
+        return $pos === false ? null : mb_substr($basename, $pos + 1, null, 'UTF-8');
     }
 
     /**
+     * Returns directory of path.
+     * 
      * @param string $path
      * @return string
      */
     public static function dirname($path)
     {
         $normalized = str_replace('\\', '/', $path);
-        if ($normalized === '/') {
+
+        if ($normalized === '') {
+            return '';
+        } elseif ($normalized === '/') {
             return DIRECTORY_SEPARATOR;
+        } else {
+            $path = rtrim($path, '\/');
+            $normalized = rtrim($normalized, '/');
         }
+
         $pos = mb_strrpos($normalized, '/', 0, 'UTF-8');
         return $pos === false ? '.' : mb_substr($path, 0, $pos, 'UTF-8');
     }
 
     /**
-     * Generates random alpha-numeric base name for a file.
+     * Generates random alpha-numeric name for a file.
      * 
      * @param integer $length the length of file name.
      * @return string generated name
      */
-    public static function generateRandomBasename($length = 16)
+    public static function generateRandomName($length = 16)
     {
         $string = '';
         while (($len = strlen($string)) < $length) {

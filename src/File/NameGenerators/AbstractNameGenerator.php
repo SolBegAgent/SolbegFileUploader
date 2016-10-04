@@ -158,7 +158,7 @@ abstract class AbstractNameGenerator implements GeneratorInterface
 
         $maxSubdirNum = 0;
         foreach ($this->getDisk()->directories($rootDir) as $subdirPath) {
-            $subdir = FileHelper::filename($subdirPath);
+            $subdir = FileHelper::basename($subdirPath);
             if ($this->isValidCommonSubdir($subdir) && intval($subdir) > $maxSubdirNum) {
                 $maxSubdirNum = (int) $subdir;
             }
@@ -182,7 +182,7 @@ abstract class AbstractNameGenerator implements GeneratorInterface
         $rootDir = $this->generateRootDirectory();
         $disk = $this->getDisk();
         do {
-            $random = FileHelper::generateRandomBasename($this->fileSubdirLength);
+            $random = FileHelper::generateRandomName($this->fileSubdirLength);
             $result = $this->normalizeCase($random);
         } while($disk->exists("$rootDir/$commonSubdir/$result"));
         return $result;
@@ -216,12 +216,12 @@ abstract class AbstractNameGenerator implements GeneratorInterface
         }
 
         $originSubdir = FileHelper::dirname($relativePathToOrigin);
-        $originBasename = FileHelper::basename($relativePathToOrigin);
+        $originFilename = FileHelper::filename($relativePathToOrigin);
         $extension = $this->normalizeCase($source->extension());
         return implode('/', [
             $originSubdir,
             $format . $this->formatSubdirSuffix,
-            $extension === null ? $originBasename : "$originBasename.$extension",
+            $extension === null ? $originFilename : "$originFilename.$extension",
         ]);
     }
 
@@ -236,9 +236,9 @@ abstract class AbstractNameGenerator implements GeneratorInterface
         }
 
         $originSubdir = FileHelper::dirname($relativePathToOrigin);
-        $originBasename = FileHelper::basename($relativePathToOrigin);
+        $originFilename = FileHelper::filename($relativePathToOrigin);
         foreach ($this->getDisk()->files("$rootDir/$originSubdir/$format$this->formatSubdirSuffix") as $file) {
-            if ($originBasename === FileHelper::basename($file)) {
+            if ($originFilename === FileHelper::filename($file)) {
                 return $file;
             }
         }
@@ -278,17 +278,17 @@ abstract class AbstractNameGenerator implements GeneratorInterface
     {
         $rootDir = rtrim($this->generateRootDirectory(), '\/');
         $originSubdir = FileHelper::dirname($relativePathToOrigin);
-        $originBasename = FileHelper::basename($relativePathToOrigin);
+        $originFilename = FileHelper::filename($relativePathToOrigin);
 
         $disk = $this->getDisk();
         $result = [];
         foreach ($disk->directories("$rootDir/$originSubdir") as $formatPath) {
-            $format = $this->cutFormatSubdirSuffix(FileHelper::filename($formatPath));
+            $format = $this->cutFormatSubdirSuffix(FileHelper::basename($formatPath));
             if ($format === null) {
                 continue;
             }
             foreach ($disk->files($formatPath) as $file) {
-                if ($originBasename === FileHelper::basename($file)) {
+                if ($originFilename === FileHelper::filename($file)) {
                     $result[$file] = $format;
                 }
             }

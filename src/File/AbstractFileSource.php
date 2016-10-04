@@ -27,5 +27,5 @@ abstract class AbstractFileSource implements FileSourceInterface
     /**
      * @inheritdoc
      */
-    abstract public function name($format = null);
+    abstract public function basename($format = null);
 }

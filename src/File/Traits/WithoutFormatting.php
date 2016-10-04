@@ -33,7 +33,7 @@ trait WithoutFormatting
     /**
      * @return string
      */
-    abstract protected function originName();
+    abstract protected function originBasename();
     /**
      * @return string|null
      */
@@ -54,9 +54,9 @@ trait WithoutFormatting
     /**
      * @return string
      */
-    protected function originBasename()
+    protected function originFilename()
     {
-        return FileHelper::basename($this->originName());
+        return FileHelper::filename($this->originBasename());
     }
 
     /**
@@ -64,7 +64,7 @@ trait WithoutFormatting
      */
     protected function originExtension()
     {
-        return FileHelper::extension($this->originName());
+        return FileHelper::extension($this->originBasename());
     }
 
     /**
@@ -104,10 +104,10 @@ trait WithoutFormatting
      * @inheritdoc
      * @throws NotSupportedException if `$format` is not null.
      */
-    public function name($format = null)
+    public function filename($format = null)
     {
         $this->assertFormatIsNull($format);
-        return $this->originName();
+        return $this->originFilename();
     }
 
     /**

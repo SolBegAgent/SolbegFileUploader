@@ -15,7 +15,7 @@ class FixedNameGenerator extends AbstractNameGenerator
     /**
      * @var string
      */
-    protected $basename = 'file';
+    protected $filename = 'file';
 
     /**
      * @inheritdoc
@@ -26,6 +26,6 @@ class FixedNameGenerator extends AbstractNameGenerator
         if (!$this->isValidExtension($extension)) {
             $extension = null;
         }
-        return $extension === null ? $this->basename : "$this->basename.$extension";
+        return $extension === null ? $this->filename : "$this->filename.$extension";
     }
 }

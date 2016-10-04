@@ -80,13 +80,13 @@ interface Storage
     public function fileUrl($relativePath, $format = null);
 
     /**
-     * Returns name of file.
+     * Returns name of file with extension.
      * 
      * @param string $relativePath relative path to origin file
      * @param string|null $format the name of format. Null is meaning origin file.
      * @return string
      */
-    public function fileName($relativePath, $format = null);
+    public function fileBasename($relativePath, $format = null);
 
     /**
      * Returns MIME type of file.

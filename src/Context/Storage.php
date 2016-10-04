@@ -384,11 +384,11 @@ class Storage implements Contracts\Storage
     /**
      * @inheritdoc
      */
-    public function fileName($relativePath, $format = null)
+    public function fileBasename($relativePath, $format = null)
     {
         return $this->operateWithFile(function ($path) {
-            return Helpers\File::filename($path);
-        }, 'name', $relativePath, $format);
+            return Helpers\File::basename($path);
+        }, 'basename', $relativePath, $format);
     }
 
     /**

@@ -88,9 +88,9 @@ class UrlFileSource extends AbstractFileSource
     /**
      * @inheritdoc
      */
-    protected function originName()
+    protected function originBasename()
     {
-        return FileHelper::filename($this->urlWithoutParams());
+        return FileHelper::basename($this->urlWithoutParams());
     }
 
     /**

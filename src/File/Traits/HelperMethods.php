@@ -34,10 +34,12 @@ trait HelperMethods
     abstract protected function contents($format = null);
 
     /**
+     * Returns basename of the file (file name with extension).
+     * 
      * @param string|null $format
      * @return string
      */
-    abstract protected function name($format = null);
+    abstract protected function basename($format = null);
 
     /**
      * Returns string HTML code for link to the file.
@@ -50,7 +52,7 @@ trait HelperMethods
      */
     public function link($format = null, $content = null, array $attributes = [], $encodeContent = true)
     {
-        $name = $this->name($format);
+        $name = $this->basename($format);
 
         if ($content === null) {
             $content = Helpers\Html::encode($name);
@@ -74,7 +76,7 @@ trait HelperMethods
     {
         $attributes['src'] = $this->url($format);
         if (!isset($attributes['alt'])) {
-            $attributes['alt'] = $this->name($format);
+            $attributes['alt'] = $this->basename($format);
         }
 
         $html = Helpers\Html::tag('img', null, $attributes);

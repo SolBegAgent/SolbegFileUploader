@@ -167,8 +167,8 @@ class Manager implements Contracts\Manager
         $prefix = $this->getTempFilePrefix();
         $dir = $this->getTempDirectory();
         do {
-            $basename = $prefix . Helpers\File::generateRandomBasename();
-            $filename = $extension === null ? $basename : "$basename.$extension";
+            $random = $prefix . Helpers\File::generateRandomName();
+            $filename = $extension === null ? $random : "$random.$extension";
             $fullPath = $dir . DIRECTORY_SEPARATOR . $filename;
         } while (file_exists($fullPath));
         return $fullPath;

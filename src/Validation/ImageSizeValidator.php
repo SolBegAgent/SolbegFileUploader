@@ -122,7 +122,7 @@ class ImageSizeValidator extends AbstractValidator
             return $this->errorMessage();
         }
 
-        $fileName = $source->name();
+        $fileName = $source->basename();
         $messages = [];
 
         foreach (['minWidth', 'maxWidth'] as $attribute) {

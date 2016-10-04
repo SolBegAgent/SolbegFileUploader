@@ -47,7 +47,7 @@ interface Manager
     public function validators();
 
     /**
-     * Generates and returns filename for new temporary file.
+     * Generates and returns name for new temporary file.
      * 
      * @param string|null $extension
      * @return string

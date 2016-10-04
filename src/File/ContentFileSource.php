@@ -21,7 +21,7 @@ class ContentFileSource extends AbstractFileSource
     /**
      * @var string
      */
-    private $filename;
+    private $name;
 
     /**
      * @var string|null
@@ -41,15 +41,15 @@ class ContentFileSource extends AbstractFileSource
 
     /**
      * @param string $content
-     * @param string $filename
+     * @param string $name
      * @param string|null $mimeType
      * @param string|null $url
      */
-    public function __construct($content, $filename, $mimeType = null, $url = null)
+    public function __construct($content, $name, $mimeType = null, $url = null)
     {
         $this->lastModified = time();
         $this->content = (string) $content;
-        $this->filename = (string) $filename;
+        $this->name = (string) $name;
         $this->mimeType = $mimeType;
         $this->url = $url;
     }
@@ -85,9 +85,9 @@ class ContentFileSource extends AbstractFileSource
     /**
      * @inheritdoc
      */
-    protected function originName()
+    protected function originBasename()
     {
-        return $this->filename;
+        return $this->name;
     }
 
     /**

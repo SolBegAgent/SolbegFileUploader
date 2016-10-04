@@ -67,9 +67,9 @@ class SplFileSource extends AbstractFileSource
     /**
      * @inheritdoc
      */
-    protected function originName()
+    protected function originBasename()
     {
-        return $this->getFile()->getFilename();
+        return $this->getFile()->getBasename();
     }
 
     /**

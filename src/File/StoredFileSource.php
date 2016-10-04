@@ -89,9 +89,9 @@ class StoredFileSource extends AbstractFileSource implements
     /**
      * @inheritdoc
      */
-    public function name($format = null)
+    public function filename($format = null)
     {
-        return $this->storage->fileName($this->relativePath(), $format);
+        return FileHelper::filename($this->basename($format));
     }
 
     /**
@@ -99,7 +99,7 @@ class StoredFileSource extends AbstractFileSource implements
      */
     public function basename($format = null)
     {
-        return FileHelper::basename($this->name($format));
+        return $this->storage->fileBasename($this->relativePath(), $format);
     }
 
     /**
@@ -131,7 +131,7 @@ class StoredFileSource extends AbstractFileSource implements
      */
     public function extension($format = null)
     {
-        return FileHelper::extension($this->name($format));
+        return FileHelper::extension($this->basename($format));
     }
 
     /**

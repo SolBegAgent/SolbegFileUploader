@@ -21,9 +21,9 @@ class SlugNameGenerator extends OriginNameGenerator
     /**
      * @inheritdoc
      */
-    protected function fetchSourceBaseName(FileSourceInterface $source)
+    protected function fetchSourceName(FileSourceInterface $source)
     {
-        $result = parent::fetchSourceBaseName($source);
+        $result = parent::fetchSourceName($source);
         return $this->slugify($result);
     }
 

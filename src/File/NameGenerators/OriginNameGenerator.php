@@ -26,13 +26,13 @@ class OriginNameGenerator extends RandomNameGenerator
      */
     public function generateNewFilename(FileSourceInterface $source)
     {
-        $basename = $this->fetchSourceBaseName($source);
+        $sourceName = $this->fetchSourceName($source);
         $extension = $source->extension();
 
         if (!$this->isValidExtension($extension)) {
             $extension = null;
         }
-        $filename = $extension === null ? $basename : "$basename.$extension";
+        $filename = $extension === null ? $sourceName : "$sourceName.$extension";
 
         if (!$this->isValidFileName($filename) || (mb_strlen($filename, 'UTF-8') > $this->getMaxLength())) {
             if ($extension !== null && ($this->length + 1/*.*/ + mb_strlen($extension, 'UTF-8')) > $this->getMaxLength()) {
@@ -47,9 +47,9 @@ class OriginNameGenerator extends RandomNameGenerator
      * @param FileSourceInterface $source
      * @return string
      */
-    protected function fetchSourceBaseName(FileSourceInterface $source)
+    protected function fetchSourceName(FileSourceInterface $source)
     {
-        return $source->basename();
+        return $source->filename();
     }
 
     /**

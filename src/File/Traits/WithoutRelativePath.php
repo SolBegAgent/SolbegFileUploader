@@ -11,7 +11,7 @@ trait WithoutRelativePath
 {
     /**
      * @param string $message
-     * @return NotSupportedException
+     * @return \Bicycle\FilesManager\Exceptions\NotSupportedException
      */
     abstract protected function createNotSupportedException($message);
 

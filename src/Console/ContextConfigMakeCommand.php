@@ -43,11 +43,11 @@ class ContextConfigMakeCommand extends GeneratorCommand
      */
     protected function getPath($name)
     {
-        $basename = Helpers\File::basename($name);
+        $filename = Helpers\File::filename($name);
         return implode(DIRECTORY_SEPARATOR, [
             $this->laravel['path.config'],
             'filecontexts',
-            strtolower($basename) . '.php',
+            strtolower($filename) . '.php',
         ]);
     }
 

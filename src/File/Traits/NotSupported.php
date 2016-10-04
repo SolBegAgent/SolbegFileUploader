@@ -3,6 +3,7 @@
 namespace Bicycle\FilesManager\File\Traits;
 
 use Bicycle\FilesManager\Exceptions\NotSupportedException;
+use Bicycle\FilesManager\Helpers\File as FileHelper;
 
 /**
  * NotSupported Trait

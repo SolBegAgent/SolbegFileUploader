@@ -70,9 +70,9 @@ class FixedFormatFileSource extends AbstractFileSource
     /**
      * @inheritdoc
      */
-    protected function originName()
+    protected function originFilename()
     {
-        return $this->getSource()->name($this->getFixedFormat());
+        return $this->getSource()->filename($this->getFixedFormat());
     }
 
     /**

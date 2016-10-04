@@ -36,7 +36,7 @@ class RandomNameGenerator extends AbstractNameGenerator
      */
     protected function generateRandomFilename($extension = null)
     {
-        $basename = FileHelper::generateRandomBasename($this->length);
-        return $extension === null ? $basename : "$basename.$extension";
+        $name = FileHelper::generateRandomName($this->length);
+        return $extension === null ? $name : "$name.$extension";
     }
 }

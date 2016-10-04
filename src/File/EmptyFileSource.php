@@ -66,7 +66,7 @@ class EmptyFileSource extends AbstractFileSource
      * @inheritdoc
      * @throws NotSupportedException always
      */
-    public function name($format = null)
+    public function filename($format = null)
     {
         return $this->process(__FUNCTION__, $format);
     }

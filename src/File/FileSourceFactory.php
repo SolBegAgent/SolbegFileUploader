@@ -75,9 +75,9 @@ class FileSourceFactory implements FactoryInterface
      * @inheritdoc
      * @return ContentFileSource
      */
-    public function contentFile($content, $filename, $mimeType = null, $url = null)
+    public function contentFile($content, $name, $mimeType = null, $url = null)
     {
-        return new ContentFileSource($content, $filename, $mimeType, $url);
+        return new ContentFileSource($content, $name, $mimeType, $url);
     }
 
     /**

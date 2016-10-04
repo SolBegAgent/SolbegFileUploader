@@ -35,7 +35,7 @@ class CleanGarbageCommand extends Command
     protected $filesmanager;
 
     /**
-     * Create a new cache clear command instance.
+     * Create a new garbage clear command instance.
      *
      * @param Manager $filesmanager
      * @return void
@@ -98,7 +98,6 @@ class CleanGarbageCommand extends Command
 
         $this->line('Done!');
     }
-
 
     /**
      * Gets context names that should be cleaned.

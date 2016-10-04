@@ -39,16 +39,16 @@ interface FileSource
     public function url($format = null);
 
     /**
-     * Returns name of the file.
+     * Returns name of the file (file name without extension).
      * 
      * @param string|null $format the name of formatted version of the file.
      * Null means original version.
      * @return string
      */
-    public function name($format = null);
+    public function filename($format = null);
 
     /**
-     * Returns basename of the file (file name without extension)
+     * Returns basename of the file (file name with extension).
      * 
      * @param string|null $format the name of formatted version of the file.
      * Null means original version.
