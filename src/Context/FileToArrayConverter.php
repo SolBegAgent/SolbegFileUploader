@@ -29,7 +29,7 @@ class FileToArrayConverter implements Contracts\FileToArrayConverter
      *  - 'relativePath'|'path'
      *  - 'formats'|'versions'
      * 
-     * @var string[]|string
+     * @var string[]|string|\Closure[]|\Closure
      */
     protected $originExport = ['url', 'path', 'formats'];
 
@@ -46,7 +46,7 @@ class FileToArrayConverter implements Contracts\FileToArrayConverter
      *  - 'width'
      *  - 'height'
      * 
-     * @var string[]|string
+     * @var string[]|string|\Closure[]|\Closure
      */
     protected $formatExport = 'url';
 
@@ -72,7 +72,7 @@ class FileToArrayConverter implements Contracts\FileToArrayConverter
     protected $appendExistingFormats = true;
 
     /**
-     * @var string[]
+     * @var string[]|\Closure[]
      */
     public static $defaultAliases = [
         'href' => 'url',
@@ -92,7 +92,7 @@ class FileToArrayConverter implements Contracts\FileToArrayConverter
     ];
 
     /**
-     * @var string[]
+     * @var string[]|\Closure[]
      */
     protected $aliases = [];
 
@@ -158,21 +158,24 @@ class FileToArrayConverter implements Contracts\FileToArrayConverter
         }
 
         $result = [];
-        foreach ($exportKeys as $key) {
-            $result[$key] = $this->fetchFileDataByKey($file, $key, $format);
+        foreach ($exportKeys as $key => $value) {
+            $result[is_int($key) ? $value : $key] = $this->fetchFileDataByKey($file, $value, $format);
         }
         return $result;
     }
 
     /**
      * @param Contracts\ExportableFileSource $file
-     * @param string $key
+     * @param string|\Closure $key
      * @param string|null $format
      * @return mixed
      */
     protected function fetchFileDataByKey(Contracts\ExportableFileSource $file, $key, $format = null)
     {
         $normalized = $this->normalizeKey($key);
+        if ($normalized instanceof \Closure) {
+            return $normalized($file, $format);
+        }
 
         if ($this->absoluteUrls && $normalized === 'url') {
             $normalized = 'absoluteUrl';
@@ -196,11 +199,15 @@ class FileToArrayConverter implements Contracts\FileToArrayConverter
     }
 
     /**
-     * @param string $key
-     * @return string
+     * @param string|\Closure $key
+     * @return string|\Closure
      */
     protected function normalizeKey($key)
     {
+        if ($key instanceof \Closure) {
+            return $key;
+        }
+
         $result = lcfirst(str_replace(' ', '', ucwords(str_replace(['_', '-'], ' ', $key))));
         return isset($this->aliases[$result]) ? $this->aliases[$result] : $result;
     }
