@@ -14,11 +14,6 @@ use Illuminate\Support\Str;
 class SlugNameGenerator extends OriginNameGenerator
 {
     /**
-     * @var string
-     */
-    protected $separator = '-';
-
-    /**
      * @inheritdoc
      */
     protected function fetchSourceName(FileSourceInterface $source)

@@ -78,9 +78,13 @@ abstract class AbstractNameGenerator implements GeneratorInterface
 
     /**
      * Used for validating strings in `containsSpecialChar()` method.
+     * 
+     * `'\/?<>:*|"^` - special chars of files systems
+     * `:/?#[]@!$&'()*+,;=%` - special chars of urls (https://tools.ietf.org/html/rfc3986#section-2)
+     * 
      * @var string local file system special chars.
      */
-    protected $specialChars = '\'\\/?<>:*|"';
+    protected $specialChars = '\'\\/?<>:*|"^#[]@!$&()+,;=%';
 
     /**
      * @var boolean whether new generated names should be lowerize or not.

@@ -22,6 +22,11 @@ class OriginNameGenerator extends RandomNameGenerator
     protected $maxLength = null;
 
     /**
+     * @var string
+     */
+    protected $separator = '-';
+
+    /**
      * @inheritdoc
      */
     public function generateNewFilename(FileSourceInterface $source)
@@ -49,7 +54,8 @@ class OriginNameGenerator extends RandomNameGenerator
      */
     protected function fetchSourceName(FileSourceInterface $source)
     {
-        return $source->filename();
+        $specialChars = preg_quote($this->specialChars, '/');
+        return preg_replace('/([' . $specialChars . '])/u', $this->separator, $source->filename());
     }
 
     /**
