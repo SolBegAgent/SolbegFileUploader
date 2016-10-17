@@ -1,0 +1,33 @@
+{
+    "name": "bicycle/files-manager",
+    "description": "Extended files logic for Laravel applications. Simple file uploading. Using files in models similar to other any simple attribute.",
+    "keywords": ["laravel", "file", "uploader", "file manager", "file uploading"],
+    "authors": [
+        {
+            "name": "Alexey Sejnov",
+            "email": "alexey.sejnov@solbeg.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "illuminate/container": "5.2.*|5.3.*",
+        "illuminate/contracts": "5.2.*|5.3.*",
+        "illuminate/console": "5.2.*|5.3.*",
+        "illuminate/database": "5.2.*|5.3.*",
+        "illuminate/events": "5.2.*|5.3.*",
+        "illuminate/filesystem": "5.2.*|5.3.*",
+        "illuminate/http": "5.2.*|5.3.*",
+        "illuminate/session": "5.2.*|5.3.*",
+        "illuminate/support": "5.2.*|5.3.*",
+        "illuminate/validation": "5.2.*|5.3.*",
+        "paragonie/random_compat": ">=1.0",
+        "symfony/http-foundation": "2.8.*|3.0.*|3.1.*"
+    },
+    "suggest": {
+        "intervention/image": "Allows to use image formatters. Suggested version: 2.3.*."
+    },
+    "autoload": {
+        "psr-4": { "Bicycle\\FilesManager\\": "src/" }
+    }
+}

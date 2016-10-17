@@ -1,0 +1,332 @@
+<?php
+
+use Bicycle\FilesManager\Context\FileNotFound;
+use Bicycle\FilesManager\File\NameGenerators;
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Context Type
+    |--------------------------------------------------------------------------
+    |
+    | Type of this files context, e.g.: 'default' or 'image'.
+    | You may define any types in your `filemanager.php` config file.
+    |
+    */
+
+    'type' => 'dummy-type',
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | File Formats
+    |--------------------------------------------------------------------------
+    |
+    | You may define here formatters that will be used for generating formatted versions of files.
+    | Keys are formats names. Values are formatter configs.
+    | See examples below to know how you may define formats.
+    |
+    */
+
+    'formats' => [
+
+        // Examples:
+        //'thumb' => 'image/thumb: width = 200, height = 300',
+        //'small' => ['image/thumb', 'width' => 500, 'height' => 500, 'aspect_ratio' => false],
+        //'format-name1' => function ($source, $context, $formatter) {},
+        //'format-name2' => function (Intervention\Image\Image $image) {},
+        //'format-name3' => 'from: source=small, formatter=image/resize, width=150, upsize',
+        //'format-name4' => 'Your\Custom\FormatterClass: property1 = value1, property2 = value2, bool_property',
+        //'format-name5' => [Your\Custom\FormatterClass::class, 'property1' => 'value1', 'property2' => 'value2', 'bool_property' => true],
+    ],
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Parsing Format Names
+    |--------------------------------------------------------------------------
+    |
+    | It true then the context tries to parse the name of format.
+    | It may be useful for simple formats like '200x300'.
+    | See 'format_parsers' setting in 'config/filemanager.php' file to know which parsers will be used.
+    | Default is true.
+    |
+    */
+
+    /*
+    'parse_format_names' => true,
+     */
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validation
+    |--------------------------------------------------------------------------
+    |
+    | Validators that will be used by the context before saving files.
+    | See examples below to know how you may define validators.
+    |
+    */
+    'validate' => [
+
+        // Examples:
+        //'extensions' => 'jpg, png', // or ['jpg', 'png']
+        //'types' => 'image/*', // or ['image/jpeg', 'image/png'] or 'image/jpeg, image/png'
+        //'size' => 5 * 1024 * 1024, // or 'max = 5M, min = 1k' or ['max' => 5 * 1024 * 1024, 'min' => '1K']
+        //'image' => ['min_width' => 100, 'max_width' => 3000, 'min_height' => 100, 'max_height' => 3000], // or 'width = 1024, height = 1024'
+    ],
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Not Found Handlers
+    |--------------------------------------------------------------------------
+    |
+    | This handler will be executed when any origin or formatted file was not found.
+    | Handlers will be executed exactly in the same order as they defined below.
+    |
+    | You may define handlers in two ways:
+    |  - without key, value is name of handler class
+    |  - without key, array value with `class` key is handler config
+    |  - key is the name of handler class, value is handler config
+    | See examples below.
+    |
+    | Default is array with only one GenerateOnFlyHandler handler.
+    |
+    */
+    /*
+    'file_not_found_handlers' => [
+
+        # This handler works only with formatted versions of files.
+        # If formatted file was not found it tries to generate it on fly.
+        # If file was not generated even now then next handlers will work.
+        #
+        FileNotFound\GenerateOnFlyHandler::class,
+
+        # This handler returns any defined here url if origin or formatted file was not found.
+        # You may define default url for origin file and default url for each of formats.
+        #
+        //FileNotFound\ReturnUrlHandler::class => [
+        //    # Optional path that will be used only for origin file
+        //    'origin' => '/images/path/to/origin/no-photo.jpg',
+        //
+        //    # Optional paths that will be used for appropriate formatted files.
+        //    'formats' => [
+        //        'thumb' => '/images/path/to/thumb/formatted/no-photo.jpg',
+        //        'mini' => 'http://domain.com/some/url/to/no-photo.png',
+        //    ],
+        //
+        //    # Optional path that will be used if url was not found in 'origin' and 'formats' properties.
+        //    'default' => '/images/path/to/default/no-photo.gif',
+        //],
+    ],
+    */
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Main Storage
+    |--------------------------------------------------------------------------
+    |
+    | Configuration of main storage.
+    | It will be used for files that has been finally saved on your disk.
+    */
+    /*
+    'main_storage' => [
+
+        # Disk from your laravel's file system.
+        # See 'config/filesystems.php' config file to jnow defined and defining new disks.
+        #
+        // 'disk' => 'public',
+
+        # If this param is true the storage will auto generate all formatted versions of file on fly.
+        #
+        # May be one of the followings:
+        #  - true (default), means all formatted versions of file will be generated,
+        #  - false, means formatted versions of file will not be generated,
+        #  - array of formats names, only these formats will be generated.
+        #
+        // 'generate_formats_on_save' => true,
+
+        # Class that will be used for generating new filenames.
+        # You may use:
+        #
+        #  - NameGenerators\RandomNameGenerator: for generating random file names
+        #
+        #  - NameGenerators\OriginNameGenerator: for keeping origin file names.
+        # But origin file names will be validated before for security reasons.
+        # If origin name contains any special char or very long then random will be generated.
+        # 
+        # - NameGenerators\SlugNameGenerator: is the same as OriginNameGenerator,
+        # but it slugify origin file names.
+        # 
+        # - NameGenerators\FixedNameGenerator: all files have fixed name, default is 'file.{extension}'.
+        #
+        //'name_generator' => [
+        //
+        //    # The name of generator class
+        //    'class' => NameGenerators\RandomNameGenerator::class,
+        //
+        //    # Folder for keeping all uploads of all contexts
+        //    'global_prefix' => 'uploads',
+        //
+        //    # The length of new generated random filenames
+        //    'length' => 8,
+        //
+        //    # The length of common subdir, it is meaning numerical subdirs (e.g.`0035`)
+        //    'common_subdir_length' => 4,
+        //
+        //    # Max count of subdirs in one common subdir
+        //    'max_common_subdir_files_count' => 1000,
+        //
+        //    # The length of new generated subdirectories, it is meaning subdir that stores the file
+        //    'file_subdir_length' => 16,
+        //
+        //    # Suffix that will be added to subdirectory that stores formatted versions of file
+        //    'format_subdir_suffix' => '-format',
+        //
+        //    # All files and subdirs names will be lowerized before saving.
+        //    # It may be useful when project developers are working on defferent OS (linux/windows)
+        //    'lowerize' => true,
+        //
+        //],
+    ],
+     */
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Temporary Storage
+    |--------------------------------------------------------------------------
+    |
+    | Configuration of temporary storage.
+    | It will be used for storing temporary files between request.
+    | Files in this storage will be removed by garbage collector by a timeout.
+    |
+    | See config of 'main_storage' for more info about properties.
+    |
+    */
+    /*
+    'temp_storage' => [
+
+        # NOTE! It is highly recommended to use local disk by performance reasons.
+        #
+        // 'disk' => 'public',
+
+        # It is set to false by default by performance reasons.
+        # But you may use formatted files because FileNotFound\GenerateOnFlyHandler
+        # generates it on fly.
+        #
+        // 'generate_formats_on_save' => false,
+
+        # Use origin name generator for keeping available
+        # origin name before saving in main storage.
+        #
+        //'name_generator' => [
+        //
+        //    # The name of generator class
+        //    'class' => NameGenerators\SlugNameGenerator::class,
+        //
+        //    # Folder for keeping all temporary files of all contexts
+        //    'global_prefix' => 'temp',
+        //
+        //],
+    ],
+     */
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | To Array Converter
+    |--------------------------------------------------------------------------
+    |
+    | This converter exports file objects to array and/or JSON, when it is necessary
+    |
+    */
+    /*
+    'to_array_converter' => [
+
+        # The name of converter class
+        #
+        // 'class' => \Bicycle\FilesManager\Context\FileToArrayConverter::class,
+
+        # Which fields of origin files will be exported (may be an array or string).
+        # Possible value see in PHPDoc to the FileToArrayConverter::$originExport property.
+        #
+        //'origin_export' => [
+        //    'url',
+        //    'path',
+        //    'formats',
+        //],
+
+        # Which fields of origin files will be exported (may be an array or string).
+        # Possible value see in PHPDoc to the FileToArrayConverter::$formatExport property.
+        #
+        //'format_export' => 'url',
+
+        # Whether urls must be an absolute or not.
+        # If false then only `absoluteUrl` key will return absolute url.
+        #
+        //'absolute_urls' => true,
+
+        # The protocol (http or https) from request url will be used by default
+        #
+        //'secure_urls' => null,
+
+        # You may pass array of format names here, so only these formats will be exported
+        # Otherwise (if null) all formats specified in `formats` setting will be used.
+        #
+        //'format_names' => null,
+
+        # Independently from `format_names` value, if this property is true,
+        # all already generated format versions will be exported too
+        #
+        //'append_existing_formats' => true,
+
+    ],
+     */
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Garbage Collector
+    |--------------------------------------------------------------------------
+    |
+    | The garbage collector cleans your temporary storage form an old files.
+    | The garbage collector will be run automatically, when anything accessed to temp storage.
+    | See also `gc_probability` & `gc_divisor` below.
+    |
+    */
+    /*
+    'garbage_collector' => [
+
+        # The name of collector class.
+        #
+        // 'class' => \Bicycle\FilesManager\Context\GarbageCollector::class,
+
+        # Time in seconds after which a file will be considered as old.
+        #
+        // 'lifetime' => 24 * 60 * 60, // 1 day
+
+    ],
+     */
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Auto Garbage Cleaning
+    |--------------------------------------------------------------------------
+    |
+    | The `gc_probability` in conjunction with `gc_divisor`` is used to manage probability
+    | that the garbage collection routine is automatically started on every storage initialization.
+    |
+    | The probability is calculated by using `gc_probability/gc_divisor`,
+    | e.g. 1/100 (default) means there is a 1% chance that the GC process starts on each request.
+    |
+    */
+    /*
+    'gc_probability' => 1,
+    'gc_divisor' => 100,
+     */
+];
