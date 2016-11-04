@@ -1,12 +1,12 @@
 <?php
 
-namespace Bicycle\FilesManager\Context;
-
-use Bicycle\FilesManager\Contracts\FileNameGenerator as GeneratorInterface;
-use Bicycle\FilesManager\Exceptions\FileSystemException;
-use Bicycle\FilesManager\Helpers\File as FileHelper;
+namespace Solbeg\FilesManager\Context;
 
 use Illuminate\Filesystem\FilesystemAdapter;
+
+use Solbeg\FilesManager\Contracts\FileNameGenerator as GeneratorInterface;
+use Solbeg\FilesManager\Exceptions\FileSystemException;
+use Solbeg\FilesManager\Helpers\File as FileHelper;
 
 /**
  * FilesCleaner is used to clear all or any specific files in directory.

@@ -1,8 +1,8 @@
 <?php
 
-namespace Bicycle\FilesManager\Exceptions;
+namespace Solbeg\FilesManager\Exceptions;
 
-use Bicycle\FilesManager\Contracts\Context;
+use Solbeg\FilesManager\Contracts\Context;
 
 class FormatterNotFoundException extends \Exception
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager\File;
+namespace Solbeg\FilesManager\File;
 
 /**
  * ContentsFileSource keeps file content.
@@ -72,7 +72,7 @@ class ContentFileSource extends AbstractFileSource
 
     /**
      * @inheritdoc
-     * @throws \Bicycle\FilesManager\Exceptions\NotSupportedException
+     * @throws \Solbeg\FilesManager\Exceptions\NotSupportedException
      */
     protected function originUrl()
     {

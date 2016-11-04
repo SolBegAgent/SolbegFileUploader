@@ -1,15 +1,15 @@
 <?php
 
-namespace Bicycle\FilesManager\Context;
-
-use Bicycle\FilesManager\Contracts;
-use Bicycle\FilesManager\Exceptions;
-use Bicycle\FilesManager\File\NameGenerators\RandomNameGenerator;
-use Bicycle\FilesManager\File\ContentStreams;
-use Bicycle\FilesManager\Helpers;
+namespace Solbeg\FilesManager\Context;
 
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Filesystem\FilesystemAdapter;
+
+use Solbeg\FilesManager\Contracts;
+use Solbeg\FilesManager\Exceptions;
+use Solbeg\FilesManager\File\NameGenerators\RandomNameGenerator;
+use Solbeg\FilesManager\File\ContentStreams;
+use Solbeg\FilesManager\Helpers;
 
 use Symfony\Component\HttpFoundation\File\File;
 
@@ -66,7 +66,7 @@ class Storage implements Contracts\Storage
 
     /**
      * @param Container $container
-     * @param \Bicycle\FilesManager\Context\Context $context
+     * @param \Solbeg\FilesManager\Context\Context $context
      * @param array $config
      */
     public function __construct(Container $container, Context $context, array $config = [])
@@ -140,7 +140,7 @@ class Storage implements Contracts\Storage
 
     /**
      * @param mixed $config
-     * @return \Bicycle\FilesManager\Contracts\FileNameGenerator
+     * @return \Solbeg\FilesManager\Contracts\FileNameGenerator
      */
     protected function createNameGenerator($config)
     {

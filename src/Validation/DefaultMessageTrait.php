@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager\Validation;
+namespace Solbeg\FilesManager\Validation;
 
 /**
  * DefaultMessageTrait

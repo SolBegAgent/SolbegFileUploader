@@ -1,12 +1,12 @@
 <?php
 
-namespace Bicycle\FilesManager\Context\FileNotFound;
-
-use Bicycle\FilesManager\Contracts;
-use Bicycle\FilesManager\Exceptions;
-use Bicycle\FilesManager\Helpers;
+namespace Solbeg\FilesManager\Context\FileNotFound;
 
 use Psr\Log\LoggerInterface;
+
+use Solbeg\FilesManager\Contracts;
+use Solbeg\FilesManager\Exceptions;
+use Solbeg\FilesManager\Helpers;
 
 /**
  * LogExceptionHandler

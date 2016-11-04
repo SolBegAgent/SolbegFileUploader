@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager\Context\FileNotFound;
+namespace Solbeg\FilesManager\Context\FileNotFound;
 
 /**
  * AllowedStoragesTrait
@@ -20,7 +20,7 @@ trait AllowedStoragesTrait
     protected $exceptStorages = null;
 
     /**
-     * @param \Bicycle\FilesManager\Contracts\FileNotFoundException $exception
+     * @param \Solbeg\FilesManager\Contracts\FileNotFoundException $exception
      * @return boolean
      */
     protected function isAllowedStorage($exception)

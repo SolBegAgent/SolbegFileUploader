@@ -1,8 +1,8 @@
 <?php
 
-namespace Bicycle\FilesManager\Helpers;
+namespace Solbeg\FilesManager\Helpers;
 
-use Bicycle\FilesManager\Exceptions\InvalidConfigException;
+use Solbeg\FilesManager\Exceptions\InvalidConfigException;
 
 /**
  * ConfigurableTrait adds `configure()` method to a class.

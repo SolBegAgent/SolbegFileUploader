@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager;
+namespace Solbeg\FilesManager;
 
 use Illuminate\Container\Container;
 
@@ -149,7 +149,7 @@ trait ModelFilesTrait
     /**
      * @param Contracts\Context $context
      * @param Contracts\FileSource $source
-     * @return \Bicycle\FilesManager\FilesManager\File\File
+     * @return \Solbeg\FilesManager\FilesManager\File\File
      */
     public function createFileAttributeInstance($context, $source)
     {

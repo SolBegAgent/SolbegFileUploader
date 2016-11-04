@@ -1,8 +1,8 @@
 <?php
 
-namespace Bicycle\FilesManager\Contracts\Validators;
+namespace Solbeg\FilesManager\Contracts\Validators;
 
-use Bicycle\FilesManager\Contracts\Validator;
+use Solbeg\FilesManager\Contracts\Validator;
 
 interface MaxSizeValidator extends Validator
 {

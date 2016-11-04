@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\FilesManager\File\NameGenerators;
+namespace Solbeg\FilesManager\File\NameGenerators;
 
-use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
 use Illuminate\Support\Str;
+use Solbeg\FilesManager\Contracts\FileSource as FileSourceInterface;
 
 /**
  * SlugNameGenerator uses slugified origin file names for generating new paths.

@@ -1,5 +1,5 @@
 {
-    "name": "bicycle/files-manager",
+    "name": "solbeg/laravel-files-manager",
     "description": "Extended files logic for Laravel applications. Simple file uploading. Using files in models similar to other any simple attribute.",
     "keywords": ["laravel", "file", "uploader", "file manager", "file uploading"],
     "authors": [
@@ -28,6 +28,6 @@
         "intervention/image": "Allows to use image formatters. Suggested version: 2.3.*."
     },
     "autoload": {
-        "psr-4": { "Bicycle\\FilesManager\\": "src/" }
+        "psr-4": { "Solbeg\\FilesManager\\": "src/" }
     }
 }

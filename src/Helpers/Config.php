@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager\Helpers;
+namespace Solbeg\FilesManager\Helpers;
 
 use Illuminate\Contracts\Support\Arrayable;
 

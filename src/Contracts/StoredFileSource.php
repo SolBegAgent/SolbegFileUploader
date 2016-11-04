@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager\Contracts;
+namespace Solbeg\FilesManager\Contracts;
 
 interface StoredFileSource extends FileSource, \Serializable
 {

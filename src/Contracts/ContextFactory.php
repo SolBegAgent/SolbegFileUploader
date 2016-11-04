@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager\Contracts;
+namespace Solbeg\FilesManager\Contracts;
 
 /**
  * @author Alexey Sejnov <alexey.sejnov@solbeg.com>

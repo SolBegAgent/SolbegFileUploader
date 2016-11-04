@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager\Context\FileNotFound;
+namespace Solbeg\FilesManager\Context\FileNotFound;
 
 /**
  * AllowedFormatsTrait
@@ -20,7 +20,7 @@ trait AllowedFormatsTrait
     protected $exceptFormats = null;
 
     /**
-     * @param \Bicycle\FilesManager\Contracts\FileNotFoundException $exception
+     * @param \Solbeg\FilesManager\Contracts\FileNotFoundException $exception
      * @param boolean $allowOrigin
      * @return boolean
      */

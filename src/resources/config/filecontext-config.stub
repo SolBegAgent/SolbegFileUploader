@@ -1,7 +1,7 @@
 <?php
 
-use Bicycle\FilesManager\Context\FileNotFound;
-use Bicycle\FilesManager\File\NameGenerators;
+use Solbeg\FilesManager\Context\FileNotFound;
+use Solbeg\FilesManager\File\NameGenerators;
 
 return [
 
@@ -249,7 +249,7 @@ return [
 
         # The name of converter class
         #
-        // 'class' => \Bicycle\FilesManager\Context\FileToArrayConverter::class,
+        // 'class' => \Solbeg\FilesManager\Context\FileToArrayConverter::class,
 
         # Which fields of origin files will be exported (may be an array or string).
         # Possible value see in PHPDoc to the FileToArrayConverter::$originExport property.
@@ -303,7 +303,7 @@ return [
 
         # The name of collector class.
         #
-        // 'class' => \Bicycle\FilesManager\Context\GarbageCollector::class,
+        // 'class' => \Solbeg\FilesManager\Context\GarbageCollector::class,
 
         # Time in seconds after which a file will be considered as old.
         #

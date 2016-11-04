@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\FilesManager\Formatters\Parsers;
+namespace Solbeg\FilesManager\Formatters\Parsers;
 
-use Bicycle\FilesManager\Contracts;
-use Bicycle\FilesManager\Formatters\FormatterFactory;
+use Solbeg\FilesManager\Contracts;
+use Solbeg\FilesManager\Formatters\FormatterFactory;
 
 /**
  * NumXNumParser parses strings like as '200x300'.

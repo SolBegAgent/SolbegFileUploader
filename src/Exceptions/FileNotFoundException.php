@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\FilesManager\Exceptions;
+namespace Solbeg\FilesManager\Exceptions;
 
-use Bicycle\FilesManager\Contracts\Storage;
-use Bicycle\FilesManager\Contracts\FileNotFoundException as ExceptionInterface;
+use Solbeg\FilesManager\Contracts\Storage;
+use Solbeg\FilesManager\Contracts\FileNotFoundException as ExceptionInterface;
 
 class FileNotFoundException extends FileSystemException implements ExceptionInterface
 {

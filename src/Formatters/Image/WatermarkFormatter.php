@@ -1,11 +1,11 @@
 <?php
 
-namespace Bicycle\FilesManager\Formatters\Image;
-
-use Bicycle\FilesManager\Contracts;
-use Bicycle\FilesManager\Exceptions;
+namespace Solbeg\FilesManager\Formatters\Image;
 
 use Intervention\Image\Image as InterventionImage;
+
+use Solbeg\FilesManager\Contracts;
+use Solbeg\FilesManager\Exceptions;
 
 /**
  * WatermarkFormatter inserts watermark image to a source image.

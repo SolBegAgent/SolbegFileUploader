@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager\File;
+namespace Solbeg\FilesManager\File;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 

@@ -1,13 +1,13 @@
 <?php
 
-namespace Bicycle\FilesManager\Formatters;
-
-use Bicycle\FilesManager\Contracts\Context as ContextInterface;
-use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
-use Bicycle\FilesManager\Contracts\Storage as StorageInterface;
-use Bicycle\FilesManager\Exceptions\InvalidConfigException;
+namespace Solbeg\FilesManager\Formatters;
 
 use Illuminate\Contracts\Container\Container;
+
+use Solbeg\FilesManager\Contracts\Context as ContextInterface;
+use Solbeg\FilesManager\Contracts\FileSource as FileSourceInterface;
+use Solbeg\FilesManager\Contracts\Storage as StorageInterface;
+use Solbeg\FilesManager\Exceptions\InvalidConfigException;
 
 /**
  * InlineFormatter uses a callable to format file.

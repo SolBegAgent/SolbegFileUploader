@@ -1,10 +1,10 @@
 <?php
 
-namespace Bicycle\FilesManager\File;
+namespace Solbeg\FilesManager\File;
+
+use Solbeg\FilesManager\Exceptions\FileSystemException;
 
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
-
-use Bicycle\FilesManager\Exceptions\FileSystemException;
 
 /**
  * SplFileSource
@@ -57,7 +57,7 @@ class SplFileSource extends AbstractFileSource
 
     /**
      * @inheritdoc
-     * @throws \Bicycle\FilesManager\Exceptions\NotSupportedException always
+     * @throws \Solbeg\FilesManager\Exceptions\NotSupportedException always
      */
     protected function originUrl()
     {

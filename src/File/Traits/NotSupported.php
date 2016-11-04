@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\FilesManager\File\Traits;
+namespace Solbeg\FilesManager\File\Traits;
 
-use Bicycle\FilesManager\Exceptions\NotSupportedException;
-use Bicycle\FilesManager\Helpers\File as FileHelper;
+use Solbeg\FilesManager\Exceptions\NotSupportedException;
+use Solbeg\FilesManager\Helpers\File as FileHelper;
 
 /**
  * NotSupported Trait

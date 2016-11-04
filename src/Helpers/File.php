@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager\Helpers;
+namespace Solbeg\FilesManager\Helpers;
 
 /**
  * File helper provides some helpful methods to manipulate with files.

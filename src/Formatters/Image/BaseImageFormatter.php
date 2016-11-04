@@ -1,12 +1,12 @@
 <?php
 
-namespace Bicycle\FilesManager\Formatters\Image;
-
-use Bicycle\FilesManager\Contracts;
-use Bicycle\FilesManager\Formatters;
+namespace Solbeg\FilesManager\Formatters\Image;
 
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
+
+use Solbeg\FilesManager\Contracts;
+use Solbeg\FilesManager\Formatters;
 
 /**
  * Image\BaseImageFormatter is base formatter for all image formatters.

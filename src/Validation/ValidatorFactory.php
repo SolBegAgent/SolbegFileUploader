@@ -1,12 +1,12 @@
 <?php
 
-namespace Bicycle\FilesManager\Validation;
+namespace Solbeg\FilesManager\Validation;
 
 use Illuminate\Contracts\Container\Container;
 
-use Bicycle\FilesManager\Contracts;
-use Bicycle\FilesManager\Exceptions;
-use Bicycle\FilesManager\Helpers;
+use Solbeg\FilesManager\Contracts;
+use Solbeg\FilesManager\Exceptions;
+use Solbeg\FilesManager\Helpers;
 
 /**
  * ValidatorFactory builds validators instances.

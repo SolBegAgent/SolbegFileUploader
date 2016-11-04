@@ -1,8 +1,8 @@
 <?php
 
-namespace Bicycle\FilesManager\File\NameGenerators;
+namespace Solbeg\FilesManager\File\NameGenerators;
 
-use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
+use Solbeg\FilesManager\Contracts\FileSource as FileSourceInterface;
 
 /**
  * FixedNameGenerator saves files with a fixed name.

@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\FilesManager\File;
+namespace Solbeg\FilesManager\File;
 
-use Bicycle\FilesManager\Contracts\FileSource as SourceInterface;
-use Bicycle\FilesManager\Exceptions\NotSupportedException;
+use Solbeg\FilesManager\Contracts\FileSource as SourceInterface;
+use Solbeg\FilesManager\Exceptions\NotSupportedException;
 
 /**
  * FixedFormatFileSource always returns file of the passed in constructor format.

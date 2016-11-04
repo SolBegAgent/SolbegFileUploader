@@ -1,8 +1,8 @@
 <?php
 
-namespace Bicycle\FilesManager\File\ContentStreams;
+namespace Solbeg\FilesManager\File\ContentStreams;
 
-use Bicycle\FilesManager\Contracts\ContentStream as ContentStreamInterface;
+use Solbeg\FilesManager\Contracts\ContentStream as ContentStreamInterface;
 
 /**
  * Path works with file paths or urls.

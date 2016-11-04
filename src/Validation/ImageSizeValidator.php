@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\FilesManager\Validation;
+namespace Solbeg\FilesManager\Validation;
 
-use Bicycle\FilesManager\Contracts;
 use Intervention\Image\ImageManager;
+use Solbeg\FilesManager\Contracts;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -197,7 +197,7 @@ class ImageSizeValidator extends AbstractValidator
     }
 
     /**
-     * @param \Bicycle\FilesManager\Contracts\FileSource $source
+     * @param \Solbeg\FilesManager\Contracts\FileSource $source
      * @return array [width, height]
      */
     protected function fetchFileSizes(Contracts\FileSource $source)

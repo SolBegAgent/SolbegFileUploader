@@ -1,10 +1,10 @@
 <?php
 
-namespace Bicycle\FilesManager\File;
+namespace Solbeg\FilesManager\File;
 
-use Bicycle\FilesManager\Exceptions\FileSystemException;
-use Bicycle\FilesManager\Exceptions\InvalidConfigException;
-use Bicycle\FilesManager\Helpers\File as FileHelper;
+use Solbeg\FilesManager\Exceptions\FileSystemException;
+use Solbeg\FilesManager\Exceptions\InvalidConfigException;
+use Solbeg\FilesManager\Helpers\File as FileHelper;
 
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 

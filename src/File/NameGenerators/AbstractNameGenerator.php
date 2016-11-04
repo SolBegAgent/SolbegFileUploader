@@ -1,15 +1,15 @@
 <?php
 
-namespace Bicycle\FilesManager\File\NameGenerators;
+namespace Solbeg\FilesManager\File\NameGenerators;
 
 use Illuminate\Filesystem\FilesystemAdapter;
 
-use Bicycle\FilesManager\Contracts\Context as ContextInterface;
-use Bicycle\FilesManager\Contracts\FileNameGenerator as GeneratorInterface;
-use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
-use Bicycle\FilesManager\Exceptions\InvalidConfigException;
-use Bicycle\FilesManager\Helpers\ConfigurableTrait;
-use Bicycle\FilesManager\Helpers\File as FileHelper;
+use Solbeg\FilesManager\Contracts\Context as ContextInterface;
+use Solbeg\FilesManager\Contracts\FileNameGenerator as GeneratorInterface;
+use Solbeg\FilesManager\Contracts\FileSource as FileSourceInterface;
+use Solbeg\FilesManager\Exceptions\InvalidConfigException;
+use Solbeg\FilesManager\Helpers\ConfigurableTrait;
+use Solbeg\FilesManager\Helpers\File as FileHelper;
 
 /**
  * AbstractNameGenerator is the base class for name generators.

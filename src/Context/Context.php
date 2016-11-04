@@ -1,13 +1,13 @@
 <?php
 
-namespace Bicycle\FilesManager\Context;
+namespace Solbeg\FilesManager\Context;
 
 use Illuminate\Contracts\Foundation\Application;
 
-use Bicycle\FilesManager\Contracts;
-use Bicycle\FilesManager\Exceptions;
-use Bicycle\FilesManager\File;
-use Bicycle\FilesManager\Helpers;
+use Solbeg\FilesManager\Contracts;
+use Solbeg\FilesManager\Exceptions;
+use Solbeg\FilesManager\File;
+use Solbeg\FilesManager\Helpers;
 
 /**
  * @author Alexey Sejnov <alexey.sejnov@solbeg.com>

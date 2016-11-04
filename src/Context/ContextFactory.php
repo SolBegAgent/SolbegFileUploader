@@ -1,12 +1,12 @@
 <?php
 
-namespace Bicycle\FilesManager\Context;
+namespace Solbeg\FilesManager\Context;
 
 use Illuminate\Contracts\Foundation\Application;
 
-use Bicycle\FilesManager\Contracts;
-use Bicycle\FilesManager\Exceptions;
-use Bicycle\FilesManager\Helpers;
+use Solbeg\FilesManager\Contracts;
+use Solbeg\FilesManager\Exceptions;
+use Solbeg\FilesManager\Helpers;
 
 /**
  * ContextFactory builds contexts instances.
@@ -81,7 +81,7 @@ class ContextFactory implements Contracts\ContextFactory
         if (!$this->has($name) && strpos($name, '@') !== false) {
             list($class, $attribute) = explode('@', $name);
             $model = $this->app->make($class);
-            /* @var $model \Bicycle\FilesManager\ModelFilesTrait */
+            /* @var $model \Solbeg\FilesManager\ModelFilesTrait */
             return $model->getFileAttributeContext($attribute);
         }
 

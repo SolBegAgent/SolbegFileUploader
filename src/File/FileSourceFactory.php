@@ -1,14 +1,14 @@
 <?php
 
-namespace Bicycle\FilesManager\File;
+namespace Solbeg\FilesManager\File;
+
+use Solbeg\FilesManager\Contracts\Context as ContextInterace;
+use Solbeg\FilesManager\Contracts\Storage as StorageInterface;
+use Solbeg\FilesManager\Contracts\FileSource as SourceInterface;
+use Solbeg\FilesManager\Contracts\FileSourceFactory as FactoryInterface;
+use Solbeg\FilesManager\Exceptions;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
-
-use Bicycle\FilesManager\Contracts\Context as ContextInterace;
-use Bicycle\FilesManager\Contracts\Storage as StorageInterface;
-use Bicycle\FilesManager\Contracts\FileSource as SourceInterface;
-use Bicycle\FilesManager\Contracts\FileSourceFactory as FactoryInterface;
-use Bicycle\FilesManager\Exceptions;
 
 /**
  * FileSourceFactory creates FileSource instances.
@@ -32,7 +32,7 @@ class FileSourceFactory implements FactoryInterface
 
     /**
      * @param mixed $data
-     * @return \Bicycle\FilesManager\Contracts\FileSource
+     * @return \Solbeg\FilesManager\Contracts\FileSource
      */
     public function make($data)
     {

@@ -1,8 +1,8 @@
 <?php
 
-use Bicycle\FilesManager\Context\FileNotFound;
-use Bicycle\FilesManager\File\NameGenerators;
-use Bicycle\FilesManager\Formatters;
+use Solbeg\FilesManager\Context\FileNotFound;
+use Solbeg\FilesManager\File\NameGenerators;
+use Solbeg\FilesManager\Formatters;
 
 return [
 

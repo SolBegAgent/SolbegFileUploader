@@ -1,14 +1,14 @@
 <?php
 
-namespace Bicycle\FilesManager\File;
+namespace Solbeg\FilesManager\File;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 
-use Bicycle\FilesManager\Contracts;
-use Bicycle\FilesManager\Helpers\File as FileHelper;
+use Solbeg\FilesManager\Contracts;
+use Solbeg\FilesManager\Helpers\File as FileHelper;
 
 /**
  * StoredFileSource keeps file that stored in context.
@@ -181,7 +181,7 @@ class StoredFileSource extends AbstractFileSource implements
         }
 
         $manager = Container::getInstance()->make('filesmanager');
-        /* @var $manager \Bicycle\FilesManager\Manager */
+        /* @var $manager \Solbeg\FilesManager\Manager */
         $context = $manager->context($data['context']);
 
         foreach ([true, false] as $temp) {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Bicycle\FilesManager\File;
+namespace Solbeg\FilesManager\File;
 
-use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
+use Solbeg\FilesManager\Contracts\FileSource as FileSourceInterface;
 
 /**
  * AbstractFileSource is the base class for all file sources.

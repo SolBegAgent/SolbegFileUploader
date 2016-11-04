@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager\Exceptions;
+namespace Solbeg\FilesManager\Exceptions;
 
 class InvalidConfigException extends \Exception
 {

@@ -1,13 +1,13 @@
 <?php
 
-namespace Bicycle\FilesManager\File\Traits;
-
-use Bicycle\FilesManager\Exceptions;
-use Bicycle\FilesManager\Helpers;
+namespace Solbeg\FilesManager\File\Traits;
 
 use Illuminate\Support\HtmlString;
 
 use Intervention\Image\ImageManager;
+
+use Solbeg\FilesManager\Exceptions;
+use Solbeg\FilesManager\Helpers;
 
 /**
  * HelperMethods adds some helpful methods to file source.
@@ -29,7 +29,7 @@ trait HelperMethods
 
     /**
      * @param string|null $format
-     * @return \Bicycle\FilesManager\Contracts\ContentStream
+     * @return \Solbeg\FilesManager\Contracts\ContentStream
      */
     abstract protected function contents($format = null);
 

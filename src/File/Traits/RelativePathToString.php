@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager\File\Traits;
+namespace Solbeg\FilesManager\File\Traits;
 
 /**
  * RelativePathToString returns relative path when object is converting to string.

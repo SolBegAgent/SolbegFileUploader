@@ -13,7 +13,7 @@ Also you may configure global setting that will be used for all contexts.
 This plugin also allows to save file in temporary directory between requests.
 So if validation of request's data was failed user must not upload a file again.
 
-Bicycle/file-manager uses standard [laravel's filesystem](https://laravel.com/docs/5.3/filesystem) to storing files,
+Solbeg/laravel-files-manager uses standard [laravel's filesystem](https://laravel.com/docs/5.3/filesystem) to storing files,
 so you may use it with any storage driver like local, amazon S3, rackspace or others.
 
 For manipulating with images this package uses [Intervention/image plugin](http://image.intervention.io/).
@@ -34,7 +34,7 @@ The best way to install this plugin is using [Composer](http://getcomposer.org/)
 To install the most recent version, run the following command:
 
 ```
-$ php composer.phar require bicycle/files-manager
+$ php composer.phar require solbeg/laravel-files-manager
 ```
 
 After you have installed this vendor, add the following lines.
@@ -44,7 +44,7 @@ add the service provider for this package.
 
 ```php
     // ...
-    Bicycle\FilesManager\FilesManagerServiceProvider::class,
+    Solbeg\FilesManager\FilesManagerServiceProvider::class,
     // ...
 ```
 
@@ -53,7 +53,7 @@ add middleware for this package.
 
 ```php
     // ...
-    \Bicycle\FilesManager\StoreUploadedFilesMiddleware::class,
+    \Solbeg\FilesManager\StoreUploadedFilesMiddleware::class,
     // ...
 ```
 
@@ -110,7 +110,7 @@ so you may quickly configure the plugin as you want.
 You may do it with artisan console command.
 
 ```
-$ php ./artisan vendor:publish --provider="Bicycle\FilesManager\FilesManagerServiceProvider" --tag=config
+$ php ./artisan vendor:publish --provider="Solbeg\FilesManager\FilesManagerServiceProvider" --tag=config
 ```
 
 All files in this plugin are separated by contexts.
@@ -137,7 +137,7 @@ Configure model
 You likely want to work with files, names of which stored in database.
 So you should configure your Eloquent model.
 
-For it you need include `Bicycle\FilesManager\ModelFilesTrait` in you Eloquent model
+For it you need include `Solbeg\FilesManager\ModelFilesTrait` in you Eloquent model
 and add `filesAttributes()` method.
 
 Example:
@@ -145,7 +145,7 @@ Example:
 
 ```php
 
-use Bicycle\FilesManager\ModelFilesTrait;
+use Solbeg\FilesManager\ModelFilesTrait;
 
 class Product extends ...\Eloquent\Model
 {

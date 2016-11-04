@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\FilesManager\Formatters;
+namespace Solbeg\FilesManager\Formatters;
 
-use Bicycle\FilesManager\Contracts;
-use Bicycle\FilesManager\Exceptions;
+use Solbeg\FilesManager\Contracts;
+use Solbeg\FilesManager\Exceptions;
 
 use Symfony\Component\HttpFoundation\File\File;
 
@@ -18,7 +18,7 @@ class ChainFormatter extends AbstractFormatter
      * The chain of formatters that will be applied one by one to a file source.
      * 
      * @var array|Contracts\Formatter[] Format of values is identical to format in
-     * `\Bicycle\FilesManager\Context\Context::$formats` property.
+     * `\Solbeg\FilesManager\Context\Context::$formats` property.
      */
     protected $formatters = [];
 

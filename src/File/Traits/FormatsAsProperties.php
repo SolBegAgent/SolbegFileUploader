@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\FilesManager\File\Traits;
+namespace Solbeg\FilesManager\File\Traits;
 
-use Bicycle\FilesManager\Exceptions\ReadOnlyPropertyException;
-use Bicycle\FilesManager\Exceptions\UnknownPropertyException;
+use Solbeg\FilesManager\Exceptions\ReadOnlyPropertyException;
+use Solbeg\FilesManager\Exceptions\UnknownPropertyException;
 
 /**
  * FormatsAsProperties adds "magic" properties.

@@ -1,14 +1,14 @@
 <?php
 
-namespace Bicycle\FilesManager\Formatters\Image;
-
-use Bicycle\FilesManager\Contracts;
-use Bicycle\FilesManager\Exceptions\InvalidConfigException;
+namespace Solbeg\FilesManager\Formatters\Image;
 
 use Illuminate\Contracts\Container\Container;
 
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
+
+use Solbeg\FilesManager\Contracts;
+use Solbeg\FilesManager\Exceptions\InvalidConfigException;
 
 /**
  * InlineFormatter uses a callable to format file.

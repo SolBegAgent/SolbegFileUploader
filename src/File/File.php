@@ -1,15 +1,15 @@
 <?php
 
-namespace Bicycle\FilesManager\File;
-
-use Bicycle\FilesManager\Contracts\Context as ContextInterface;
-use Bicycle\FilesManager\Contracts\ExportableFileSource as FileInterface;
-use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
-use Bicycle\FilesManager\Contracts\StoredFileSource as StoredFileInterface;
+namespace Solbeg\FilesManager\File;
 
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+
+use Solbeg\FilesManager\Contracts\Context as ContextInterface;
+use Solbeg\FilesManager\Contracts\ExportableFileSource as FileInterface;
+use Solbeg\FilesManager\Contracts\FileSource as FileSourceInterface;
+use Solbeg\FilesManager\Contracts\StoredFileSource as StoredFileInterface;
 
 /**
  * File objects that will be instantiated for each file attribute.

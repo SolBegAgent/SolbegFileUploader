@@ -1,10 +1,10 @@
 <?php
 
-namespace Bicycle\FilesManager\Console;
-
-use Bicycle\FilesManager\Manager;
+namespace Solbeg\FilesManager\Console;
 
 use Illuminate\Console\Command;
+
+use Solbeg\FilesManager\Manager;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -80,7 +80,7 @@ class GenerateFormatsCommand extends Command
     }
 
     /**
-     * @param \Bicycle\FilesManager\Contracts\Storage $storage
+     * @param \Solbeg\FilesManager\Contracts\Storage $storage
      * @param array $formats
      * @param boolean $regenerate
      */
@@ -95,7 +95,7 @@ class GenerateFormatsCommand extends Command
     }
 
     /**
-     * @param \Bicycle\FilesManager\Contracts\Storage $storage
+     * @param \Solbeg\FilesManager\Contracts\Storage $storage
      * @param string $relativePath
      * @param string $format
      * @param boolean $regenerate

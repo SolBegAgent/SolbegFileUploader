@@ -1,12 +1,12 @@
 <?php
 
-namespace Bicycle\FilesManager\Formatters;
+namespace Solbeg\FilesManager\Formatters;
 
-use Bicycle\FilesManager\Contracts\Context as ContextInterface;
-use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
-use Bicycle\FilesManager\Contracts\Storage as StorageInterface;
-use Bicycle\FilesManager\Exceptions\FileSystemException;
-use Bicycle\FilesManager\Exceptions\InvalidConfigException;
+use Solbeg\FilesManager\Contracts\Context as ContextInterface;
+use Solbeg\FilesManager\Contracts\FileSource as FileSourceInterface;
+use Solbeg\FilesManager\Contracts\Storage as StorageInterface;
+use Solbeg\FilesManager\Exceptions\FileSystemException;
+use Solbeg\FilesManager\Exceptions\InvalidConfigException;
 
 /**
  * FromFormatter formats file from another formatted version.
@@ -46,7 +46,7 @@ class FromFormatter extends AbstractFormatter
     private $isProcess = false;
 
     /**
-     * @param \Bicycle\FilesManager\Formatters\FormatterFactory $factory
+     * @param \Solbeg\FilesManager\Formatters\FormatterFactory $factory
      * @inheritdoc
      */
     public function __construct(FormatterFactory $factory, $name, ContextInterface $context, array $config = [])

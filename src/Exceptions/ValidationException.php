@@ -1,8 +1,8 @@
 <?php
 
-namespace Bicycle\FilesManager\Exceptions;
+namespace Solbeg\FilesManager\Exceptions;
 
-use Bicycle\FilesManager\Contracts;
+use Solbeg\FilesManager\Contracts;
 
 class ValidationException extends \Exception implements Contracts\ValidationException
 {
@@ -27,8 +27,8 @@ class ValidationException extends \Exception implements Contracts\ValidationExce
     private $messages;
 
     /**
-     * @param \Bicycle\FilesManager\Contracts\Context $context
-     * @param \Bicycle\FilesManager\Contracts\FileSource $source
+     * @param \Solbeg\FilesManager\Contracts\Context $context
+     * @param \Solbeg\FilesManager\Contracts\FileSource $source
      * @param Contracts\Validator[] $failedValidators in rule => Validator format
      */
     public function __construct(

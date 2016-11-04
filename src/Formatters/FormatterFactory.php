@@ -1,18 +1,18 @@
 <?php
 
-namespace Bicycle\FilesManager\Formatters;
-
-use Bicycle\FilesManager\Contracts\Context as ContextInterface;
-use Bicycle\FilesManager\Contracts\Formatter as FormatterInterface;
-use Bicycle\FilesManager\Contracts\FormatterFactory as FormatterFactoryInterface;
-use Bicycle\FilesManager\Contracts\FormatterParser as ParserInterface;
-use Bicycle\FilesManager\Exceptions\InvalidConfigException;
-use Bicycle\FilesManager\Exceptions\FormatterParserNotFoundException;
-use Bicycle\FilesManager\Helpers;
+namespace Solbeg\FilesManager\Formatters;
 
 use Illuminate\Contracts\Foundation\Application;
 
 use Intervention\Image\Image as InterventionImage;
+
+use Solbeg\FilesManager\Contracts\Context as ContextInterface;
+use Solbeg\FilesManager\Contracts\Formatter as FormatterInterface;
+use Solbeg\FilesManager\Contracts\FormatterFactory as FormatterFactoryInterface;
+use Solbeg\FilesManager\Contracts\FormatterParser as ParserInterface;
+use Solbeg\FilesManager\Exceptions\InvalidConfigException;
+use Solbeg\FilesManager\Exceptions\FormatterParserNotFoundException;
+use Solbeg\FilesManager\Helpers;
 
 /**
  * FormatterFactory builds formatters instances.

@@ -1,8 +1,8 @@
 <?php
 
-namespace Bicycle\FilesManager\File;
+namespace Solbeg\FilesManager\File;
 
-use Bicycle\FilesManager\Exceptions\NotSupportedException;
+use Solbeg\FilesManager\Exceptions\NotSupportedException;
 
 /**
  * EmptyFileSource
@@ -134,7 +134,7 @@ class EmptyFileSource extends AbstractFileSource
 
     /**
      * @param string|null $format
-     * @return \Bicycle\FilesManager\Contracts\FileSource|null
+     * @return \Solbeg\FilesManager\Contracts\FileSource|null
      * @throws NotSupportedException
      */
     protected function process($method, $format = null)

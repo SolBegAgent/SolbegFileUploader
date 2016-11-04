@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\FilesManager\Validation;
+namespace Solbeg\FilesManager\Validation;
 
-use Bicycle\FilesManager\Contracts;
-use Bicycle\FilesManager\Helpers;
+use Solbeg\FilesManager\Contracts;
+use Solbeg\FilesManager\Helpers;
 
 /**
  * MimeTypeValidator validates file MIME types.

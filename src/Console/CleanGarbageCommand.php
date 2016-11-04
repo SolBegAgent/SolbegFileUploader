@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\FilesManager\Console;
+namespace Solbeg\FilesManager\Console;
 
-use Bicycle\FilesManager\Manager;
 use Illuminate\Console\Command;
+use Solbeg\FilesManager\Manager;
 use Symfony\Component\Console\Input\InputOption;
 
 /**

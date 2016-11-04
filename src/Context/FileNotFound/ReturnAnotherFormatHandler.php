@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\FilesManager\Context\FileNotFound;
+namespace Solbeg\FilesManager\Context\FileNotFound;
 
-use Bicycle\FilesManager\Contracts;
-use Bicycle\FilesManager\Helpers;
+use Solbeg\FilesManager\Contracts;
+use Solbeg\FilesManager\Helpers;
 
 /**
  * ReturnAnotherFormatHandler return another formatted version of source file.

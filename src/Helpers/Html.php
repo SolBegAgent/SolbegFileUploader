@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager\Helpers;
+namespace Solbeg\FilesManager\Helpers;
 
 /**
  * Html provides some helpful methods to generate HTML.

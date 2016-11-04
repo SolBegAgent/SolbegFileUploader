@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\FilesManager\Context;
+namespace Solbeg\FilesManager\Context;
 
-use Bicycle\FilesManager\Contracts;
-use Bicycle\FilesManager\Helpers;
+use Solbeg\FilesManager\Contracts;
+use Solbeg\FilesManager\Helpers;
 
 /**
  * GarbageCollector collects old temporary files and removes them.

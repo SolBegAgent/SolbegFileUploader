@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager\Console;
+namespace Solbeg\FilesManager\Console;
 
 use Illuminate\Console\Command;
 

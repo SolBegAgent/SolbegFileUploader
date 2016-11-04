@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\FilesManager\File\Traits;
+namespace Solbeg\FilesManager\File\Traits;
 
-use Bicycle\FilesManager\Helpers\File as FileHelper;
-use Bicycle\FilesManager\Exceptions\NotSupportedException;
+use Solbeg\FilesManager\Helpers\File as FileHelper;
+use Solbeg\FilesManager\Exceptions\NotSupportedException;
 
 /**
  * WithoutFormatting Trait
@@ -23,7 +23,7 @@ trait WithoutFormatting
      */
     abstract protected function originExists();
     /**
-     * @return \Bicycle\FilesManager\Contracts\ContentStream
+     * @return \Solbeg\FilesManager\Contracts\ContentStream
      */
     abstract protected function originContents();
     /**

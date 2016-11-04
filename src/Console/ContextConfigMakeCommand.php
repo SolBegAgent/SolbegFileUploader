@@ -1,10 +1,10 @@
 <?php
 
-namespace Bicycle\FilesManager\Console;
-
-use Bicycle\FilesManager\Helpers;
+namespace Solbeg\FilesManager\Console;
 
 use Illuminate\Console\GeneratorCommand;
+
+use Solbeg\FilesManager\Helpers;
 
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;

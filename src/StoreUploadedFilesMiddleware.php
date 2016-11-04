@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager;
+namespace Solbeg\FilesManager;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Session\Store as SessionStore;

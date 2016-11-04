@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\FilesManager\File\NameGenerators;
+namespace Solbeg\FilesManager\File\NameGenerators;
 
-use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
-use Bicycle\FilesManager\Helpers\File as FileHelper;
+use Solbeg\FilesManager\Contracts\FileSource as FileSourceInterface;
+use Solbeg\FilesManager\Helpers\File as FileHelper;
 
 /**
  * RandomNameGenerator generates random names for each of files.

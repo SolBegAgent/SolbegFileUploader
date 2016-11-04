@@ -1,11 +1,11 @@
 <?php
 
-namespace Bicycle\FilesManager\Formatters\Image;
-
-use Bicycle\FilesManager\Contracts;
-use Bicycle\FilesManager\Exceptions;
+namespace Solbeg\FilesManager\Formatters\Image;
 
 use Intervention\Image\Image;
+
+use Solbeg\FilesManager\Contracts;
+use Solbeg\FilesManager\Exceptions;
 
 /**
  * Image\FitFormatter formatter fits images.

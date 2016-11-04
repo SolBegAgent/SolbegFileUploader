@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager\Contracts;
+namespace Solbeg\FilesManager\Contracts;
 
 interface Validator
 {
@@ -10,7 +10,7 @@ interface Validator
      * If file passed then `null` must be returned as result.
      * Otherwise the method must return string error message.
      * 
-     * @param \Bicycle\FilesManager\Contracts\FileSource $source
+     * @param \Solbeg\FilesManager\Contracts\FileSource $source
      * @return string|null error message or null if file passed.
      */
     public function validate(FileSource $source);

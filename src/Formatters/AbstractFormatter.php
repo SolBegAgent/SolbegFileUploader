@@ -1,12 +1,12 @@
 <?php
 
-namespace Bicycle\FilesManager\Formatters;
+namespace Solbeg\FilesManager\Formatters;
 
-use Bicycle\FilesManager\Contracts\Context as ContextInterface;
-use Bicycle\FilesManager\Contracts\FileSource as FileSourceInterface;
-use Bicycle\FilesManager\Contracts\Formatter as FormatterInterface;
-use Bicycle\FilesManager\Contracts\Storage as StorageInterface;
-use Bicycle\FilesManager\Helpers\ConfigurableTrait;
+use Solbeg\FilesManager\Contracts\Context as ContextInterface;
+use Solbeg\FilesManager\Contracts\FileSource as FileSourceInterface;
+use Solbeg\FilesManager\Contracts\Formatter as FormatterInterface;
+use Solbeg\FilesManager\Contracts\Storage as StorageInterface;
+use Solbeg\FilesManager\Helpers\ConfigurableTrait;
 
 /**
  * AbstractFormatter is the base class for all formatters.
@@ -58,7 +58,7 @@ abstract class AbstractFormatter implements FormatterInterface
     /**
      * Initializes config.
      * 
-     * @throws \Bicycle\FilesManager\Exceptions\InvalidConfigException
+     * @throws \Solbeg\FilesManager\Exceptions\InvalidConfigException
      */
     protected function init()
     {

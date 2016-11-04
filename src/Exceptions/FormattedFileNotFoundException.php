@@ -1,8 +1,8 @@
 <?php
 
-namespace Bicycle\FilesManager\Exceptions;
+namespace Solbeg\FilesManager\Exceptions;
 
-use Bicycle\FilesManager\Contracts\Storage;
+use Solbeg\FilesManager\Contracts\Storage;
 
 class FormattedFileNotFoundException extends FileNotFoundException
 {

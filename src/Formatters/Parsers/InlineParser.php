@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\FilesManager\Formatters\Parsers;
+namespace Solbeg\FilesManager\Formatters\Parsers;
 
-use Bicycle\FilesManager\Contracts;
-use Bicycle\FilesManager\Exceptions;
+use Solbeg\FilesManager\Contracts;
+use Solbeg\FilesManager\Exceptions;
 
 /**
  * InlineParser uses Closure to parse formatter name.

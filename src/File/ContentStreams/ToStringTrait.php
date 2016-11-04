@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager\File\ContentStreams;
+namespace Solbeg\FilesManager\File\ContentStreams;
 
 /**
  * @author Alexey Sejnov <alexey.sejnov@solbeg.com>

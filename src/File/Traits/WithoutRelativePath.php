@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\FilesManager\File\Traits;
+namespace Solbeg\FilesManager\File\Traits;
 
 /**
  * WithoutRelativePath Trait
@@ -11,13 +11,13 @@ trait WithoutRelativePath
 {
     /**
      * @param string $message
-     * @return \Bicycle\FilesManager\Exceptions\NotSupportedException
+     * @return \Solbeg\FilesManager\Exceptions\NotSupportedException
      */
     abstract protected function createNotSupportedException($message);
 
     /**
      * @inheritdoc
-     * @throws \Bicycle\FilesManager\Exceptions\NotSupportedException always
+     * @throws \Solbeg\FilesManager\Exceptions\NotSupportedException always
      */
     public function relativePath()
     {
